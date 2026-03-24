@@ -13,6 +13,9 @@
                     "expose_mower": "Exposer la tondeuse Indego comme une entité tondeuse dans HomeAssistant",
                     "expose_vacuum": "Exposer la tondeuse Indego comme une entité aspirateur dans HomeAssistant"
                 },
+                "data_description": {
+                    "user_agent": "In case of HTTP 4XX errors (especially Reason: 403, message='Forbidden') it might help to change the User Agent. Should not contain Homeassistant or HA."
+                },
                 "description": "Réglages avancés du composant Bosch Indego. Peuvent être laissés inchangés pour la plupart des utilisateurs."
             },
             "mower": {
@@ -38,6 +41,9 @@
                   "expose_mower": "Exposer la tondeuse Indego comme une entité tondeuse dans HomeAssistant",
                   "expose_vacuum": "Exposer la tondeuse Indego comme une entité aspirateur dans HomeAssistant",
                   "show_all_alerts": "Montrer l'historique complet des alertes dans HomeAssistant. Non recommandé pour la plupart des utilisateurs, l'impact sur la taille de la base de données HomeAssistant peut être assez important!"
+              },
+              "data_description": {
+                  "user_agent": "In case of HTTP 4XX errors (especially Reason: 403, message='Forbidden') it might help to change the User Agent. Should not contain Homeassistant or HA."
               }
           }
       }
