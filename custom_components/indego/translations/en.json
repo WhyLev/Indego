@@ -13,6 +13,9 @@
                     "expose_mower": "Expose Indego mower as mower entity in HomeAssistant",
                     "expose_vacuum": "Expose Indego mower as vacuum entity in HomeAssistant"
                 },
+                "data_description": {
+                    "user_agent": "In case of HTTP 4XX errors (especially Reason: 403, message='Forbidden') it might help to change the User Agent. Should not contain Homeassistant or HA."
+                },
                 "description": "Advanced settings of the Bosch Indego component."
             },
             "mower": {
@@ -38,6 +41,9 @@
                   "expose_mower": "Expose Indego mower as mower entity in HomeAssistant",
                   "expose_vacuum": "Expose Indego mower as vacuum entity in HomeAssistant",
                   "show_all_alerts": "Show the full alert history into HomeAssistant. This is not recommended for most users, it might have a significant impact on the HomeAssistant database size!"
+              },
+              "data_description": {
+                  "user_agent": "In case of HTTP 4XX errors (especially Reason: 403, message='Forbidden') it might help to change the User Agent. Should not contain Homeassistant or HA."
               }
           }
       }
