@@ -9,7 +9,7 @@ from homeassistant.helpers.icon import icon_for_battery_level
 from homeassistant.components.vacuum import (
     StateVacuumEntity,
     VacuumEntityFeature,
-    VacuumActivity,
+    VacuumActivity
 )
 
 from homeassistant.components.vacuum import (
@@ -21,7 +21,7 @@ from .mixins import IndegoEntity
 
 _LOGGER = logging.getLogger(__name__)
 
-INDEGO_STATE_TO_VACUUM_MAPPING: dict[int, VacuumActivity] = {
+INDEGO_STATE_TO_VACUUM_MAPPING = {
     0: VacuumActivity.DOCKED,
     101: VacuumActivity.DOCKED,
     257: VacuumActivity.DOCKED,
@@ -120,11 +120,12 @@ class IndegoVacuum(IndegoEntity, StateVacuumEntity):
         return self._attr_indego_state
 
     @indego_state.setter
-    def indego_state(self, indego_state: int) -> None:
-        """Set the mower state by converting Indego state to VacuumActivity."""
+    def indego_state(self, indego_state: int):
+        """Set the mower state by converting the Indego mower state to a vacuum state."""
         self._attr_indego_state = indego_state
-
-        new_state = INDEGO_STATE_TO_VACUUM_MAPPING.get(indego_state)
+        new_state = INDEGO_STATE_TO_VACUUM_MAPPING[indego_state] \
+            if indego_state in INDEGO_STATE_TO_VACUUM_MAPPING \
+            else None
 
         if self._attr_state != new_state:
             self._attr_state = new_state

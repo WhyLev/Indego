@@ -2,6 +2,10 @@
 from typing import Optional
 import asyncio
 import logging
+import time
+import math
+import os
+import aiofiles
 from datetime import datetime, timedelta
 from aiohttp.client_exceptions import ClientResponseError
 
@@ -32,6 +36,7 @@ from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.config_entry_oauth2_flow import async_get_config_entry_implementation
 from homeassistant.helpers.event import async_track_point_in_time
+from homeassistant.helpers.event import async_track_time_interval
 from pyIndego import IndegoAsyncClient
 
 from .api import IndegoOAuth2Session
@@ -40,6 +45,8 @@ from .vacuum import IndegoVacuum
 from .lawn_mower import IndegoLawnMower
 from .const import *
 from .sensor import IndegoSensor
+from .camera import IndegoCamera
+from .error_codes import ERROR_CODE_MAP, get_error_description
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -71,6 +78,10 @@ SERVICE_SCHEMA_READ_ALERT_ALL = vol.Schema({
     vol.Optional(CONF_MOWER_SERIAL): cv.string
 })
 
+SERVICE_SCHEMA_DOWNLOAD_MAP = vol.Schema({
+    vol.Optional(CONF_MOWER_SERIAL): cv.string
+})
+
 
 def FUNC_ICON_MOWER_ALERT(state):
     if state:
@@ -99,7 +110,7 @@ ENTITY_DEFINITIONS = {
         CONF_NAME: "alert",
         CONF_ICON: FUNC_ICON_MOWER_ALERT,
         CONF_DEVICE_CLASS: BinarySensorDeviceClass.PROBLEM,
-        CONF_ATTR: ["alerts_count"],
+        CONF_ATTR: ["alerts_count", "last_alert_message"],
         CONF_TRANSLATION_KEY: "indego_alert",
     },
     ENTITY_MOWER_STATE: {
@@ -196,6 +207,88 @@ ENTITY_DEFINITIONS = {
     ENTITY_LAWN_MOWER: {
         CONF_TYPE: LAWN_MOWER_TYPE,
     },
+    ENTITY_GARDEN_SIZE: {
+        CONF_TYPE: SENSOR_TYPE,
+        CONF_NAME: "garden size",
+        CONF_ICON: "mdi:ruler-square",
+        CONF_DEVICE_CLASS: None,
+        CONF_UNIT_OF_MEASUREMENT: "m²",
+        CONF_ATTR: [],
+    },
+    ENTITY_CAMERA: {
+        CONF_TYPE: CAMERA_TYPE,
+    },
+    ENTITY_MOWER_SVG_X: {
+        CONF_TYPE: SENSOR_TYPE,
+        CONF_NAME: "mower position x",
+        CONF_ICON: "mdi:map-marker",
+        CONF_DEVICE_CLASS: None,
+        CONF_UNIT_OF_MEASUREMENT: "px",
+        CONF_ATTR: [],
+    },
+    ENTITY_MOWER_SVG_Y: {
+        CONF_TYPE: SENSOR_TYPE,
+        CONF_NAME: "mower position y",
+        CONF_ICON: "mdi:map-marker",
+        CONF_DEVICE_CLASS: None,
+        CONF_UNIT_OF_MEASUREMENT: "px",
+        CONF_ATTR: [],
+    },
+    ENTITY_MOWER_STUCK: {
+        CONF_TYPE: BINARY_SENSOR_TYPE,
+        CONF_NAME: "mower stuck",
+        CONF_ICON: "mdi:alert-circle-outline",
+        CONF_DEVICE_CLASS: BinarySensorDeviceClass.PROBLEM,
+        CONF_ATTR: ["stuck_since", "stuck_x", "stuck_y"],
+    },
+    ENTITY_BATTERY_HEALTH: {
+        CONF_TYPE: SENSOR_TYPE,
+        CONF_NAME: "battery health",
+        CONF_ICON: "mdi:battery-heart",
+        CONF_DEVICE_CLASS: SensorDeviceClass.ENUM,
+        CONF_UNIT_OF_MEASUREMENT: None,
+        CONF_ATTR: ["charge_cycles", "battery_temperature"],
+    },
+    ENTITY_LAST_ERROR_CODE: {
+        CONF_TYPE: SENSOR_TYPE,
+        CONF_NAME: "last error",
+        CONF_ICON: "mdi:alert",
+        CONF_DEVICE_CLASS: None,
+        CONF_UNIT_OF_MEASUREMENT: None,
+        CONF_ATTR: ["error_code", "error_time"],
+    },
+    ENTITY_FIRMWARE_VERSION: {
+        CONF_TYPE: SENSOR_TYPE,
+        CONF_NAME: "firmware version",
+        CONF_ICON: "mdi:chip",
+        CONF_DEVICE_CLASS: None,
+        CONF_UNIT_OF_MEASUREMENT: None,
+        CONF_ATTR: [],
+    },
+    ENTITY_MAINTENANCE_HOURS: {
+        CONF_TYPE: SENSOR_TYPE,
+        CONF_NAME: "maintenance hours",
+        CONF_ICON: "mdi:tools",
+        CONF_DEVICE_CLASS: None,
+        CONF_UNIT_OF_MEASUREMENT: "h",
+        CONF_ATTR: ["maintenance_status"],
+    },
+    ENTITY_ESTIMATED_DURATION: {
+        CONF_TYPE: SENSOR_TYPE,
+        CONF_NAME: "estimated session duration",
+        CONF_ICON: "mdi:clock-outline",
+        CONF_DEVICE_CLASS: None,
+        CONF_UNIT_OF_MEASUREMENT: "min",
+        CONF_ATTR: ["based_on_battery", "based_on_garden_size"],
+    },
+    ENTITY_SESSION_COUNT: {
+        CONF_TYPE: SENSOR_TYPE,
+        CONF_NAME: "session count",
+        CONF_ICON: "mdi:counter",
+        CONF_DEVICE_CLASS: None,
+        CONF_UNIT_OF_MEASUREMENT: None,
+        CONF_ATTR: [],
+    },
 }
 
 
@@ -227,6 +320,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         hass,
         entry.options.get(CONF_USER_AGENT)
     )
+
+    await indego_hub.start_periodic_position_update()
 
     async def load_platforms():
         _LOGGER.debug("Loading platforms")
@@ -318,6 +413,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         await instance._indego_client.put_all_alerts_read()
         await instance._update_alerts()
 
+    async def async_download_map(call):
+        """Handle the download_map service call."""
+        instance = find_instance_for_mower_service_call(call)
+        _LOGGER.debug("Indego.download_map service called for serial: %s", instance.serial)
+        await instance.download_and_store_map()
+
     # In HASS we can have multiple Indego component instances as long as the mower serial is unique.
     # So the mower services should only need to be registered for the first instance.
     if CONF_SERVICES_REGISTERED not in hass.data[DOMAIN]:
@@ -359,6 +460,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             SERVICE_NAME_READ_ALERT_ALL, 
             async_read_alert_all, 
             schema=SERVICE_SCHEMA_READ_ALERT_ALL
+        )
+        hass.services.async_register(
+            DOMAIN,
+            SERVICE_NAME_DOWNLOAD_MAP,
+            async_download_map,
+            schema=SERVICE_SCHEMA_DOWNLOAD_MAP
         )
 
         hass.data[DOMAIN][CONF_SERVICES_REGISTERED] = entry.entry_id
@@ -410,6 +517,19 @@ class IndegoHub:
         self._latest_alert = None
         self.entities = {}
         self._update_fail_count = None
+        self._lawn_map = None
+        self._unsub_map_timer = None
+        self._last_position = (None, None)
+        self._last_state = None
+        self._last_position_change_time = None
+        self._last_svg_x = None
+        self._last_svg_y = None
+        self._map_svg = None
+        self._map_trail = []
+        self._last_error_code = None
+        self._last_error_time = None
+        self._session_count = 0
+        self._last_session_state = None
 
         async def async_token_refresh() -> str:
             await session.async_ensure_token_valid()
@@ -476,6 +596,14 @@ class IndegoHub:
                         self
                     )
 
+            elif entity[CONF_TYPE] == CAMERA_TYPE:
+                self.entities[entity_key] = IndegoCamera(
+                    f"indego_{self._serial}",
+                    self._mower_name,
+                    device_info,
+                    self
+                )
+
     async def update_generic_data_and_load_platforms(self, load_platforms):
         """Update the generic mower data, so we can create the HA platforms for the Indego component."""
         _LOGGER.debug("Getting generic data for device info.")
@@ -518,7 +646,7 @@ class IndegoHub:
             await self._update_operating_data()
 
         except Exception as exc:
-            _LOGGER.warning("Error %s for while performing initial update", str(exc))
+            _LOGGER.warning("Error while performing initial update: %s", str(exc))
 
     async def async_shutdown(self, _=None):
         """Remove all future updates, cancel tasks and close the client."""
@@ -540,6 +668,10 @@ class IndegoHub:
 
         if self._refresh_24h_remover:
             self._refresh_24h_remover()
+
+        if self._unsub_map_timer:
+            self._unsub_map_timer()
+            self._unsub_map_timer = None
 
         await self._indego_client.close()
         _LOGGER.debug("Shutdown finished.")
@@ -638,12 +770,63 @@ class IndegoHub:
 
         try:
             await self._update_updates_available()
+            await self._update_firmware_version()
 
         except Exception as exc:
             _LOGGER.warning("Error %s while performing 24h update", str(exc))
 
         self._refresh_24h_remover = async_call_later(self._hass, 86400, self.refresh_24h)
 
+    def map_path(self):
+        return f"/config/www/indego_map_{self._serial}.svg"
+
+    async def download_and_store_map(self):
+        try:
+            svg_bytes = await self._indego_client.get(f"alms/{self._serial}/map")
+            if svg_bytes:
+                async with aiofiles.open(self.map_path(), "wb") as f:
+                    await f.write(svg_bytes)
+                _LOGGER.info("Map saved in %s", self.map_path())
+        except Exception as e:
+            _LOGGER.warning("Error during saving the map [%s]: %s", self._serial, e)
+
+    async def start_periodic_position_update(self):
+        self._unsub_map_timer = async_track_time_interval(
+            self._hass, self._check_position_and_state, timedelta(seconds=60)
+        )
+
+    async def _check_position_and_state(self, now):
+        try:
+            await self._indego_client.update_state(force=True)
+        except asyncio.TimeoutError:
+            _LOGGER.warning("Timeout on update_state() – Mower not available or too slow")
+            return
+        except Exception as e:
+            _LOGGER.exception("Error on update_state() – actual mower_state=%s", self._last_state)
+            return
+
+        state = self._indego_client.state
+        if not state:
+            _LOGGER.warning("Received invalid state from mower")
+            return
+
+        mower_state = getattr(state, "mower_state", "unknown")
+        xpos = getattr(state, "svg_xPos", None)
+        ypos = getattr(state, "svg_yPos", None)
+        self._last_state = mower_state
+
+        if mower_state == "docked":
+            _LOGGER.debug("Mower is docked - no position updates")
+            return
+
+        if xpos is not None and ypos is not None:
+            if (xpos, ypos) != self._last_position:
+                _LOGGER.info("Position geändert: x=%s, y=%s", xpos, ypos)
+                self._last_position = (xpos, ypos)
+                for entity in self.entities.values():
+                    if hasattr(entity, "refresh_map"):
+                        await entity.refresh_map(mower_state)
+    
     async def _update_operating_data(self):
         await self._indego_client.update_operating_data()
 
@@ -653,6 +836,8 @@ class IndegoHub:
 
             if ENTITY_VACUUM in self.entities:
                 self.entities[ENTITY_VACUUM].battery_level = self._indego_client.operating_data.battery.percent_adjusted
+
+            self.entities[ENTITY_GARDEN_SIZE].state = self._indego_client.operating_data.garden.size
 
             self.entities[ENTITY_BATTERY].add_attributes(
                 {
@@ -688,6 +873,16 @@ class IndegoHub:
             self.set_online_state(False)
             return  # State update failed
 
+        # Refresh Camera map if Position is available
+        new_x = self._indego_client.state.svg_xPos
+        new_y = self._indego_client.state.svg_yPos
+        mower_state = self._indego_client.state_description
+
+        if new_x is not None and new_y is not None:
+            for entity in self.entities.values():
+                if hasattr(entity, "refresh_map"):
+                    await entity.refresh_map(mower_state)
+        
         self.set_online_state(self._indego_client.online)
         self.entities[ENTITY_MOWER_STATE].state = self._indego_client.state_description
         self.entities[ENTITY_MOWER_STATE_DETAIL].state = self._indego_client.state_description_detail
@@ -734,6 +929,60 @@ class IndegoHub:
 
         if ENTITY_LAWN_MOWER in self.entities:
             self.entities[ENTITY_LAWN_MOWER].indego_state = self._indego_client.state.state
+
+        # Position tracking and stuck detection
+        svg_x = self._indego_client.state.svg_xPos
+        svg_y = self._indego_client.state.svg_yPos
+
+        if svg_x is not None and svg_y is not None:
+            if ENTITY_MOWER_SVG_X in self.entities:
+                self.entities[ENTITY_MOWER_SVG_X].state = svg_x
+            if ENTITY_MOWER_SVG_Y in self.entities:
+                self.entities[ENTITY_MOWER_SVG_Y].state = svg_y
+
+            is_mowing = 500 <= self._indego_client.state.state <= 799
+            now = datetime.now()
+
+            moved = self._last_svg_x is None or math.sqrt(
+                (svg_x - self._last_svg_x) ** 2 + (svg_y - self._last_svg_y) ** 2
+            ) > 5
+
+            if moved:
+                self._last_svg_x = svg_x
+                self._last_svg_y = svg_y
+                self._last_position_change_time = now
+
+            stuck = (
+                is_mowing
+                and self._last_position_change_time is not None
+                and (now - self._last_position_change_time).total_seconds() > 60
+            )
+
+            if ENTITY_MOWER_STUCK in self.entities:
+                self.entities[ENTITY_MOWER_STUCK].state = stuck
+                if stuck:
+                    self.entities[ENTITY_MOWER_STUCK].add_attributes({
+                        "stuck_since": self._last_position_change_time.strftime("%Y-%m-%d %H:%M:%S"),
+                        "stuck_x": svg_x,
+                        "stuck_y": svg_y,
+                    })
+
+            if is_mowing:
+                self._map_trail.append((svg_x, svg_y))
+
+            self._hass.async_create_task(self._update_map_svg(svg_x, svg_y))
+
+        # Battery Health Tracking
+        self._update_battery_health()
+
+        # Maintenance Hours Tracking
+        self._update_maintenance_hours()
+
+        # Session Counting and Estimated Duration
+        self._update_session_tracking()
+
+        # Error Code Tracking
+        self._update_error_tracking()
 
     async def _update_generic_data(self):
         await self._indego_client.update_generic_data()
@@ -820,6 +1069,180 @@ class IndegoHub:
             self.entities[ENTITY_LAWN_MOWED].add_attributes(
                 {"next_mow": next_mow}
             )
+
+    async def _update_map_svg(self, current_x: int, current_y: int):
+        """Fetch SVG map once and overlay mower trail, saving to www."""
+        try:
+            if self._map_svg is None:
+                _LOGGER.debug("Fetching SVG map from Bosch API")
+                svg_bytes = await self._indego_client.get(f"alms/{self._serial}/map")
+                if svg_bytes:
+                    self._map_svg = svg_bytes.decode("utf-8") if isinstance(svg_bytes, bytes) else svg_bytes
+
+            if not self._map_svg:
+                return
+
+            trail_points = " ".join(f"{x},{y}" for x, y in self._map_trail[-500:])
+            overlay = ""
+            if len(self._map_trail) > 1:
+                overlay += (
+                    f'<polyline points="{trail_points}" fill="none" '
+                    f'stroke="#2196F3" stroke-width="3" stroke-opacity="0.7" '
+                    f'stroke-linecap="round" stroke-linejoin="round"/>'
+                )
+            overlay += (
+                f'<circle cx="{current_x}" cy="{current_y}" r="8" '
+                f'fill="#F44336" stroke="white" stroke-width="2"/>'
+            )
+
+            annotated = self._map_svg.replace("</svg>", f"{overlay}</svg>")
+
+            www_path = self._hass.config.path("www")
+            os.makedirs(www_path, exist_ok=True)
+            map_path = os.path.join(www_path, f"indego_map_{self._serial}.svg")
+
+            async with aiofiles.open(map_path, "w") as f:
+                await f.write(annotated)
+
+        except Exception as exc:
+            _LOGGER.warning("Failed to update Indego map SVG: %s", str(exc))
+
+    def _update_battery_health(self):
+        """Track battery health based on charge cycles and temperature."""
+        if ENTITY_BATTERY_HEALTH not in self.entities:
+            return
+
+        battery_state = self._indego_client.generic_data
+        if not battery_state:
+            return
+
+        charge_cycles = getattr(battery_state, "charge_cycles", 0) or 0
+        battery_temp = getattr(battery_state, "battery_temp", None)
+
+        # Determine health status based on cycles
+        if charge_cycles < 100:
+            health_status = "excellent"
+        elif charge_cycles < 300:
+            health_status = "good"
+        elif charge_cycles < 500:
+            health_status = "fair"
+        elif charge_cycles < 800:
+            health_status = "poor"
+        else:
+            health_status = "critical"
+
+        self.entities[ENTITY_BATTERY_HEALTH].state = health_status
+        self.entities[ENTITY_BATTERY_HEALTH].add_attributes({
+            "charge_cycles": charge_cycles,
+            "battery_temperature": battery_temp,
+        })
+
+    def _update_session_tracking(self):
+        """Track session count and calculate estimated duration."""
+        current_state = self._indego_client.state.state
+        is_mowing = 500 <= current_state <= 799
+
+        # Count transitions to mowing state
+        if is_mowing and self._last_session_state != current_state:
+            if not (500 <= (self._last_session_state or 0) <= 799):
+                self._session_count += 1
+
+        self._last_session_state = current_state
+
+        if ENTITY_SESSION_COUNT in self.entities:
+            self.entities[ENTITY_SESSION_COUNT].state = self._session_count
+
+        # Calculate estimated session duration
+        if ENTITY_ESTIMATED_DURATION in self.entities:
+            estimated_mins = self._calculate_estimated_duration()
+            self.entities[ENTITY_ESTIMATED_DURATION].state = estimated_mins
+
+            self.entities[ENTITY_ESTIMATED_DURATION].add_attributes({
+                "based_on_battery": f"{estimated_mins} min (from battery capacity)",
+                "based_on_garden_size": f"{estimated_mins} min (from garden size)",
+            })
+
+    def _calculate_estimated_duration(self) -> int:
+        """Calculate estimated session duration based on battery and garden size."""
+        battery_percent = self._indego_client.state.battery.percent
+        garden_size = getattr(self._indego_client.generic_data, "garden_size", 0) or 100
+
+        # Estimation based on battery capacity
+        # Assume: 100% = 120 minutes max
+        battery_based = int((battery_percent / 100) * 120)
+
+        # Estimation based on garden size
+        # Assume: 500m² = 60min, scales linearly
+        garden_based = max(10, int((garden_size / 500) * 60))
+
+        # Return conservative estimate (minimum of both)
+        estimated = min(battery_based, garden_based)
+        return max(5, estimated)  # At least 5 minutes
+
+    def _update_error_tracking(self):
+        """Track error codes and descriptions from last alert."""
+        if ENTITY_LAST_ERROR_CODE not in self.entities:
+            return
+
+        if self._indego_client.alerts and len(self._indego_client.alerts) > 0:
+            latest_alert = self._indego_client.alerts[0]
+            error_code = str(latest_alert.error_code)
+            error_description = get_error_description(error_code)
+
+            self._last_error_code = error_code
+            self._last_error_time = latest_alert.date
+
+            self.entities[ENTITY_LAST_ERROR_CODE].state = error_description
+            self.entities[ENTITY_LAST_ERROR_CODE].add_attributes({
+                "error_code": error_code,
+                "error_time": format_indego_date(latest_alert.date),
+            })
+        else:
+            self.entities[ENTITY_LAST_ERROR_CODE].state = "No errors"
+            self.entities[ENTITY_LAST_ERROR_CODE].add_attributes({
+                "error_code": "0",
+                "error_time": "N/A",
+            })
+
+    async def _update_firmware_version(self):
+        """Update firmware version sensor."""
+        if ENTITY_FIRMWARE_VERSION not in self.entities:
+            return
+
+        try:
+            # Check if firmware version is available
+            firmware_version = getattr(self._indego_client, "firmware_version", None)
+            if firmware_version:
+                self.entities[ENTITY_FIRMWARE_VERSION].state = str(firmware_version)
+            else:
+                self.entities[ENTITY_FIRMWARE_VERSION].state = "Unknown"
+        except Exception as e:
+            _LOGGER.debug("Could not fetch firmware version: %s", str(e))
+            self.entities[ENTITY_FIRMWARE_VERSION].state = "Unknown"
+
+    def _update_maintenance_hours(self):
+        """Track maintenance hours based on cumulative operation time."""
+        if ENTITY_MAINTENANCE_HOURS not in self.entities:
+            return
+
+        runtime = self._indego_client.state.runtime
+        if not runtime:
+            return
+
+        total_hours = runtime.total.operate
+
+        # Maintenance recommendations (based on Indego specs)
+        if total_hours < 50:
+            maintenance_status = "good"
+        elif total_hours < 150:
+            maintenance_status = "service_due_soon"
+        else:
+            maintenance_status = "service_required"
+
+        self.entities[ENTITY_MAINTENANCE_HOURS].state = int(total_hours)
+        self.entities[ENTITY_MAINTENANCE_HOURS].add_attributes({
+            "maintenance_status": maintenance_status,
+        })
 
     @property
     def serial(self) -> str:
