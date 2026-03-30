@@ -1,4 +1,4 @@
-[![GitHub release](https://img.shields.io/github/release/sander1988/Indego.svg)](https://github.com/sander1988/Indego/releases/) [![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg)](https://github.com/custom-components/hacs)
+[![GitHub release](https://img.shields.io/github/release/WhyLev/Indego.svg)](https://github.com/WhyLev/Indego/releases/) [![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg)](https://github.com/custom-components/hacs)
 
 # Indego
 Join the Discord channel to discuss around this integration and vote for your favourite change to happen!
@@ -58,14 +58,27 @@ You can add this integration multiple times in case you own multiple Indego mowe
 ***Mower state***<br>Shows state of the mower. | ![State](/doc/1-State_3.png)
 ***Mower state detail***<br>Shows detailed state of the mower. | ![State Detail](/doc/2-StateDetail_1.png)
 ***Lawn mowed***<br>Shows percentage of lawn mowed. | ![Lawn mowed](/doc/3-LawnMowed_3.png)
-***Total mowing time***<br>Shows the total mowing time for the mower. | ![Mowtime total](/doc/4-MowTime_3.png)
-***Battery***<br>Shows the status of the battery. | ![Battery sensor percent](/doc/5-Battery_3.png)
-***Alerts***<br>Shows all alerts | ![Alerts sensor](/doc/7-Alerts_3.png)
-***Last completed mow***<br>Shows when the lawn was completed last time. | ![Last mow](/doc/8-LastCompleted_3.png)
-***Next mow time***<br>Show the next planned mow. | ![Next mow](/doc/9-NextMow_3.png)
+***Total mowing time***<br>Shows the total mowing time for the mower (hours). | ![Mowtime total](/doc/4-MowTime_3.png)
+***Battery***<br>Shows the battery charge level in percent. | ![Battery sensor percent](/doc/5-Battery_3.png)
+***Battery health***<br>Shows the health status of the battery. | ![Battery sensor percent](/doc/5-Battery_3.png)
+***Alert***<br>Shows whether an alert is active. Attributes include alert count and last alert message. | ![Alerts sensor](/doc/7-Alerts_3.png)
+***Last completed mow***<br>Shows when the lawn was last completely mowed. | ![Last mow](/doc/8-LastCompleted_3.png)
+***Next mow time***<br>Shows the next planned mow. | ![Next mow](/doc/9-NextMow_3.png)
 ***Mowing mode***<br>Shows the mowing mode set. | ![Mowing mode](/doc/10-MowingMode_2.png)
-***Online***<br>Shows if the mower is online/offline. Possble values:<br> *True, False* | ![Online status](/doc/11-Online_3.png)
-***Update available***<br>Shows if there is an update available for the firmware. Possble values:<br> *On, Off* | ![Update available](/doc/12-Update_4.png)
+***Online***<br>Shows if the mower is online/offline. Possible values:<br> *True, False* | ![Online status](/doc/11-Online_3.png)
+***Update available***<br>Shows if there is an update available for the firmware. Possible values:<br> *On, Off* | ![Update available](/doc/12-Update_4.png)
+***Garden size***<br>Shows the size of the garden in m². | ![Entities in Home Assistant](/doc/0-Sensors_3.png)
+***Mower position X***<br>Shows the X position of the mower on the map in pixels. | ![Entities in Home Assistant](/doc/0-Sensors_3.png)
+***Mower position Y***<br>Shows the Y position of the mower on the map in pixels. | ![Entities in Home Assistant](/doc/0-Sensors_3.png)
+***Mower stuck***<br>Binary sensor indicating whether the mower is stuck. | ![Entities in Home Assistant](/doc/0-Sensors_3.png)
+***Last error***<br>Shows the last error code and timestamp. | ![Entities in Home Assistant](/doc/0-Sensors_3.png)
+***Firmware version***<br>Shows the current firmware version of the mower. | ![Entities in Home Assistant](/doc/0-Sensors_3.png)
+***Maintenance hours***<br>Shows the maintenance hours counter (hours). | ![Entities in Home Assistant](/doc/0-Sensors_3.png)
+***Estimated session duration***<br>Shows the estimated duration of the current mowing session in minutes. | ![Entities in Home Assistant](/doc/0-Sensors_3.png)
+***Session count***<br>Shows the total number of mowing sessions. | ![Entities in Home Assistant](/doc/0-Sensors_3.png)
+***Lawn Mower entity***<br>Exposes the mower as a native Home Assistant Lawn Mower entity (supports Start, Pause, Dock). | ![Entities in Home Assistant](/doc/0-Sensors_3.png)
+***Vacuum entity***<br>Exposes the mower as a Home Assistant Vacuum entity (legacy, supports Start, Pause, Return to base, Battery). | ![Entities in Home Assistant](/doc/0-Sensors_3.png)
+***Camera***<br>Displays the SVG lawn map with the current mower position overlaid. | ![Entities in Home Assistant](/doc/0-Sensors_3.png)
 
 
 
@@ -131,6 +144,14 @@ Accepted values are:
 |----------|--------------------------|
 | `0`      | Mark all Alerts as read  |
 
+### indego.download_map ####
+Downloads the current lawn map from the Bosch API and saves it as `www/indego_map_base.svg` in your Home Assistant configuration directory. This map is also used by the Camera entity.
+
+No required fields. Optional field:
+|Field               |Description                                                   |
+|--------------------|--------------------------------------------------------------|
+| `mower_serial`     | Mower serial (only needed when you have multiple mowers)     |
+
 ## Examples
 Creating automation in HA gui:
 
@@ -190,7 +211,7 @@ If you experience any readings from your mower that the sensor does not read out
 ## New issues
 If you experience issues/bugs with this the best way to report them is to open an issue in **this** repo.
 
-[Issue link](https://github.com/sander1988/Indego/issues)
+[Issue link](https://github.com/WhyLev/Indego/issues)
 
 
 ## Credits
