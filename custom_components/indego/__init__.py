@@ -797,58 +797,97 @@ class IndegoHub:
 
     async def _check_position_and_state(self, now):
         try:
+            _LOGGER.debug("Periodic position and state update started")
             await self._indego_client.update_state(force=True)
         except asyncio.TimeoutError:
-            _LOGGER.warning("Timeout on update_state() – Mower not available or too slow")
+            _LOGGER.warning("Timeout on update_state() – Mower not available or too slow (timeout exceeded)")
             return
         except Exception as e:
-            _LOGGER.exception("Error on update_state() – actual mower_state=%s", self._last_state)
+            _LOGGER.exception("Error on update_state() – actual mower_state=%s, error: %s", self._last_state, str(e))
             return
 
-        state = self._indego_client.state
-        if not state:
-            _LOGGER.warning("Received invalid state from mower")
-            return
+        try:
+            state = self._indego_client.state
+            if not state:
+                _LOGGER.warning("Received invalid state from mower - state object is None")
+                return
 
-        mower_state = getattr(state, "mower_state", "unknown")
-        xpos = getattr(state, "svg_xPos", None)
-        ypos = getattr(state, "svg_yPos", None)
-        self._last_state = mower_state
+            mower_state = getattr(state, "mower_state", "unknown")
+            xpos = getattr(state, "svg_xPos", None)
+            ypos = getattr(state, "svg_yPos", None)
+            self._last_state = mower_state
 
-        if mower_state == "docked":
-            _LOGGER.debug("Mower is docked - no position updates")
-            return
+            _LOGGER.debug("Mower state: %s, Position: x=%s, y=%s", mower_state, xpos, ypos)
 
-        if xpos is not None and ypos is not None:
-            if (xpos, ypos) != self._last_position:
-                _LOGGER.info("Position geändert: x=%s, y=%s", xpos, ypos)
-                self._last_position = (xpos, ypos)
-                for entity in self.entities.values():
-                    if hasattr(entity, "refresh_map"):
-                        await entity.refresh_map(mower_state)
+            if mower_state == "docked":
+                _LOGGER.debug("Mower is docked - no position updates")
+                return
+
+            if xpos is not None and ypos is not None:
+                if (xpos, ypos) != self._last_position:
+                    _LOGGER.info("Position changed: x=%s, y=%s", xpos, ypos)
+                    self._last_position = (xpos, ypos)
+                    for entity in self.entities.values():
+                        if hasattr(entity, "refresh_map"):
+                            await entity.refresh_map(mower_state)
+        except Exception as e:
+            _LOGGER.error("Unexpected error while processing state update: %s", str(e))
     
     async def _update_operating_data(self):
-        await self._indego_client.update_operating_data()
+        try:
+            await self._indego_client.update_operating_data()
+            _LOGGER.debug("Updating operating data")
+        except Exception as exc:
+            _LOGGER.warning("Failed to fetch operating data from API: %s", str(exc))
+            return
 
-        _LOGGER.debug(f"Updating operating data")
-        if self._indego_client.operating_data:
-            self.entities[ENTITY_BATTERY].state = self._indego_client.operating_data.battery.percent_adjusted
+        try:
+            if not self._indego_client.operating_data:
+                _LOGGER.warning("Operating data is None - mower may not support this feature")
+                return
 
-            if ENTITY_VACUUM in self.entities:
-                self.entities[ENTITY_VACUUM].battery_level = self._indego_client.operating_data.battery.percent_adjusted
+            # Update battery
+            try:
+                if hasattr(self._indego_client.operating_data, 'battery') and self._indego_client.operating_data.battery:
+                    battery_percent = self._indego_client.operating_data.battery.percent_adjusted
+                    self.entities[ENTITY_BATTERY].state = battery_percent
+                    _LOGGER.debug("Battery updated: %s%%", battery_percent)
 
-            self.entities[ENTITY_GARDEN_SIZE].state = self._indego_client.operating_data.garden.size
+                    if ENTITY_VACUUM in self.entities:
+                        self.entities[ENTITY_VACUUM].battery_level = battery_percent
 
-            self.entities[ENTITY_BATTERY].add_attributes(
-                {
-                    "last_updated": last_updated_now(),
-                    "voltage_V": self._indego_client.operating_data.battery.voltage,
-                    "discharge_Ah": self._indego_client.operating_data.battery.discharge,
-                    "cycles": self._indego_client.operating_data.battery.cycles,
-                    f"battery_temp_{UnitOfTemperature.CELSIUS}": self._indego_client.operating_data.battery.battery_temp,
-                    f"ambient_temp_{UnitOfTemperature.CELSIUS}": self._indego_client.operating_data.battery.ambient_temp,
-                }
-            )
+                    self.entities[ENTITY_BATTERY].add_attributes(
+                        {
+                            "last_updated": last_updated_now(),
+                            "voltage_V": getattr(self._indego_client.operating_data.battery, 'voltage', 'N/A'),
+                            "discharge_Ah": getattr(self._indego_client.operating_data.battery, 'discharge', 'N/A'),
+                            "cycles": getattr(self._indego_client.operating_data.battery, 'cycles', 'N/A'),
+                            f"battery_temp_{UnitOfTemperature.CELSIUS}": getattr(self._indego_client.operating_data.battery, 'battery_temp', 'N/A'),
+                            f"ambient_temp_{UnitOfTemperature.CELSIUS}": getattr(self._indego_client.operating_data.battery, 'ambient_temp', 'N/A'),
+                        }
+                    )
+                else:
+                    _LOGGER.warning("Battery attribute not available in operating_data")
+                    self.entities[ENTITY_BATTERY].state = STATE_UNKNOWN
+            except AttributeError as exc:
+                _LOGGER.error("Battery attribute missing: %s", str(exc))
+                self.entities[ENTITY_BATTERY].state = STATE_UNKNOWN
+
+            # Update garden size
+            try:
+                if hasattr(self._indego_client.operating_data, 'garden') and self._indego_client.operating_data.garden:
+                    garden_size = self._indego_client.operating_data.garden.size
+                    self.entities[ENTITY_GARDEN_SIZE].state = garden_size
+                    _LOGGER.debug("Garden size updated: %s m²", garden_size)
+                else:
+                    _LOGGER.warning("Garden attribute not available in operating_data")
+                    self.entities[ENTITY_GARDEN_SIZE].state = STATE_UNKNOWN
+            except AttributeError as exc:
+                _LOGGER.error("Garden size attribute missing: %s", str(exc))
+                self.entities[ENTITY_GARDEN_SIZE].state = STATE_UNKNOWN
+
+        except Exception as exc:
+            _LOGGER.error("Unexpected error while updating operating data: %s", str(exc))
 
     def set_online_state(self, online: bool):
         _LOGGER.debug("Set online state: %s", online)
@@ -864,134 +903,242 @@ class IndegoHub:
             self.entities[ENTITY_LAWN_MOWER].set_cloud_connection_state(online)
 
     async def _update_state(self, longpoll: bool = True):
-        await self._indego_client.update_state(longpoll=longpoll, longpoll_timeout=230)
+        try:
+            _LOGGER.debug("Fetching mower state (longpoll=%s)", longpoll)
+            await self._indego_client.update_state(longpoll=longpoll, longpoll_timeout=230)
+        except asyncio.TimeoutError:
+            _LOGGER.warning("Timeout while fetching mower state - mower may be offline or slow to respond")
+            self.set_online_state(False)
+            return
+        except Exception as exc:
+            _LOGGER.error("Failed to fetch mower state: %s", str(exc))
+            self.set_online_state(False)
+            return
 
         if self._shutdown:
             return
 
         if not self._indego_client.state:
+            _LOGGER.warning("State update failed - received empty state from API")
             self.set_online_state(False)
-            return  # State update failed
+            return
 
-        # Refresh Camera map if Position is available
-        new_x = self._indego_client.state.svg_xPos
-        new_y = self._indego_client.state.svg_yPos
-        mower_state = self._indego_client.state_description
+        try:
+            # Update online state
+            online = self._indego_client.online
+            self.set_online_state(online)
+            _LOGGER.debug("Cloud connection state: %s", online)
 
-        if new_x is not None and new_y is not None:
-            for entity in self.entities.values():
-                if hasattr(entity, "refresh_map"):
-                    await entity.refresh_map(mower_state)
-        
-        self.set_online_state(self._indego_client.online)
-        self.entities[ENTITY_MOWER_STATE].state = self._indego_client.state_description
-        self.entities[ENTITY_MOWER_STATE_DETAIL].state = self._indego_client.state_description_detail
-        self.entities[ENTITY_LAWN_MOWED].state = self._indego_client.state.mowed
-        self.entities[ENTITY_RUNTIME].state = self._indego_client.state.runtime.total.cut
-        self.entities[ENTITY_BATTERY].charging = (
-            True if self._indego_client.state_description_detail == "Charging" else False
-        )
+            # Refresh Camera map if Position is available
+            new_x = self._indego_client.state.svg_xPos
+            new_y = self._indego_client.state.svg_yPos
+            mower_state = self._indego_client.state_description
 
-        self.entities[ENTITY_MOWER_STATE].add_attributes(
-            {
-                "last_updated": last_updated_now()
-            }
-        )
+            if new_x is not None and new_y is not None:
+                for entity in self.entities.values():
+                    if hasattr(entity, "refresh_map"):
+                        await entity.refresh_map(mower_state)
 
-        self.entities[ENTITY_MOWER_STATE_DETAIL].add_attributes(
-            {
-                "last_updated": last_updated_now(),
-                "state_number": self._indego_client.state.state,
-                "state_description": self._indego_client.state_description_detail,
-            }
-        )
+            # Update mower state (with safe getattr)
+            try:
+                state_desc = self._indego_client.state_description
+                self.entities[ENTITY_MOWER_STATE].state = state_desc if state_desc else STATE_UNKNOWN
+                _LOGGER.debug("Mower state: %s", state_desc)
+            except Exception as exc:
+                _LOGGER.error("Failed to update mower state: %s", str(exc))
+                self.entities[ENTITY_MOWER_STATE].state = STATE_UNKNOWN
 
-        self.entities[ENTITY_LAWN_MOWED].add_attributes(
-            {
-                "last_updated": last_updated_now(),
-                "last_session_operation_min": self._indego_client.state.runtime.session.operate,
-                "last_session_cut_min": self._indego_client.state.runtime.session.cut,
-                "last_session_charge_min": self._indego_client.state.runtime.session.charge,
-            }
-        )
+            # Update mower state detail
+            try:
+                state_detail = self._indego_client.state_description_detail
+                state_number = getattr(self._indego_client.state, 'state', 'unknown')
+                self.entities[ENTITY_MOWER_STATE_DETAIL].state = state_detail if state_detail else STATE_UNKNOWN
+                _LOGGER.debug("Mower state detail: %s (code: %s)", state_detail, state_number)
+            except Exception as exc:
+                _LOGGER.error("Failed to update mower state detail: %s", str(exc))
+                self.entities[ENTITY_MOWER_STATE_DETAIL].state = STATE_UNKNOWN
 
-        self.entities[ENTITY_RUNTIME].add_attributes(
-            {
-                "total_operation_time_h": self._indego_client.state.runtime.total.operate,
-                "total_mowing_time_h": self._indego_client.state.runtime.total.cut,
-                "total_charging_time_h": self._indego_client.state.runtime.total.charge,
-            }
-        )
+            # Update lawn mowed
+            try:
+                mowed = getattr(self._indego_client.state, 'mowed', None)
+                self.entities[ENTITY_LAWN_MOWED].state = mowed if mowed is not None else STATE_UNKNOWN
+                _LOGGER.debug("Lawn mowed: %s", mowed)
+            except Exception as exc:
+                _LOGGER.error("Failed to update lawn mowed: %s", str(exc))
+                self.entities[ENTITY_LAWN_MOWED].state = STATE_UNKNOWN
 
-        if ENTITY_VACUUM in self.entities:
-            self.entities[ENTITY_VACUUM].indego_state = self._indego_client.state.state
-            self.entities[ENTITY_VACUUM].battery_charging = self.entities[ENTITY_BATTERY].charging
+            # Update runtime
+            try:
+                runtime = getattr(self._indego_client.state, 'runtime', None)
+                if runtime and hasattr(runtime, 'total'):
+                    cut_time = getattr(runtime.total, 'cut', None)
+                    self.entities[ENTITY_RUNTIME].state = cut_time if cut_time is not None else STATE_UNKNOWN
+                    _LOGGER.debug("Runtime total cut: %s hours", cut_time)
+                else:
+                    self.entities[ENTITY_RUNTIME].state = STATE_UNKNOWN
+            except Exception as exc:
+                _LOGGER.error("Failed to update runtime: %s", str(exc))
+                self.entities[ENTITY_RUNTIME].state = STATE_UNKNOWN
 
-        if ENTITY_LAWN_MOWER in self.entities:
-            self.entities[ENTITY_LAWN_MOWER].indego_state = self._indego_client.state.state
+            # Update battery charging state
+            try:
+                self.entities[ENTITY_BATTERY].charging = (
+                    self._indego_client.state_description_detail == "Charging"
+                )
+            except Exception as exc:
+                _LOGGER.error("Failed to update battery charging state: %s", str(exc))
+                self.entities[ENTITY_BATTERY].charging = False
 
-        # Position tracking and stuck detection
-        svg_x = self._indego_client.state.svg_xPos
-        svg_y = self._indego_client.state.svg_yPos
-
-        if svg_x is not None and svg_y is not None:
-            if ENTITY_MOWER_SVG_X in self.entities:
-                self.entities[ENTITY_MOWER_SVG_X].state = svg_x
-            if ENTITY_MOWER_SVG_Y in self.entities:
-                self.entities[ENTITY_MOWER_SVG_Y].state = svg_y
-
-            is_mowing = 500 <= self._indego_client.state.state <= 799
-            now = datetime.now()
-
-            moved = self._last_svg_x is None or math.sqrt(
-                (svg_x - self._last_svg_x) ** 2 + (svg_y - self._last_svg_y) ** 2
-            ) > 5
-
-            if moved:
-                self._last_svg_x = svg_x
-                self._last_svg_y = svg_y
-                self._last_position_change_time = now
-
-            stuck = (
-                is_mowing
-                and self._last_position_change_time is not None
-                and (now - self._last_position_change_time).total_seconds() > 60
+            # Update state attributes
+            self.entities[ENTITY_MOWER_STATE].add_attributes(
+                {"last_updated": last_updated_now()}
             )
 
-            if ENTITY_MOWER_STUCK in self.entities:
-                self.entities[ENTITY_MOWER_STUCK].state = stuck
-                if stuck:
-                    self.entities[ENTITY_MOWER_STUCK].add_attributes({
-                        "stuck_since": self._last_position_change_time.strftime("%Y-%m-%d %H:%M:%S"),
-                        "stuck_x": svg_x,
-                        "stuck_y": svg_y,
-                    })
+            self.entities[ENTITY_MOWER_STATE_DETAIL].add_attributes(
+                {
+                    "last_updated": last_updated_now(),
+                    "state_number": getattr(self._indego_client.state, 'state', 'unknown'),
+                    "state_description": self._indego_client.state_description_detail,
+                }
+            )
 
-            if is_mowing:
-                self._map_trail.append((svg_x, svg_y))
+            # Update lawn mowed attributes
+            try:
+                mow_attrs = {
+                    "last_updated": last_updated_now(),
+                }
+                if hasattr(self._indego_client.state, 'runtime') and hasattr(self._indego_client.state.runtime, 'session'):
+                    mow_attrs["last_session_operation_min"] = getattr(self._indego_client.state.runtime.session, 'operate', 'N/A')
+                    mow_attrs["last_session_cut_min"] = getattr(self._indego_client.state.runtime.session, 'cut', 'N/A')
+                    mow_attrs["last_session_charge_min"] = getattr(self._indego_client.state.runtime.session, 'charge', 'N/A')
+                self.entities[ENTITY_LAWN_MOWED].add_attributes(mow_attrs)
+            except Exception as exc:
+                _LOGGER.error("Failed to update lawn mowed attributes: %s", str(exc))
 
-            self._hass.async_create_task(self._update_map_svg(svg_x, svg_y))
+            # Update runtime attributes
+            try:
+                runtime_attrs = {"last_updated": last_updated_now()}
+                if hasattr(self._indego_client.state, 'runtime') and hasattr(self._indego_client.state.runtime, 'total'):
+                    runtime_attrs["total_operation_time_h"] = getattr(self._indego_client.state.runtime.total, 'operate', 'N/A')
+                    runtime_attrs["total_mowing_time_h"] = getattr(self._indego_client.state.runtime.total, 'cut', 'N/A')
+                    runtime_attrs["total_charging_time_h"] = getattr(self._indego_client.state.runtime.total, 'charge', 'N/A')
+                self.entities[ENTITY_RUNTIME].add_attributes(runtime_attrs)
+            except Exception as exc:
+                _LOGGER.error("Failed to update runtime attributes: %s", str(exc))
 
-        # Battery Health Tracking
-        self._update_battery_health()
+            # Update vacuum state
+            if ENTITY_VACUUM in self.entities:
+                try:
+                    self.entities[ENTITY_VACUUM].indego_state = getattr(self._indego_client.state, 'state', None)
+                    self.entities[ENTITY_VACUUM].battery_charging = self.entities[ENTITY_BATTERY].charging
+                except Exception as exc:
+                    _LOGGER.error("Failed to update vacuum state: %s", str(exc))
 
-        # Maintenance Hours Tracking
-        self._update_maintenance_hours()
+            # Update lawn mower state
+            if ENTITY_LAWN_MOWER in self.entities:
+                try:
+                    self.entities[ENTITY_LAWN_MOWER].indego_state = getattr(self._indego_client.state, 'state', None)
+                except Exception as exc:
+                    _LOGGER.error("Failed to update lawn mower state: %s", str(exc))
 
-        # Session Counting and Estimated Duration
-        self._update_session_tracking()
+            # Position tracking and stuck detection
+            try:
+                svg_x = getattr(self._indego_client.state, 'svg_xPos', None)
+                svg_y = getattr(self._indego_client.state, 'svg_yPos', None)
 
-        # Error Code Tracking
-        self._update_error_tracking()
+                if svg_x is not None and svg_y is not None:
+                    if ENTITY_MOWER_SVG_X in self.entities:
+                        self.entities[ENTITY_MOWER_SVG_X].state = svg_x
+                    if ENTITY_MOWER_SVG_Y in self.entities:
+                        self.entities[ENTITY_MOWER_SVG_Y].state = svg_y
+
+                    is_mowing = 500 <= self._indego_client.state.state <= 799
+                    now = datetime.now()
+
+                    moved = self._last_svg_x is None or math.sqrt(
+                        (svg_x - self._last_svg_x) ** 2 + (svg_y - self._last_svg_y) ** 2
+                    ) > 5
+
+                    if moved:
+                        self._last_svg_x = svg_x
+                        self._last_svg_y = svg_y
+                        self._last_position_change_time = now
+
+                    stuck = (
+                        is_mowing
+                        and self._last_position_change_time is not None
+                        and (now - self._last_position_change_time).total_seconds() > 60
+                    )
+
+                    if ENTITY_MOWER_STUCK in self.entities:
+                        self.entities[ENTITY_MOWER_STUCK].state = stuck
+                        if stuck:
+                            self.entities[ENTITY_MOWER_STUCK].add_attributes({
+                                "stuck_since": self._last_position_change_time.strftime("%Y-%m-%d %H:%M:%S"),
+                                "stuck_x": svg_x,
+                                "stuck_y": svg_y,
+                            })
+
+                    if is_mowing:
+                        self._map_trail.append((svg_x, svg_y))
+
+                    self._hass.async_create_task(self._update_map_svg(svg_x, svg_y))
+            except Exception as exc:
+                _LOGGER.error("Failed to update position tracking: %s", str(exc))
+
+            # Battery Health Tracking
+            try:
+                self._update_battery_health()
+            except Exception as exc:
+                _LOGGER.error("Failed to update battery health: %s", str(exc))
+
+            # Maintenance Hours Tracking
+            try:
+                self._update_maintenance_hours()
+            except Exception as exc:
+                _LOGGER.error("Failed to update maintenance hours: %s", str(exc))
+
+            # Session Counting and Estimated Duration
+            try:
+                self._update_session_tracking()
+            except Exception as exc:
+                _LOGGER.error("Failed to update session tracking: %s", str(exc))
+
+            # Error Code Tracking
+            try:
+                self._update_error_tracking()
+            except Exception as exc:
+                _LOGGER.error("Failed to update error tracking: %s", str(exc))
+
+        except Exception as exc:
+            _LOGGER.error("Unexpected error in _update_state: %s", str(exc))
 
     async def _update_generic_data(self):
-        await self._indego_client.update_generic_data()
+        try:
+            await self._indego_client.update_generic_data()
+            _LOGGER.debug("Generic data updated successfully")
+        except Exception as exc:
+            _LOGGER.warning("Failed to fetch generic data: %s", str(exc))
+            return None
 
-        if self._indego_client.generic_data:
+        try:
+            if self._indego_client.generic_data:
+                if ENTITY_MOWING_MODE in self.entities:
+                    mowing_mode = getattr(
+                        self._indego_client.generic_data,
+                        'mowing_mode_description',
+                        STATE_UNKNOWN
+                    )
+                    self.entities[ENTITY_MOWING_MODE].state = mowing_mode
+                    _LOGGER.debug("Mowing mode: %s", mowing_mode)
+            else:
+                _LOGGER.warning("Generic data is None")
+                if ENTITY_MOWING_MODE in self.entities:
+                    self.entities[ENTITY_MOWING_MODE].state = STATE_UNKNOWN
+        except Exception as exc:
+            _LOGGER.error("Error updating mowing mode: %s", str(exc))
             if ENTITY_MOWING_MODE in self.entities:
-                self.entities[
-                    ENTITY_MOWING_MODE
-                ].state = self._indego_client.generic_data.mowing_mode_description
+                self.entities[ENTITY_MOWING_MODE].state = STATE_UNKNOWN
 
         return self._indego_client.generic_data
 
@@ -1112,97 +1259,129 @@ class IndegoHub:
         if ENTITY_BATTERY_HEALTH not in self.entities:
             return
 
-        battery_state = self._indego_client.generic_data
-        if not battery_state:
-            return
+        try:
+            battery_state = self._indego_client.generic_data
+            if not battery_state:
+                _LOGGER.debug("Generic data not available for battery health")
+                return
 
-        charge_cycles = getattr(battery_state, "charge_cycles", 0) or 0
-        battery_temp = getattr(battery_state, "battery_temp", None)
+            charge_cycles = getattr(battery_state, "charge_cycles", 0) or 0
+            battery_temp = getattr(battery_state, "battery_temp", None)
 
-        # Determine health status based on cycles
-        if charge_cycles < 100:
-            health_status = "excellent"
-        elif charge_cycles < 300:
-            health_status = "good"
-        elif charge_cycles < 500:
-            health_status = "fair"
-        elif charge_cycles < 800:
-            health_status = "poor"
-        else:
-            health_status = "critical"
+            # Determine health status based on cycles
+            if charge_cycles < 100:
+                health_status = "excellent"
+            elif charge_cycles < 300:
+                health_status = "good"
+            elif charge_cycles < 500:
+                health_status = "fair"
+            elif charge_cycles < 800:
+                health_status = "poor"
+            else:
+                health_status = "critical"
 
-        self.entities[ENTITY_BATTERY_HEALTH].state = health_status
-        self.entities[ENTITY_BATTERY_HEALTH].add_attributes({
-            "charge_cycles": charge_cycles,
-            "battery_temperature": battery_temp,
-        })
+            self.entities[ENTITY_BATTERY_HEALTH].state = health_status
+            self.entities[ENTITY_BATTERY_HEALTH].add_attributes({
+                "charge_cycles": charge_cycles,
+                "battery_temperature": battery_temp,
+            })
+            _LOGGER.debug("Battery health updated: %s (%d cycles)", health_status, charge_cycles)
+        except Exception as exc:
+            _LOGGER.error("Failed to update battery health: %s", str(exc))
+            self.entities[ENTITY_BATTERY_HEALTH].state = STATE_UNKNOWN
 
     def _update_session_tracking(self):
         """Track session count and calculate estimated duration."""
-        current_state = self._indego_client.state.state
-        is_mowing = 500 <= current_state <= 799
+        try:
+            current_state = getattr(self._indego_client.state, 'state', None)
+            if current_state is None:
+                _LOGGER.debug("State not available for session tracking")
+                return
 
-        # Count transitions to mowing state
-        if is_mowing and self._last_session_state != current_state:
-            if not (500 <= (self._last_session_state or 0) <= 799):
-                self._session_count += 1
+            is_mowing = 500 <= current_state <= 799
 
-        self._last_session_state = current_state
+            # Count transitions to mowing state
+            if is_mowing and self._last_session_state != current_state:
+                if not (500 <= (self._last_session_state or 0) <= 799):
+                    self._session_count += 1
+                    _LOGGER.debug("New mowing session started, count: %d", self._session_count)
 
-        if ENTITY_SESSION_COUNT in self.entities:
-            self.entities[ENTITY_SESSION_COUNT].state = self._session_count
+            self._last_session_state = current_state
 
-        # Calculate estimated session duration
-        if ENTITY_ESTIMATED_DURATION in self.entities:
-            estimated_mins = self._calculate_estimated_duration()
-            self.entities[ENTITY_ESTIMATED_DURATION].state = estimated_mins
+            if ENTITY_SESSION_COUNT in self.entities:
+                self.entities[ENTITY_SESSION_COUNT].state = self._session_count
 
-            self.entities[ENTITY_ESTIMATED_DURATION].add_attributes({
-                "based_on_battery": f"{estimated_mins} min (from battery capacity)",
-                "based_on_garden_size": f"{estimated_mins} min (from garden size)",
-            })
+            # Calculate estimated session duration
+            if ENTITY_ESTIMATED_DURATION in self.entities:
+                estimated_mins = self._calculate_estimated_duration()
+                self.entities[ENTITY_ESTIMATED_DURATION].state = estimated_mins
+
+                self.entities[ENTITY_ESTIMATED_DURATION].add_attributes({
+                    "based_on_battery": f"{estimated_mins} min (from battery capacity)",
+                    "based_on_garden_size": f"{estimated_mins} min (from garden size)",
+                })
+        except Exception as exc:
+            _LOGGER.error("Failed to update session tracking: %s", str(exc))
 
     def _calculate_estimated_duration(self) -> int:
         """Calculate estimated session duration based on battery and garden size."""
-        battery_percent = self._indego_client.state.battery.percent
-        garden_size = getattr(self._indego_client.generic_data, "garden_size", 0) or 100
+        try:
+            # Safely get battery percent - some mowers don't have this attribute
+            if hasattr(self._indego_client.state, 'battery') and self._indego_client.state.battery:
+                battery_percent = getattr(self._indego_client.state.battery, 'percent', None)
+                if battery_percent is None:
+                    _LOGGER.debug("Battery percent not available for duration estimation")
+                    battery_percent = 50  # Use default estimate
+            else:
+                _LOGGER.debug("Battery data not available for duration estimation")
+                battery_percent = 50  # Use default estimate
 
-        # Estimation based on battery capacity
-        # Assume: 100% = 120 minutes max
-        battery_based = int((battery_percent / 100) * 120)
+            garden_size = getattr(self._indego_client.generic_data, "garden_size", 0) or 100
 
-        # Estimation based on garden size
-        # Assume: 500m² = 60min, scales linearly
-        garden_based = max(10, int((garden_size / 500) * 60))
+            # Estimation based on battery capacity
+            # Assume: 100% = 120 minutes max
+            battery_based = int((battery_percent / 100) * 120)
 
-        # Return conservative estimate (minimum of both)
-        estimated = min(battery_based, garden_based)
-        return max(5, estimated)  # At least 5 minutes
+            # Estimation based on garden size
+            # Assume: 500m² = 60min, scales linearly
+            garden_based = max(10, int((garden_size / 500) * 60))
+
+            # Return conservative estimate (minimum of both)
+            estimated = min(battery_based, garden_based)
+            return max(5, estimated)  # At least 5 minutes
+        except Exception as exc:
+            _LOGGER.debug("Failed to calculate estimated duration: %s", str(exc))
+            return 30  # Return safe default
 
     def _update_error_tracking(self):
         """Track error codes and descriptions from last alert."""
         if ENTITY_LAST_ERROR_CODE not in self.entities:
             return
 
-        if self._indego_client.alerts and len(self._indego_client.alerts) > 0:
-            latest_alert = self._indego_client.alerts[0]
-            error_code = str(latest_alert.error_code)
-            error_description = get_error_description(error_code)
+        try:
+            if self._indego_client.alerts and len(self._indego_client.alerts) > 0:
+                latest_alert = self._indego_client.alerts[0]
+                error_code = str(latest_alert.error_code)
+                error_description = get_error_description(error_code)
 
-            self._last_error_code = error_code
-            self._last_error_time = latest_alert.date
+                self._last_error_code = error_code
+                self._last_error_time = latest_alert.date
 
-            self.entities[ENTITY_LAST_ERROR_CODE].state = error_description
-            self.entities[ENTITY_LAST_ERROR_CODE].add_attributes({
-                "error_code": error_code,
-                "error_time": format_indego_date(latest_alert.date),
-            })
-        else:
-            self.entities[ENTITY_LAST_ERROR_CODE].state = "No errors"
-            self.entities[ENTITY_LAST_ERROR_CODE].add_attributes({
-                "error_code": "0",
-                "error_time": "N/A",
-            })
+                self.entities[ENTITY_LAST_ERROR_CODE].state = error_description
+                self.entities[ENTITY_LAST_ERROR_CODE].add_attributes({
+                    "error_code": error_code,
+                    "error_time": format_indego_date(latest_alert.date),
+                })
+                _LOGGER.debug("Last error updated: %s (code: %s)", error_description, error_code)
+            else:
+                self.entities[ENTITY_LAST_ERROR_CODE].state = "No errors"
+                self.entities[ENTITY_LAST_ERROR_CODE].add_attributes({
+                    "error_code": "0",
+                    "error_time": "N/A",
+                })
+        except Exception as exc:
+            _LOGGER.error("Failed to update error tracking: %s", str(exc))
+            self.entities[ENTITY_LAST_ERROR_CODE].state = STATE_UNKNOWN
 
     async def _update_firmware_version(self):
         """Update firmware version sensor."""
@@ -1210,39 +1389,55 @@ class IndegoHub:
             return
 
         try:
-            # Check if firmware version is available
-            firmware_version = getattr(self._indego_client, "firmware_version", None)
-            if firmware_version:
-                self.entities[ENTITY_FIRMWARE_VERSION].state = str(firmware_version)
+            # Firmware version is available in generic_data, not directly on client
+            if self._indego_client.generic_data:
+                firmware_version = getattr(self._indego_client.generic_data, "alm_firmware_version", None)
+                if firmware_version:
+                    self.entities[ENTITY_FIRMWARE_VERSION].state = str(firmware_version)
+                    _LOGGER.debug("Firmware version updated: %s", firmware_version)
+                else:
+                    _LOGGER.warning("alm_firmware_version not available in generic_data")
+                    self.entities[ENTITY_FIRMWARE_VERSION].state = STATE_UNKNOWN
             else:
-                self.entities[ENTITY_FIRMWARE_VERSION].state = "Unknown"
+                _LOGGER.warning("generic_data not available for firmware version")
+                self.entities[ENTITY_FIRMWARE_VERSION].state = STATE_UNKNOWN
         except Exception as e:
-            _LOGGER.debug("Could not fetch firmware version: %s", str(e))
-            self.entities[ENTITY_FIRMWARE_VERSION].state = "Unknown"
+            _LOGGER.error("Failed to fetch firmware version: %s", str(e))
+            self.entities[ENTITY_FIRMWARE_VERSION].state = STATE_UNKNOWN
 
     def _update_maintenance_hours(self):
         """Track maintenance hours based on cumulative operation time."""
         if ENTITY_MAINTENANCE_HOURS not in self.entities:
             return
 
-        runtime = self._indego_client.state.runtime
-        if not runtime:
-            return
+        try:
+            runtime = getattr(self._indego_client.state, 'runtime', None)
+            if not runtime:
+                _LOGGER.debug("Runtime data not available for maintenance hours")
+                return
 
-        total_hours = runtime.total.operate
+            total_hours = getattr(runtime.total if hasattr(runtime, 'total') else runtime, 'operate', None)
+            if total_hours is None:
+                _LOGGER.debug("Total operation hours not available")
+                self.entities[ENTITY_MAINTENANCE_HOURS].state = STATE_UNKNOWN
+                return
 
-        # Maintenance recommendations (based on Indego specs)
-        if total_hours < 50:
-            maintenance_status = "good"
-        elif total_hours < 150:
-            maintenance_status = "service_due_soon"
-        else:
-            maintenance_status = "service_required"
+            # Maintenance recommendations (based on Indego specs)
+            if total_hours < 50:
+                maintenance_status = "good"
+            elif total_hours < 150:
+                maintenance_status = "service_due_soon"
+            else:
+                maintenance_status = "service_required"
 
-        self.entities[ENTITY_MAINTENANCE_HOURS].state = int(total_hours)
-        self.entities[ENTITY_MAINTENANCE_HOURS].add_attributes({
-            "maintenance_status": maintenance_status,
-        })
+            self.entities[ENTITY_MAINTENANCE_HOURS].state = int(total_hours)
+            self.entities[ENTITY_MAINTENANCE_HOURS].add_attributes({
+                "maintenance_status": maintenance_status,
+            })
+            _LOGGER.debug("Maintenance hours updated: %d hours (%s)", int(total_hours), maintenance_status)
+        except Exception as exc:
+            _LOGGER.error("Failed to update maintenance hours: %s", str(exc))
+            self.entities[ENTITY_MAINTENANCE_HOURS].state = STATE_UNKNOWN
 
     @property
     def serial(self) -> str:
