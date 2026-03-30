@@ -1,4 +1,4 @@
-[![GitHub release](https://img.shields.io/github/release/WhyLev/Indego.svg)](https://github.com/WhyLev/Indego/releases/) [![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg)](https://github.com/custom-components/hacs)
+[![GitHub release](https://img.shields.io/github/release/sander1988/Indego.svg)](https://github.com/sander1988/Indego/releases/) [![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg)](https://github.com/custom-components/hacs)
 
 # Indego
 Join the Discord channel to discuss around this integration and vote for your favourite change to happen!
@@ -211,7 +211,7 @@ If you experience any readings from your mower that the sensor does not read out
 ## New issues
 If you experience issues/bugs with this the best way to report them is to open an issue in **this** repo.
 
-[Issue link](https://github.com/WhyLev/Indego/issues)
+[Issue link](https://github.com/sander1988/Indego/issues)
 
 
 ## Credits
@@ -233,8 +233,6 @@ nath
 [mhosse](https://github.com/mhosse)
 [Promises](https://github.com/Pr0mises)
 [Sander1988](https://github.com/sander1988)
-
-Fork from iMarkus/Indego https://github.com/iMarkus/Indego
 
 Inspiration from http://grauonline.de/wordpress/?page_id=219
 
