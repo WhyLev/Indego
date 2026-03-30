@@ -241,14 +241,6 @@ ENTITY_DEFINITIONS = {
         CONF_DEVICE_CLASS: BinarySensorDeviceClass.PROBLEM,
         CONF_ATTR: ["stuck_since", "stuck_x", "stuck_y"],
     },
-    ENTITY_BATTERY_HEALTH: {
-        CONF_TYPE: SENSOR_TYPE,
-        CONF_NAME: "battery health",
-        CONF_ICON: "mdi:battery-heart",
-        CONF_DEVICE_CLASS: SensorDeviceClass.ENUM,
-        CONF_UNIT_OF_MEASUREMENT: None,
-        CONF_ATTR: ["charge_cycles", "battery_temperature"],
-    },
     ENTITY_LAST_ERROR_CODE: {
         CONF_TYPE: SENSOR_TYPE,
         CONF_NAME: "last error",
@@ -1086,12 +1078,6 @@ class IndegoHub:
             except Exception as exc:
                 _LOGGER.error("Failed to update position tracking: %s", str(exc))
 
-            # Battery Health Tracking
-            try:
-                self._update_battery_health()
-            except Exception as exc:
-                _LOGGER.error("Failed to update battery health: %s", str(exc))
-
             # Maintenance Hours Tracking
             try:
                 self._update_maintenance_hours()
@@ -1253,42 +1239,6 @@ class IndegoHub:
 
         except Exception as exc:
             _LOGGER.warning("Failed to update Indego map SVG: %s", str(exc))
-
-    def _update_battery_health(self):
-        """Track battery health based on charge cycles and temperature."""
-        if ENTITY_BATTERY_HEALTH not in self.entities:
-            return
-
-        try:
-            battery_state = self._indego_client.generic_data
-            if not battery_state:
-                _LOGGER.debug("Generic data not available for battery health")
-                return
-
-            charge_cycles = getattr(battery_state, "charge_cycles", 0) or 0
-            battery_temp = getattr(battery_state, "battery_temp", None)
-
-            # Determine health status based on cycles
-            if charge_cycles < 100:
-                health_status = "excellent"
-            elif charge_cycles < 300:
-                health_status = "good"
-            elif charge_cycles < 500:
-                health_status = "fair"
-            elif charge_cycles < 800:
-                health_status = "poor"
-            else:
-                health_status = "critical"
-
-            self.entities[ENTITY_BATTERY_HEALTH].state = health_status
-            self.entities[ENTITY_BATTERY_HEALTH].add_attributes({
-                "charge_cycles": charge_cycles,
-                "battery_temperature": battery_temp,
-            })
-            _LOGGER.debug("Battery health updated: %s (%d cycles)", health_status, charge_cycles)
-        except Exception as exc:
-            _LOGGER.error("Failed to update battery health: %s", str(exc))
-            self.entities[ENTITY_BATTERY_HEALTH].state = STATE_UNKNOWN
 
     def _update_session_tracking(self):
         """Track session count and calculate estimated duration."""

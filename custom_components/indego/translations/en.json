@@ -10,8 +10,8 @@
             "advanced": {
                 "data": {
                     "user_agent": "User-Agent",
-                    "expose_mower": "Expose Indego mower as mower entity in HomeAssistant",
-                    "expose_vacuum": "Expose Indego mower as vacuum entity in HomeAssistant"
+                    "expose_mower": "Expose Indego mower as mower entity in Home Assistant",
+                    "expose_vacuum": "Expose Indego mower as vacuum entity in Home Assistant"
                 },
                 "description": "Advanced settings of the Bosch Indego component."
             },
@@ -20,7 +20,7 @@
                     "mower_serial": "Mower serial",
                     "mower_name": "Mower name"
                 },
-                "description": "Please select the serial of the Bosch Mower your would like to add."
+                "description": "Please select the serial of the Bosch Mower you would like to add."
             },
             "reauth_confirm": {
                 "title": "Authentication expired",
@@ -35,9 +35,9 @@
               "description": "Advanced settings of the Bosch Indego component. You might have to reload the component after changing these settings.",
               "data": {
                   "user_agent": "User-Agent",
-                  "expose_mower": "Expose Indego mower as mower entity in HomeAssistant",
-                  "expose_vacuum": "Expose Indego mower as vacuum entity in HomeAssistant",
-                  "show_all_alerts": "Show the full alert history into HomeAssistant. This is not recommended for most users, it might have a significant impact on the HomeAssistant database size!"
+                  "expose_mower": "Expose Indego mower as mower entity in Home Assistant",
+                  "expose_vacuum": "Expose Indego mower as vacuum entity in Home Assistant",
+                  "show_all_alerts": "Show the full alert history in Home Assistant. This is not recommended for most users, as it might have a significant impact on the Home Assistant database size!"
               }
           }
       }
@@ -56,7 +56,7 @@
                         "name": "Alert message (most recent)"
                     },
                     "last_alert_date": {
-                        "name": " Alert date (most recent)"
+                        "name": "Alert date (most recent)"
                     },
                     "last_alert_read": {
                         "name": "Alert status (most recent)",
@@ -71,7 +71,7 @@
     },
     "services": {
         "command": {
-            "description": "Send commands to the mower. Allowed commands are mow, returnToDock and pause.",
+            "description": "Send commands to the mower. Allowed commands are mow, returnToDock, and pause.",
             "fields": {
                 "mower_serial": {
                     "description": "Mower serial. Only needed when you have configured multiple mowers."
@@ -82,7 +82,7 @@
             }
         },
         "smartmowing": {
-            "description": "Enable or Disable SmartMowing. Allowed commands are true or false.",
+            "description": "Enable or disable SmartMowing. Allowed values are true or false.",
             "fields": {
                 "mower_serial": {
                     "description": "Mower serial. Only needed when you have configured multiple mowers."
@@ -99,7 +99,7 @@
                     "description": "Mower serial. Only needed when you have configured multiple mowers."
                 },
                 "alert_index": {
-                    "description": "Delete the selected alerts. 0 for the latest alert."
+                    "description": "Delete the selected alert. 0 for the latest alert."
                 }
             }
         },
