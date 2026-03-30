@@ -1,0 +1,180 @@
+{
+    "config": {
+        "abort": {
+            "already_configured": "Denne Bosch Indego-gressklipperen er allerede konfigurert!",
+            "connection_error": "Tilkoblingen til Bosch Indego API mislyktes! Bruk siden for kjente problemer (https://github.com/sander1988/Indego?tab=readme-ov-file#known-issues) for mulige løsninger.",
+            "no_mowers_found": "Ingen gressklippere funnet på denne Bosch Indego-kontoen!",
+            "reauth_successful": "Gjenautentisering var vellykket. Tilgangen til Bosch API er gjenopprettet."
+        },
+        "step": {
+            "advanced": {
+                "data": {
+                    "user_agent": "User-Agent",
+                    "expose_mower": "Vis Indego-gressklipperen som en mower-enhet i Home Assistant",
+                    "expose_vacuum": "Vis Indego-gressklipperen som en støvsuger-enhet i Home Assistant"
+                },
+                "description": "Avanserte innstillinger for Bosch Indego-komponenten."
+            },
+            "mower": {
+                "data": {
+                    "mower_serial": "Gressklipperens serienummer",
+                    "mower_name": "Gressklippernavn"
+                },
+                "description": "Velg serienummeret på Bosch-gressklipperen du vil legge til."
+            },
+            "reauth_confirm": {
+                "title": "Autentisering utløpt",
+                "description": "Autentiseringen av Bosch Indego API er utløpt. Autentiser på nytt med din Bosch SingleKey ID."
+            }
+        }
+    },
+    "options": {
+      "step": {
+          "init": {
+              "title": "Avanserte innstillinger",
+              "description": "Avanserte innstillinger for Bosch Indego-komponenten. Du må kanskje laste inn komponenten på nytt etter å ha endret disse innstillingene.",
+              "data": {
+                  "user_agent": "User-Agent",
+                  "expose_mower": "Vis Indego-gressklipperen som en mower-enhet i Home Assistant",
+                  "expose_vacuum": "Vis Indego-gressklipperen som en støvsuger-enhet i Home Assistant",
+                  "show_all_alerts": "Vis hele advarselshistorikken i Home Assistant. Dette anbefales ikke for de fleste brukere, da det kan ha en betydelig innvirkning på Home Assistant-databasens størrelse!"
+              }
+          }
+      }
+    },
+    "entity": {
+        "binary_sensor": {
+            "indego_alert": {
+                "state_attributes": {
+                    "alerts_count": {
+                        "name": "Antall advarsler"
+                    },
+                    "last_alert_error_code": {
+                        "name": "Feilkode (siste)"
+                    },
+                    "last_alert_message": {
+                        "name": "Advarselmelding (siste)"
+                    },
+                    "last_alert_date": {
+                        "name": "Advarselsdato (siste)"
+                    },
+                    "last_alert_read": {
+                        "name": "Advarselsstatus (siste)",
+                        "state": {
+                            "read": "Lest",
+                            "unread": "Ulest"
+                        }
+                    }
+                }
+            }
+        },
+        "sensor": {
+            "mower_state": {
+                "state": {
+                    "Mowing": "Klipper",
+                    "Docked": "Docket",
+                    "Sleeping": "Sover",
+                    "Paused": "Pauset"
+                }
+            },
+            "mower_state_detail": {
+                "state": {
+                    "Reading status": "Leser status",
+                    "Charging": "Lader",
+                    "Docked": "Docket",
+                    "Sleeping": "Sover",
+                    "Docked - Software update": "Docket - Programvareoppdatering",
+                    "Docked - Loading map": "Docket - Laster kart",
+                    "Docked - Saving map": "Docket - Lagrer kart",
+                    "Docked - Leaving Dock": "Docket - Forlater dockingstasjon",
+                    "Mowing": "Klipper",
+                    "Mowing - Relocalising": "Klipper - Omposisjonering",
+                    "Mowing - Learning Lawn": "Klipper - Lærer gressplenen",
+                    "Mowing - Learning Lawn paused": "Klipper - Læring av gressplenen pauset",
+                    "SpotMow": "SpotMow",
+                    "Mowing randomly": "Klipper tilfeldig",
+                    "Diagnostic mode": "Diagnostisk modus",
+                    "End of life": "Levetids slutt",
+                    "Software update": "Programvareoppdatering",
+                    "Energy save mode": "Energispareringsmodus",
+                    "Relocalising": "Omposisjonering",
+                    "Loading map": "Laster kart",
+                    "Learning lawn": "Lærer gressplenen",
+                    "Paused": "Pauset",
+                    "Border cut": "Kantklipp",
+                    "Idle in lawn": "Inaktiv på gressplenen",
+                    "Stuck on lawn, help needed": "Stukket fast på gressplenen, hjelp trengs",
+                    "Returning to Dock": "Returnerer til dockingstasjon",
+                    "Returning to Dock - Battery low": "Returnerer til dockingstasjon - Batteri lavt",
+                    "Returning to dock - Calendar timeslot ended": "Returnerer til dockingstasjon - Kalender-tidsrom endt",
+                    "Returning to dock - Battery temp range": "Returnerer til dockingstasjon - Batteritemperaturbereich",
+                    "Returning to dock - Lawn complete": "Returnerer til dockingstasjon - Gressplenen helt klippet",
+                    "Returning to dock - Relocalising": "Returnerer til dockingstasjon - Omposisjonering",
+                    "Returning to dock - requested by user/app": "Returnerer til dockingstasjon - Forespurt av bruker/app"
+                }
+            }
+        }
+    },
+    "services": {
+        "command": {
+            "description": "Send kommandoer til gressklipperen. Tillatte kommandoer er mow, returnToDock og pause.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Gressklipperens serienummer. Bare nødvendig hvis du har konfigurert flere gressklippere."
+                },
+                "command": {
+                    "description": "Kommando til gressklipperen."
+                }
+            }
+        },
+        "smartmowing": {
+            "description": "Aktiver eller deaktiver SmartMowing. Tillatte verdier er true eller false.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Gressklipperens serienummer. Bare nødvendig hvis du har konfigurert flere gressklippere."
+                },
+                "enable": {
+                    "description": "Aktiver SmartMowing."
+                }
+            }
+        },
+        "delete_alert": {
+            "description": "Slett den valgte advarselen.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Gressklipperens serienummer. Bare nødvendig hvis du har konfigurert flere gressklippere."
+                },
+                "alert_index": {
+                    "description": "Slett den valgte advarselen. 0 for den siste advarselen."
+                }
+            }
+        },
+        "delete_alert_all": {
+            "description": "Slett alle advarsler.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Gressklipperens serienummer. Bare nødvendig hvis du har konfigurert flere gressklippere."
+                }
+            }
+        },
+        "read_alert": {
+            "description": "Merk den valgte advarselen som lest.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Gressklipperens serienummer. Bare nødvendig hvis du har konfigurert flere gressklippere."
+                },
+                "alert_index": {
+                    "description": "Merk den valgte advarselen som lest. 0 for den siste advarselen."
+                }
+            }
+        },
+        "read_alert_all": {
+            "description": "Merk alle advarsler som leste.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Gressklipperens serienummer. Bare nødvendig hvis du har konfigurert flere gressklippere."
+                }
+            }
+        }
+    }
+}

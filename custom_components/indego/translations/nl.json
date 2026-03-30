@@ -10,8 +10,8 @@
             "advanced": {
                 "data": {
                     "user_agent": "User-Agent",
-                    "expose_mower": "Voeg de Indego robotmaaier toe als grasmaaier entiteit aan HomeAssistant",
-                    "expose_vacuum": "Voeg de Indego robotmaaier toe als stofzuiger entiteit aan HomeAssistant"
+                    "expose_mower": "Voeg de Indego robotmaaier toe als grasmaaier entiteit aan Home Assistant",
+                    "expose_vacuum": "Voeg de Indego robotmaaier toe als stofzuiger entiteit aan Home Assistant"
                 },
                 "description": "Geavanceerde instellingen van het Bosch Indego component."
             },
@@ -35,9 +35,9 @@
               "description": "Geavanceerde instellingen van het Bosch Indego component. Mogelijk moet het component opnieuw geladen worden na het wijzigen van deze instellingen.",
               "data": {
                   "user_agent": "User-Agent",
-                  "expose_mower": "Voeg de Indego robotmaaier toe als grasmaaier entiteit aan HomeAssistant",
-                  "expose_vacuum": "Voeg de Indego robotmaaier toe als stofzuiger entiteit aan HomeAssistant",
-                  "show_all_alerts": "Toon de volledige melding/waarschuwing geschiedenis in HomeAssistant. Dit wordt niet aangeraden voor de meeste gebruikers, het heeft mogelijk een significante impact op de HomeAssistant database!"
+                  "expose_mower": "Voeg de Indego robotmaaier toe als grasmaaier entiteit aan Home Assistant",
+                  "expose_vacuum": "Voeg de Indego robotmaaier toe als stofzuiger entiteit aan Home Assistant",
+                  "show_all_alerts": "Toon de volledige melding/waarschuwing geschiedenis in Home Assistant. Dit wordt niet aangeraden voor de meeste gebruikers, het heeft mogelijk een significante impact op de Home Assistant database!"
               }
           }
       }
@@ -98,7 +98,7 @@
                     "Software update": "Software update",
                     "Energy save mode": "Energiespaarstand",
                     "Relocalising": "Herlokaliseren",
-                    "Loading map": "Map laden map",
+                    "Loading map": "Map laden",
                     "Learning lawn": "Gazon leren",
                     "Paused": "Gepauzeerd",
                     "Border cut": "Rand maaien",
@@ -106,7 +106,7 @@
                     "Stuck on lawn, help needed": "Vastgelopen op gazon, hulp nodig",
                     "Returning to Dock": "Terugkeren naar basisstation",
                     "Returning to Dock - Battery low": "Terugkeren naar basisstation - Batterij bijna leeg",
-                    "Returning to dock - Calendar timeslot ended": "Terugkeren naar basisstation - Kalender tijdslot eindigd",
+                    "Returning to dock - Calendar timeslot ended": "Terugkeren naar basisstation - Kalender tijdslot verstreken",
                     "Returning to dock - Battery temp range": "Terugkeren naar basisstation - Batterij temperatuur",
                     "Returning to dock - Lawn complete": "Terugkeren naar basisstation - Maaien voltooid",
                     "Returning to dock - Relocalising": "Terugkeren naar basisstation - Herlokaliseren",
@@ -128,13 +128,13 @@
             }
         },
         "smartmowing": {
-            "description": "Schakel smart-maaier in of uit. Ondersteunde waardes zijn: true of false.",
+            "description": "Schakel SmartMowing in of uit. Ondersteunde waardes zijn: true of false.",
             "fields": {
                 "mower_serial": {
                     "description": "Grasmaaier serienummer. Alleen nodig wanneer je meerdere grasmaaiers hebt geconfigureerd."
                 },
                 "enable": {
-                    "description": "Schakel smart-maaier in of uit."
+                    "description": "Schakel SmartMowing in of uit."
                 }
             }
         },
@@ -145,7 +145,7 @@
                     "description": "Grasmaaier serienummer. Alleen nodig wanneer je meerdere grasmaaiers hebt geconfigureerd."
                 },
                 "alert_index": {
-                    "description": "De index van het melding. 0 is het nieuwste bericht."
+                    "description": "De index van de melding. 0 is het nieuwste bericht."
                 }
             }
         },
@@ -164,7 +164,7 @@
                     "description": "Grasmaaier serienummer. Alleen nodig wanneer je meerdere grasmaaiers hebt geconfigureerd."
                 },
                 "alert_index": {
-                    "description": "De index van het melding. 0 is het nieuwste bericht."
+                    "description": "De index van de melding. 0 is het nieuwste bericht."
                 }
             }
         },

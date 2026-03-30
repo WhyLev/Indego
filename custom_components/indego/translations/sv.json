@@ -1,0 +1,180 @@
+{
+    "config": {
+        "abort": {
+            "already_configured": "Denna Bosch Indego-gräsklippare har redan konfigurerats!",
+            "connection_error": "Anslutningen till Bosch Indego API misslyckades! Använd sidan för kända problem (https://github.com/sander1988/Indego?tab=readme-ov-file#known-issues) för möjliga lösningar.",
+            "no_mowers_found": "Inga gräsklippare hittades på det här Bosch Indego-kontot!",
+            "reauth_successful": "Omautentisering var genomförd. Åtkomsten till Bosch API har återställts."
+        },
+        "step": {
+            "advanced": {
+                "data": {
+                    "user_agent": "User-Agent",
+                    "expose_mower": "Exponera Indego-gräsklippare som mower-enhet i Home Assistant",
+                    "expose_vacuum": "Exponera Indego-gräsklippare som dammsugare-enhet i Home Assistant"
+                },
+                "description": "Avancerade inställningar för Bosch Indego-komponenten."
+            },
+            "mower": {
+                "data": {
+                    "mower_serial": "Gräsklippare serienummer",
+                    "mower_name": "Gräsklippare namn"
+                },
+                "description": "Välj serienumret på Bosch gräsklipparen som du vill lägga till."
+            },
+            "reauth_confirm": {
+                "title": "Autentisering utgången",
+                "description": "Autentiseringen av Bosch Indego API har utgått. Autentisera igen med ditt Bosch SingleKey ID."
+            }
+        }
+    },
+    "options": {
+      "step": {
+          "init": {
+              "title": "Avancerade inställningar",
+              "description": "Avancerade inställningar för Bosch Indego-komponenten. Du kan behöva ladda om komponenten efter att ha ändrat dessa inställningar.",
+              "data": {
+                  "user_agent": "User-Agent",
+                  "expose_mower": "Exponera Indego-gräsklippare som mower-enhet i Home Assistant",
+                  "expose_vacuum": "Exponera Indego-gräsklippare som dammsugare-enhet i Home Assistant",
+                  "show_all_alerts": "Visa hela aviseringshistoriken i Home Assistant. Detta rekommenderas inte för de flesta användare, eftersom det kan ha en betydande inverkan på Home Assistant-databasens storlek!"
+              }
+          }
+      }
+    },
+    "entity": {
+        "binary_sensor": {
+            "indego_alert": {
+                "state_attributes": {
+                    "alerts_count": {
+                        "name": "Antal aviseringar"
+                    },
+                    "last_alert_error_code": {
+                        "name": "Felkod (senaste)"
+                    },
+                    "last_alert_message": {
+                        "name": "Aviseringsmeddelande (senaste)"
+                    },
+                    "last_alert_date": {
+                        "name": "Aviseringsdatum (senaste)"
+                    },
+                    "last_alert_read": {
+                        "name": "Aviseringsstatus (senaste)",
+                        "state": {
+                            "read": "Läst",
+                            "unread": "Oläst"
+                        }
+                    }
+                }
+            }
+        },
+        "sensor": {
+            "mower_state": {
+                "state": {
+                    "Mowing": "Klipper",
+                    "Docked": "Dockat",
+                    "Sleeping": "Sover",
+                    "Paused": "Pauserad"
+                }
+            },
+            "mower_state_detail": {
+                "state": {
+                    "Reading status": "Läser status",
+                    "Charging": "Laddar",
+                    "Docked": "Dockat",
+                    "Sleeping": "Sover",
+                    "Docked - Software update": "Dockat - Programuppdatering",
+                    "Docked - Loading map": "Dockat - Laddar karta",
+                    "Docked - Saving map": "Dockat - Sparar karta",
+                    "Docked - Leaving Dock": "Dockat - Lämnar dockan",
+                    "Mowing": "Klipper",
+                    "Mowing - Relocalising": "Klipper - Ompositionering",
+                    "Mowing - Learning Lawn": "Klipper - Lär sig gräsmatta",
+                    "Mowing - Learning Lawn paused": "Klipper - Läringsgräsmatta pausad",
+                    "SpotMow": "SpotMow",
+                    "Mowing randomly": "Klipper slumpmässigt",
+                    "Diagnostic mode": "Diagnostikläge",
+                    "End of life": "Livets slut",
+                    "Software update": "Programuppdatering",
+                    "Energy save mode": "Energisparläge",
+                    "Relocalising": "Ompositionering",
+                    "Loading map": "Laddar karta",
+                    "Learning lawn": "Lär sig gräsmatta",
+                    "Paused": "Pauserad",
+                    "Border cut": "Kantklippning",
+                    "Idle in lawn": "Inaktiv på gräsmattan",
+                    "Stuck on lawn, help needed": "Fastnade på gräsmattan, hjälp behövs",
+                    "Returning to Dock": "Återvänder till dockan",
+                    "Returning to Dock - Battery low": "Återvänder till dockan - Lågt batteri",
+                    "Returning to dock - Calendar timeslot ended": "Återvänder till dockan - Kalenderslutsen slutade",
+                    "Returning to dock - Battery temp range": "Återvänder till dockan - Batteritemperaturintervall",
+                    "Returning to dock - Lawn complete": "Återvänder till dockan - Gräsmattan är helt klippt",
+                    "Returning to dock - Relocalising": "Återvänder till dockan - Ompositionering",
+                    "Returning to dock - requested by user/app": "Återvänder till dockan - Begärd av användare/app"
+                }
+            }
+        }
+    },
+    "services": {
+        "command": {
+            "description": "Skicka kommandon till gräsklipparen. Tillåtna kommandon är mow, returnToDock och pause.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Gräsklippare serienummer. Krävs endast när du har flera gräsklippare konfigurerade."
+                },
+                "command": {
+                    "description": "Kommando för gräsklipparen."
+                }
+            }
+        },
+        "smartmowing": {
+            "description": "Aktivera eller inaktivera SmartMowing. Tillåtna värden är true eller false.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Gräsklippare serienummer. Krävs endast när du har flera gräsklippare konfigurerade."
+                },
+                "enable": {
+                    "description": "Aktivera SmartMowing."
+                }
+            }
+        },
+        "delete_alert": {
+            "description": "Radera den valda aviseringen.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Gräsklippare serienummer. Krävs endast när du har flera gräsklippare konfigurerade."
+                },
+                "alert_index": {
+                    "description": "Radera den valda aviseringen. 0 för den senaste aviseringen."
+                }
+            }
+        },
+        "delete_alert_all": {
+            "description": "Radera alla aviseringar.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Gräsklippare serienummer. Krävs endast när du har flera gräsklippare konfigurerade."
+                }
+            }
+        },
+        "read_alert": {
+            "description": "Markera den valda aviseringen som läst.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Gräsklippare serienummer. Krävs endast när du har flera gräsklippare konfigurerade."
+                },
+                "alert_index": {
+                    "description": "Markera den valda aviseringen som läst. 0 för den senaste aviseringen."
+                }
+            }
+        },
+        "read_alert_all": {
+            "description": "Markera alla aviseringar som lästa.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Gräsklippare serienummer. Krävs endast när du har flera gräsklippare konfigurerade."
+                }
+            }
+        }
+    }
+}

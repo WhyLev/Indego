@@ -867,15 +867,29 @@ class IndegoHub:
 
             # Update garden size
             try:
-                if hasattr(self._indego_client.operating_data, 'garden') and self._indego_client.operating_data.garden:
-                    garden_size = self._indego_client.operating_data.garden.size
-                    self.entities[ENTITY_GARDEN_SIZE].state = garden_size
-                    _LOGGER.debug("Garden size updated: %s m²", garden_size)
+                garden_size = None
+
+                if self._indego_client.operating_data:
+                    # Access garden object directly
+                    garden = self._indego_client.operating_data.garden
+
+                    if garden and garden.size:
+                        garden_size = garden.size
+                        _LOGGER.info("✓ Garden size: %s m²", garden_size)
+                    elif garden:
+                        _LOGGER.warning("DEBUG: Garden object exists but size is None/0. Garden: %s", garden)
+                    else:
+                        _LOGGER.warning("DEBUG: Garden object is None")
                 else:
-                    _LOGGER.warning("Garden attribute not available in operating_data")
+                    _LOGGER.warning("Operating data is None")
+
+                if garden_size is not None and garden_size > 0:
+                    self.entities[ENTITY_GARDEN_SIZE].state = garden_size
+                else:
                     self.entities[ENTITY_GARDEN_SIZE].state = STATE_UNKNOWN
-            except AttributeError as exc:
-                _LOGGER.error("Garden size attribute missing: %s", str(exc))
+
+            except Exception as exc:
+                _LOGGER.error("Error accessing garden size: %s", str(exc), exc_info=True)
                 self.entities[ENTITY_GARDEN_SIZE].state = STATE_UNKNOWN
 
         except Exception as exc:

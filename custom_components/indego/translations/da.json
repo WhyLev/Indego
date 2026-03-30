@@ -1,0 +1,180 @@
+{
+    "config": {
+        "abort": {
+            "already_configured": "Denne Bosch Indego-græsslåmaskine er allerede konfigureret!",
+            "connection_error": "Forbindelsen til Bosch Indego API-et mislykkedes! Brug siden for kendte problemer (https://github.com/sander1988/Indego?tab=readme-ov-file#known-issues) for mulige løsninger.",
+            "no_mowers_found": "Ingen græsslåmaskiner fundet på denne Bosch Indego-konto!",
+            "reauth_successful": "Genautentificering var vellykket. Adgangen til Bosch API er blevet gendannet."
+        },
+        "step": {
+            "advanced": {
+                "data": {
+                    "user_agent": "User-Agent",
+                    "expose_mower": "Vis Indego-græsslåmaskinen som en mower-enhed i Home Assistant",
+                    "expose_vacuum": "Vis Indego-græsslåmaskinen som en støvsuger-enhed i Home Assistant"
+                },
+                "description": "Avancerede indstillinger for Bosch Indego-komponenten."
+            },
+            "mower": {
+                "data": {
+                    "mower_serial": "Græsslåmaskine serienummer",
+                    "mower_name": "Græsslåmaskine navn"
+                },
+                "description": "Vælg serienummeret på Bosch-græsslåmaskinen, som du vil tilføje."
+            },
+            "reauth_confirm": {
+                "title": "Autentificering udløbet",
+                "description": "Autentificeringen af Bosch Indego API'et er udløbet. Autentificer igen med dine Bosch SingleKey ID."
+            }
+        }
+    },
+    "options": {
+      "step": {
+          "init": {
+              "title": "Avancerede indstillinger",
+              "description": "Avancerede indstillinger for Bosch Indego-komponenten. Du skal muligvis genindlæse komponenten efter at have ændret disse indstillinger.",
+              "data": {
+                  "user_agent": "User-Agent",
+                  "expose_mower": "Vis Indego-græsslåmaskinen som en mower-enhed i Home Assistant",
+                  "expose_vacuum": "Vis Indego-græsslåmaskinen som en støvsuger-enhed i Home Assistant",
+                  "show_all_alerts": "Vis hele advarselshistorikken i Home Assistant. Dette anbefales ikke for de fleste brugere, da det kan have en væsentlig indvirkning på Home Assistant-databasens størrelse!"
+              }
+          }
+      }
+    },
+    "entity": {
+        "binary_sensor": {
+            "indego_alert": {
+                "state_attributes": {
+                    "alerts_count": {
+                        "name": "Antal advarsler"
+                    },
+                    "last_alert_error_code": {
+                        "name": "Fejlkode (seneste)"
+                    },
+                    "last_alert_message": {
+                        "name": "Advarselskode (seneste)"
+                    },
+                    "last_alert_date": {
+                        "name": "Advarselsdato (seneste)"
+                    },
+                    "last_alert_read": {
+                        "name": "Advarselsstatuts (seneste)",
+                        "state": {
+                            "read": "Læst",
+                            "unread": "Ulæst"
+                        }
+                    }
+                }
+            }
+        },
+        "sensor": {
+            "mower_state": {
+                "state": {
+                    "Mowing": "Slåning",
+                    "Docked": "Docket",
+                    "Sleeping": "Sover",
+                    "Paused": "Sat på pause"
+                }
+            },
+            "mower_state_detail": {
+                "state": {
+                    "Reading status": "Læser status",
+                    "Charging": "Oplader",
+                    "Docked": "Docket",
+                    "Sleeping": "Sover",
+                    "Docked - Software update": "Docket - Softwareopdatering",
+                    "Docked - Loading map": "Docket - Indlæser kort",
+                    "Docked - Saving map": "Docket - Gemmer kort",
+                    "Docked - Leaving Dock": "Docket - Forlader dockingstationen",
+                    "Mowing": "Slåning",
+                    "Mowing - Relocalising": "Slåning - Genpositionering",
+                    "Mowing - Learning Lawn": "Slåning - Lærer græsplænen",
+                    "Mowing - Learning Lawn paused": "Slåning - Læring af græsplæne sat på pause",
+                    "SpotMow": "SpotMow",
+                    "Mowing randomly": "Slår tilfældigt",
+                    "Diagnostic mode": "Diagnostisk tilstand",
+                    "End of life": "Levetidsslut",
+                    "Software update": "Softwareopdatering",
+                    "Energy save mode": "Energisparingstilstand",
+                    "Relocalising": "Genpositionering",
+                    "Loading map": "Indlæser kort",
+                    "Learning lawn": "Lærer græsplænen",
+                    "Paused": "Sat på pause",
+                    "Border cut": "Kantklip",
+                    "Idle in lawn": "Inaktiv på græsplænen",
+                    "Stuck on lawn, help needed": "Fanget på græsplænen, hjælp behøves",
+                    "Returning to Dock": "Vender tilbage til dockingstationen",
+                    "Returning to Dock - Battery low": "Vender tilbage til dockingstationen - Lavt batteri",
+                    "Returning to dock - Calendar timeslot ended": "Vender tilbage til dockingstationen - Kalender-tidsslot sluttede",
+                    "Returning to dock - Battery temp range": "Vender tilbage til dockingstationen - Batteritemperaturinterval",
+                    "Returning to dock - Lawn complete": "Vender tilbage til dockingstationen - Græsplæne fuldstændig slået",
+                    "Returning to dock - Relocalising": "Vender tilbage til dockingstationen - Genpositionering",
+                    "Returning to dock - requested by user/app": "Vender tilbage til dockingstationen - Anmodet af bruger/app"
+                }
+            }
+        }
+    },
+    "services": {
+        "command": {
+            "description": "Send kommandoer til græsslåmaskinen. Tilladte kommandoer er mow, returnToDock og pause.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Græsslåmaskine serienummer. Kun nødvendigt, når du har konfigureret flere græsslåmaskiner."
+                },
+                "command": {
+                    "description": "Kommando til græsslåmaskinen."
+                }
+            }
+        },
+        "smartmowing": {
+            "description": "Aktivér eller deaktivér SmartMowing. Tilladte værdier er true eller false.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Græsslåmaskine serienummer. Kun nødvendigt, når du har konfigureret flere græsslåmaskiner."
+                },
+                "enable": {
+                    "description": "Aktivér SmartMowing."
+                }
+            }
+        },
+        "delete_alert": {
+            "description": "Slet den valgte advarsel.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Græsslåmaskine serienummer. Kun nødvendigt, når du har konfigureret flere græsslåmaskiner."
+                },
+                "alert_index": {
+                    "description": "Slet den valgte advarsel. 0 for den seneste advarsel."
+                }
+            }
+        },
+        "delete_alert_all": {
+            "description": "Slet alle advarsler.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Græsslåmaskine serienummer. Kun nødvendigt, når du har konfigureret flere græsslåmaskiner."
+                }
+            }
+        },
+        "read_alert": {
+            "description": "Markér den valgte advarsel som læst.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Græsslåmaskine serienummer. Kun nødvendigt, når du har konfigureret flere græsslåmaskiner."
+                },
+                "alert_index": {
+                    "description": "Markér den valgte advarsel som læst. 0 for den seneste advarsel."
+                }
+            }
+        },
+        "read_alert_all": {
+            "description": "Markér alle advarsler som læste.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Græsslåmaskine serienummer. Kun nødvendigt, når du har konfigureret flere græsslåmaskiner."
+                }
+            }
+        }
+    }
+}

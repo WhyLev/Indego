@@ -1,0 +1,180 @@
+{
+    "config": {
+        "abort": {
+            "already_configured": "Questo rasaerba Bosch Indego è già stato configurato!",
+            "connection_error": "La connessione all'API di Bosch Indego non è riuscita! Utilizzare la pagina dei problemi noti (https://github.com/sander1988/Indego?tab=readme-ov-file#known-issues) per le possibili soluzioni.",
+            "no_mowers_found": "Nessun rasaerba trovato in questo account Bosch Indego!",
+            "reauth_successful": "La ri-autenticazione è stata completata. L'accesso all'API di Bosch è stato ripristinato."
+        },
+        "step": {
+            "advanced": {
+                "data": {
+                    "user_agent": "User-Agent",
+                    "expose_mower": "Esponi il rasaerba Indego come entità mower in Home Assistant",
+                    "expose_vacuum": "Esponi il rasaerba Indego come entità aspirapolvere in Home Assistant"
+                },
+                "description": "Impostazioni avanzate del componente Bosch Indego."
+            },
+            "mower": {
+                "data": {
+                    "mower_serial": "Numero di serie del rasaerba",
+                    "mower_name": "Nome del rasaerba"
+                },
+                "description": "Selezionare il numero di serie del rasaerba Bosch che si desidera aggiungere."
+            },
+            "reauth_confirm": {
+                "title": "Autenticazione scaduta",
+                "description": "L'autenticazione dell'API di Bosch Indego è scaduta. Si prega di eseguire nuovamente l'autenticazione utilizzando il tuo Bosch SingleKey ID."
+            }
+        }
+    },
+    "options": {
+      "step": {
+          "init": {
+              "title": "Impostazioni avanzate",
+              "description": "Impostazioni avanzate del componente Bosch Indego. Potrebbe essere necessario ricaricare il componente dopo aver modificato queste impostazioni.",
+              "data": {
+                  "user_agent": "User-Agent",
+                  "expose_mower": "Esponi il rasaerba Indego come entità mower in Home Assistant",
+                  "expose_vacuum": "Esponi il rasaerba Indego come entità aspirapolvere in Home Assistant",
+                  "show_all_alerts": "Mostra la cronologia completa degli avvisi in Home Assistant. Questo non è consigliato per la maggior parte degli utenti, in quanto potrebbe avere un impatto significativo sulla dimensione del database di Home Assistant!"
+              }
+          }
+      }
+    },
+    "entity": {
+        "binary_sensor": {
+            "indego_alert": {
+                "state_attributes": {
+                    "alerts_count": {
+                        "name": "Numero di avvisi"
+                    },
+                    "last_alert_error_code": {
+                        "name": "Codice di errore (più recente)"
+                    },
+                    "last_alert_message": {
+                        "name": "Messaggio di avviso (più recente)"
+                    },
+                    "last_alert_date": {
+                        "name": "Data dell'avviso (più recente)"
+                    },
+                    "last_alert_read": {
+                        "name": "Stato avviso (più recente)",
+                        "state": {
+                            "read": "Letto",
+                            "unread": "Non letto"
+                        }
+                    }
+                }
+            }
+        },
+        "sensor": {
+            "mower_state": {
+                "state": {
+                    "Mowing": "Tagliando",
+                    "Docked": "Attraccato",
+                    "Sleeping": "Dormendo",
+                    "Paused": "In pausa"
+                }
+            },
+            "mower_state_detail": {
+                "state": {
+                    "Reading status": "Lettura dello stato",
+                    "Charging": "In carica",
+                    "Docked": "Attraccato",
+                    "Sleeping": "Dormendo",
+                    "Docked - Software update": "Attraccato - Aggiornamento software",
+                    "Docked - Loading map": "Attraccato - Caricamento mappa",
+                    "Docked - Saving map": "Attraccato - Salvataggio mappa",
+                    "Docked - Leaving Dock": "Attraccato - Uscita dalla base",
+                    "Mowing": "Tagliando",
+                    "Mowing - Relocalising": "Tagliando - Ricalcolando posizione",
+                    "Mowing - Learning Lawn": "Tagliando - Imparando il prato",
+                    "Mowing - Learning Lawn paused": "Tagliando - Apprendimento prato in pausa",
+                    "SpotMow": "SpotMow",
+                    "Mowing randomly": "Tagliando casualmente",
+                    "Diagnostic mode": "Modalità diagnostica",
+                    "End of life": "Fine della vita",
+                    "Software update": "Aggiornamento software",
+                    "Energy save mode": "Modalità risparmio energetico",
+                    "Relocalising": "Ricalcolando posizione",
+                    "Loading map": "Caricamento mappa",
+                    "Learning lawn": "Imparando il prato",
+                    "Paused": "In pausa",
+                    "Border cut": "Taglio del bordo",
+                    "Idle in lawn": "Inattivo nel prato",
+                    "Stuck on lawn, help needed": "Bloccato nel prato, aiuto necessario",
+                    "Returning to Dock": "Ritorno alla base",
+                    "Returning to Dock - Battery low": "Ritorno alla base - Batteria scarica",
+                    "Returning to dock - Calendar timeslot ended": "Ritorno alla base - Slot temporale calendario terminato",
+                    "Returning to dock - Battery temp range": "Ritorno alla base - Intervallo temperatura batteria",
+                    "Returning to dock - Lawn complete": "Ritorno alla base - Prato completamente tagliato",
+                    "Returning to dock - Relocalising": "Ritorno alla base - Ricalcolando posizione",
+                    "Returning to dock - requested by user/app": "Ritorno alla base - Richiesto da utente/app"
+                }
+            }
+        }
+    },
+    "services": {
+        "command": {
+            "description": "Invia comandi al rasaerba. I comandi consentiti sono mow, returnToDock e pause.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Numero di serie del rasaerba. Necessario solo quando hai configurato più rasaerba."
+                },
+                "command": {
+                    "description": "Comando per il rasaerba."
+                }
+            }
+        },
+        "smartmowing": {
+            "description": "Abilita o disabilita SmartMowing. I valori consentiti sono true o false.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Numero di serie del rasaerba. Necessario solo quando hai configurato più rasaerba."
+                },
+                "enable": {
+                    "description": "Abilita SmartMowing."
+                }
+            }
+        },
+        "delete_alert": {
+            "description": "Elimina l'avviso selezionato.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Numero di serie del rasaerba. Necessario solo quando hai configurato più rasaerba."
+                },
+                "alert_index": {
+                    "description": "Elimina l'avviso selezionato. 0 per l'avviso più recente."
+                }
+            }
+        },
+        "delete_alert_all": {
+            "description": "Elimina tutti gli avvisi.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Numero di serie del rasaerba. Necessario solo quando hai configurato più rasaerba."
+                }
+            }
+        },
+        "read_alert": {
+            "description": "Segna l'avviso selezionato come letto.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Numero di serie del rasaerba. Necessario solo quando hai configurato più rasaerba."
+                },
+                "alert_index": {
+                    "description": "Segna l'avviso selezionato come letto. 0 per l'avviso più recente."
+                }
+            }
+        },
+        "read_alert_all": {
+            "description": "Segna tutti gli avvisi come letti.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Numero di serie del rasaerba. Necessario solo quando hai configurato più rasaerba."
+                }
+            }
+        }
+    }
+}

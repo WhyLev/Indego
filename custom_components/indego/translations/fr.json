@@ -4,14 +4,14 @@
             "already_configured": "Cette tondeuse Bosch Indego a déjà été configurée !",
             "connection_error": "La connexion à l'API Bosch Indego a échoué ! Regardez la page des problèmes connus (https://github.com/sander1988/Indego?tab=readme-ov-file#known-issues) pour trouver une solution éventuelle.",
             "no_mowers_found": "Aucune tondeuse n'a été trouvée sur ce compte Bosch Indego !",
-            "reauth_successful": "Ré-authentication réussie. L'accès à l'API Bosch a été rétabli."
+            "reauth_successful": "Ré-authentification réussie. L'accès à l'API Bosch a été rétabli."
         },
         "step": {
             "advanced": {
                 "data": {
                     "user_agent": "User-Agent",
-                    "expose_mower": "Exposer la tondeuse Indego comme une entité tondeuse dans HomeAssistant",
-                    "expose_vacuum": "Exposer la tondeuse Indego comme une entité aspirateur dans HomeAssistant"
+                    "expose_mower": "Exposer la tondeuse Indego comme une entité tondeuse dans Home Assistant",
+                    "expose_vacuum": "Exposer la tondeuse Indego comme une entité aspirateur dans Home Assistant"
                 },
                 "description": "Réglages avancés du composant Bosch Indego. Peuvent être laissés inchangés pour la plupart des utilisateurs."
             },
@@ -20,10 +20,10 @@
                     "mower_serial": "Numéro de série de la tondeuse",
                     "mower_name": "Nom de la tondeuse"
                 },
-                "description": "Sélectionez le numéro de série de la tondeuse Bosch que vous souhaitez ajouter."
+                "description": "Sélectionnez le numéro de série de la tondeuse Bosch que vous souhaitez ajouter."
             },
             "reauth_confirm": {
-                "title": "Authentication expirée",
+                "title": "Authentification expirée",
                 "description": "L'authentification de l'API Bosch Indego a expiré. Re-authentifiez-vous avec votre Bosch SingleKey ID."
             }
         }
@@ -35,9 +35,9 @@
               "description": "Réglages avancés du composant Bosch Indego. Vous devrez recharger le composant après avoir changé ces paramètres.",
               "data": {
                   "user_agent": "User-Agent",
-                  "expose_mower": "Exposer la tondeuse Indego comme une entité tondeuse dans HomeAssistant",
-                  "expose_vacuum": "Exposer la tondeuse Indego comme une entité aspirateur dans HomeAssistant",
-                  "show_all_alerts": "Montrer l'historique complet des alertes dans HomeAssistant. Non recommandé pour la plupart des utilisateurs, l'impact sur la taille de la base de données HomeAssistant peut être assez important!"
+                  "expose_mower": "Exposer la tondeuse Indego comme une entité tondeuse dans Home Assistant",
+                  "expose_vacuum": "Exposer la tondeuse Indego comme une entité aspirateur dans Home Assistant",
+                  "show_all_alerts": "Montrer l'historique complet des alertes dans Home Assistant. Non recommandé pour la plupart des utilisateurs, l'impact sur la taille de la base de données Home Assistant peut être assez important !"
               }
           }
       }
@@ -56,13 +56,13 @@
                         "name": "Message d'alerte (plus récent)"
                     },
                     "last_alert_date": {
-                        "name": " Date de l'alerte (plus récent)"
+                        "name": "Date de l'alerte (plus récente)"
                     },
                     "last_alert_read": {
                         "name": "Statut de l'alerte (plus récent)",
                         "state": {
-                            "read": "Lues",
-                            "unread": "Non lues"
+                            "read": "Lue",
+                            "unread": "Non lue"
                         }
                     }
                 }
@@ -128,7 +128,7 @@
             }
         },
         "smartmowing": {
-            "description": "Activer ou Désactiver le SmartMowing. Les commandes autorisées sont true (activé) ou false (déactivé).",
+            "description": "Activer ou désactiver le SmartMowing. Les valeurs autorisées sont true (activé) ou false (désactivé).",
             "fields": {
                 "mower_serial": {
                     "description": "Numéro de série de la tondeuse. Uniquement nécessaire si vous avez configuré plusieurs tondeuses."
