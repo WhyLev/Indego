@@ -1,0 +1,63 @@
+command:
+  description: Send commands to the mower. Allowed commands are mow, returnToDock and pause.
+  fields:
+    mower_serial:
+      description: Mower serial. Only needed when you have configured multiple mowers.
+      example: '"012345789"'
+      required: false
+    command:
+      description: Command for the mower.
+      example: "mow"
+      required: true
+smartmowing:
+  description: Enable or Disable SmartMowing. Allowed commands are true or false.
+  fields:
+    mower_serial:
+      description: Mower serial. Only needed when you have configured multiple mowers.
+      example: '"012345789"'
+      required: false
+    enable: 
+      description: Enable SmartMowing.
+      example: "true"
+      required: true
+delete_alert:
+  description: Delete the selected alert.
+  fields:
+    mower_serial:
+      description: Mower serial. Only needed when you have configured multiple mowers.
+      example: '"0123456789"'
+      required: false
+    alert_index: 
+      description: Delete the selected alerts. 0 for the latest alert.
+      example: "0"
+delete_alert_all:
+  description: Delete all alerts.
+  fields:
+    mower_serial:
+      description: Mower serial. Only needed when you have configured multiple mowers.
+      example: '"0123456789"'
+      required: false
+read_alert:
+  description: Mark the selected alert as read.
+  fields:
+    mower_serial:
+      description: Mower serial. Only needed when you have configured multiple mowers.
+      example: '"0123456789"'
+      required: false
+    alert_index: 
+      description: Mark the selected alert as read. 0 for the latest alert.
+      example: "0"
+read_alert_all:
+  description: Mark all alerts as read.
+  fields:
+    mower_serial:
+      description: Mower serial. Only needed when you have configured multiple mowers.
+      example: '"0123456789"'
+      required: false
+download_map:
+  description: Download the current map from the Bosch API and store it in www/indego_map_base.svg.
+  fields:
+    mower_serial:
+      description: Mower serial. Only needed when you have configured multiple mowers.
+      example: '"0123456789"'
+      required: false

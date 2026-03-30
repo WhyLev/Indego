@@ -1,0 +1,134 @@
+{
+    "config": {
+        "abort": {
+            "already_configured": "This Bosch Indego mower has already been configured!",
+            "connection_error": "The connection to the Bosch Indego API failed! Please use the known issues page (https://github.com/sander1988/Indego?tab=readme-ov-file#known-issues) for possible solutions.",
+            "no_mowers_found": "No mowers found in this Bosch Indego account!",
+            "reauth_successful": "Re-authentication was successful. Access to the Bosch API has been restored."
+        },
+        "step": {
+            "advanced": {
+                "data": {
+                    "user_agent": "User-Agent",
+                    "expose_mower": "Expose Indego mower as mower entity in HomeAssistant",
+                    "expose_vacuum": "Expose Indego mower as vacuum entity in HomeAssistant"
+                },
+                "description": "Advanced settings of the Bosch Indego component."
+            },
+            "mower": {
+                "data": {
+                    "mower_serial": "Mower serial",
+                    "mower_name": "Mower name"
+                },
+                "description": "Please select the serial of the Bosch Mower your would like to add."
+            },
+            "reauth_confirm": {
+                "title": "Authentication expired",
+                "description": "The Bosch Indego API authentication has expired. Please re-authenticate using your Bosch SingleKey ID."
+            }
+        }
+    },
+    "options": {
+      "step": {
+          "init": {
+              "title": "Advanced settings",
+              "description": "Advanced settings of the Bosch Indego component. You might have to reload the component after changing these settings.",
+              "data": {
+                  "user_agent": "User-Agent",
+                  "expose_mower": "Expose Indego mower as mower entity in HomeAssistant",
+                  "expose_vacuum": "Expose Indego mower as vacuum entity in HomeAssistant",
+                  "show_all_alerts": "Show the full alert history into HomeAssistant. This is not recommended for most users, it might have a significant impact on the HomeAssistant database size!"
+              }
+          }
+      }
+    },
+    "entity": {
+        "binary_sensor": {
+            "indego_alert": {
+                "state_attributes": {
+                    "alerts_count": {
+                        "name": "Number of alerts"
+                    },
+                    "last_alert_error_code": {
+                        "name": "Error code (most recent)"
+                    },
+                    "last_alert_message": {
+                        "name": "Alert message (most recent)"
+                    },
+                    "last_alert_date": {
+                        "name": " Alert date (most recent)"
+                    },
+                    "last_alert_read": {
+                        "name": "Alert status (most recent)",
+                        "state": {
+                            "read": "Read",
+                            "unread": "Unread"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "services": {
+        "command": {
+            "description": "Send commands to the mower. Allowed commands are mow, returnToDock and pause.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Mower serial. Only needed when you have configured multiple mowers."
+                },
+                "command": {
+                    "description": "Command for the mower."
+                }
+            }
+        },
+        "smartmowing": {
+            "description": "Enable or Disable SmartMowing. Allowed commands are true or false.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Mower serial. Only needed when you have configured multiple mowers."
+                },
+                "enable": {
+                    "description": "Enable SmartMowing."
+                }
+            }
+        },
+        "delete_alert": {
+            "description": "Delete the selected alert.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Mower serial. Only needed when you have configured multiple mowers."
+                },
+                "alert_index": {
+                    "description": "Delete the selected alerts. 0 for the latest alert."
+                }
+            }
+        },
+        "delete_alert_all": {
+            "description": "Delete all alerts.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Mower serial. Only needed when you have configured multiple mowers."
+                }
+            }
+        },
+        "read_alert": {
+            "description": "Mark the selected alert as read.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Mower serial. Only needed when you have configured multiple mowers."
+                },
+                "alert_index": {
+                    "description": "Mark the selected alert as read. 0 for the latest alert."
+                }
+            }
+        },
+        "read_alert_all": {
+            "description": "Mark all alerts as read.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Mower serial. Only needed when you have configured multiple mowers."
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,180 @@
+{
+    "config": {
+        "abort": {
+            "already_configured": "Deze Bosch Indego robotmaaier is al geconfigureerd!",
+            "connection_error": "De verbinding met de Bosch Indego API is mislukt! Gebruik de bekende problemen pagina (https://github.com/sander1988/Indego?tab=readme-ov-file#known-issues) voor mogelijke oplossingen.",
+            "no_mowers_found": "Geen robotmaaiers gevonden in deze Bosch Indego account!",
+            "reauth_successful": "Herauthenticatie is gelukt. De toegang tot de Bosch API is hersteld."
+        },
+        "step": {
+            "advanced": {
+                "data": {
+                    "user_agent": "User-Agent",
+                    "expose_mower": "Voeg de Indego robotmaaier toe als grasmaaier entiteit aan HomeAssistant",
+                    "expose_vacuum": "Voeg de Indego robotmaaier toe als stofzuiger entiteit aan HomeAssistant"
+                },
+                "description": "Geavanceerde instellingen van het Bosch Indego component."
+            },
+            "mower": {
+                "data": {
+                    "mower_serial": "Robotmaaier serienummer",
+                    "mower_name": "Robotmaaier naam"
+                },
+                "description": "Selecteer het serienummer van de Bosch Indego robotmaaier die je toe wilt voegen."
+            },
+            "reauth_confirm": {
+                "title": "Authenticatie verlopen",
+                "description": "De Bosch Indego API authenticatie is verlopen. Log a.u.b. opnieuw in m.b.v. je Bosch SingleKey ID."
+            }
+        }
+    },
+    "options": {
+      "step": {
+          "init": {
+              "title": "Geavanceerde instellingen",
+              "description": "Geavanceerde instellingen van het Bosch Indego component. Mogelijk moet het component opnieuw geladen worden na het wijzigen van deze instellingen.",
+              "data": {
+                  "user_agent": "User-Agent",
+                  "expose_mower": "Voeg de Indego robotmaaier toe als grasmaaier entiteit aan HomeAssistant",
+                  "expose_vacuum": "Voeg de Indego robotmaaier toe als stofzuiger entiteit aan HomeAssistant",
+                  "show_all_alerts": "Toon de volledige melding/waarschuwing geschiedenis in HomeAssistant. Dit wordt niet aangeraden voor de meeste gebruikers, het heeft mogelijk een significante impact op de HomeAssistant database!"
+              }
+          }
+      }
+    },
+    "entity": {
+        "binary_sensor": {
+            "indego_alert": {
+                "state_attributes": {
+                    "alerts_count": {
+                        "name": "Aantal meldingen"
+                    },
+                    "last_alert_error_code": {
+                        "name": "Foutcode (meest recente)"
+                    },
+                    "last_alert_message": {
+                        "name": "Melding (meest recente)"
+                    },
+                    "last_alert_date": {
+                        "name": "Datum melding (meest recente)"
+                    },
+                    "last_alert_read": {
+                        "name": "Status melding (meest recente)",
+                        "state": {
+                            "read": "Gelezen",
+                            "unread": "Ongelezen"
+                        }
+                    }
+                }
+            }
+        },
+        "sensor": {
+            "mower_state": {
+                "state": {
+                    "Mowing": "Maaien",
+                    "Docked": "Geparkeerd",
+                    "Sleeping": "Inactief",
+                    "Paused": "Gepauzeerd"
+                }
+            },
+            "mower_state_detail": {
+                "state": {
+                    "Sleeping": "Inactief",
+                    "Reading status": "Status ophalen",
+                    "Charging": "Opladen",
+                    "Docked": "Geparkeerd",
+                    "Docked - Software update": "Geparkeerd - Software update",
+                    "Docked - Loading map": "Geparkeerd - Map laden",
+                    "Docked - Saving map": "Geparkeerd - Map opslaan",
+                    "Docked - Leaving Dock": "Station verlaten",
+                    "Mowing": "Maaien",
+                    "Mowing - Relocalising": "Maaien - Herlokaliseren",
+                    "Mowing - Learning Lawn": "Maaien - Gazon leren",
+                    "Mowing - Learning Lawn paused": "Maaien - Gazon leren gepauzeerd",
+                    "SpotMow": "Plek maaien",
+                    "Mowing randomly": "Willekeurig maaien",
+                    "Diagnostic mode": "Onderhoudsmodus",
+                    "End of life": "Geen ondersteuning (EOL)",
+                    "Software update": "Software update",
+                    "Energy save mode": "Energiespaarstand",
+                    "Relocalising": "Herlokaliseren",
+                    "Loading map": "Map laden map",
+                    "Learning lawn": "Gazon leren",
+                    "Paused": "Gepauzeerd",
+                    "Border cut": "Rand maaien",
+                    "Idle in lawn": "Inactief op gazon",
+                    "Stuck on lawn, help needed": "Vastgelopen op gazon, hulp nodig",
+                    "Returning to Dock": "Terugkeren naar basisstation",
+                    "Returning to Dock - Battery low": "Terugkeren naar basisstation - Batterij bijna leeg",
+                    "Returning to dock - Calendar timeslot ended": "Terugkeren naar basisstation - Kalender tijdslot eindigd",
+                    "Returning to dock - Battery temp range": "Terugkeren naar basisstation - Batterij temperatuur",
+                    "Returning to dock - Lawn complete": "Terugkeren naar basisstation - Maaien voltooid",
+                    "Returning to dock - Relocalising": "Terugkeren naar basisstation - Herlokaliseren",
+                    "Returning to dock - requested by user/app": "Terugkeren naar basisstation - verzocht door gebruiker"
+                }
+            }
+        }
+    },
+    "services": {
+        "command": {
+            "description": "Stuur een opdracht naar de grasmaaier. Ondersteunde opdrachten zijn: mow, returnToDock en pause.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Grasmaaier serienummer. Alleen nodig wanneer je meerdere grasmaaiers hebt geconfigureerd."
+                },
+                "command": {
+                    "description": "De opdracht voor de grasmaaier."
+                }
+            }
+        },
+        "smartmowing": {
+            "description": "Schakel smart-maaier in of uit. Ondersteunde waardes zijn: true of false.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Grasmaaier serienummer. Alleen nodig wanneer je meerdere grasmaaiers hebt geconfigureerd."
+                },
+                "enable": {
+                    "description": "Schakel smart-maaier in of uit."
+                }
+            }
+        },
+        "delete_alert": {
+            "description": "Verwijder een specifieke melding.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Grasmaaier serienummer. Alleen nodig wanneer je meerdere grasmaaiers hebt geconfigureerd."
+                },
+                "alert_index": {
+                    "description": "De index van het melding. 0 is het nieuwste bericht."
+                }
+            }
+        },
+        "delete_alert_all": {
+            "description": "Verwijder alle meldingen.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Grasmaaier serienummer. Alleen nodig wanneer je meerdere grasmaaiers hebt geconfigureerd."
+                }
+            }
+        },
+        "read_alert": {
+            "description": "Markeer een specifieke melding als gelezen.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Grasmaaier serienummer. Alleen nodig wanneer je meerdere grasmaaiers hebt geconfigureerd."
+                },
+                "alert_index": {
+                    "description": "De index van het melding. 0 is het nieuwste bericht."
+                }
+            }
+        },
+        "read_alert_all": {
+            "description": "Markeer alle meldingen als gelezen.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Grasmaaier serienummer. Alleen nodig wanneer je meerdere grasmaaiers hebt geconfigureerd."
+                }
+            }
+        }
+    }
+}

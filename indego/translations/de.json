@@ -1,0 +1,181 @@
+{
+    "config": {
+        "abort": {
+            "already_configured": "Dieser Bosch Indego Mähroboter wurde bereits konfiguriert!",
+            "connection_error": "Die Verbindung zur Bosch Indego API ist fehlgeschlagen! Bitte die Known Issues Seite (https://github.com/sander1988/Indego?tab=readme-ov-file#known-issues) für möglche Lösungen nutzen.",
+            "no_mowers_found": "In diesem Bosch Indego Account wurden keine Mähroboter gefunden!",
+            "reauth_successful": "Re-Authentifizierung war erfolgreich. Zugang zur Bosch API wurde wiederhergestellt."
+        },
+        "step": {
+            "advanced": {
+                "data": {
+                    "user_agent": "User-Agent",
+                    "expose_mower": "Indego Mähroboter als Mower Entität in HomeAssistant anlegen",
+                    "expose_vacuum": "Indego Mähroboter als Vacuum Entität in HomeAssistant anlegen"
+                },
+                "description": "Erweiterte Einstellung des Bosch Indego Component."
+            },
+            "mower": {
+                "data": {
+                    "mower_serial": "Mähroboter Seriennummer",
+                    "mower_name": "Mähroboter Name"
+                },
+                "description": "Bitte die Seriennummer des Bosch Mähroboters, der hinzugefügt werden soll, auswählen."
+            },
+            "reauth_confirm": {
+                "title": "Authentifizierung abgelaufen",
+                "description": "Die Bosch Indego API Authentifizierung ist abgelaufen. Bitte mit der Bosch SingleKey ID neu Authentifizieren."
+            }
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "title": "Erweiterte Einstellung",
+                "description": "Erweiterte Einstellung des Bosch Indego Component.",
+                "data": {
+                    "user_agent": "User-Agent",
+                    "expose_mower": "Indego Mähroboter als Mower Entität in HomeAssistant anlegen",
+                    "expose_vacuum": "Indego Mähroboter als Vacuum Entität in HomeAssistant anlegen",
+                    "show_all_alerts": "Zeige den kompletten Alarm Verlauf in HomeAssistant. Dies wird für die meisten Nutzer nicht empfohlen, da es signifikanten Einfluss auf die Größe der HomeAssistant Datenbank haben kann."
+                }
+            }
+        }
+    },
+    "entity": {
+        "binary_sensor": {
+            "indego_alert": {
+                "state_attributes": {
+                    "alerts_count": {
+                        "name": "Anzahl der Alarme"
+                    },
+                    "last_alert_error_code": {
+                        "name": "Error Code (letztes Auftreten)"
+                    },
+                    "last_alert_message": {
+                        "name": "Alarm Nachricht (letztes Auftreten)"
+                    },
+                    "last_alert_date": {
+                        "name": " Alarm Datum (letztes Auftreten)"
+                    },
+                    "last_alert_read": {
+                        "name": "Alarm Status (letztes Auftreten)",
+                        "state": {
+                            "read": "Gelesen",
+                            "unread": "Ungelesen"
+                        }
+                    }
+                }
+            }
+        },
+        "sensor": {
+            "mower_state": {
+                "state": {
+                    "Mowing": "Mähen",
+                    "Docked": "Angedockt",
+                    "Sleeping": "Schläft",
+                    "Paused": "Pausiert"
+                }
+            },
+            "mower_state_detail": {
+                "state": {
+                    "Sleeping": "Schläft",
+                    "Reading status": "Status abrufen",
+                    "Charging": "Laden",
+                    "Docked": "Angedockt",
+                    "Sleeping": "Schläft",
+                    "Docked - Software update": "Angedockt - Software Update",
+                    "Docked - Loading map": "Angedockt - Karte laden",
+                    "Docked - Saving map": "Angedockt - Karte speichern",
+                    "Docked - Leaving Dock": "Angedockt - Verlässt Ladestation",
+                    "Mowing": "Mähen",
+                    "Mowing - Relocalising": "Mähen - Position bestimmen",
+                    "Mowing - Learning Lawn": "Mähen - Karte lernen",
+                    "Mowing - Learning Lawn paused": "Mähen - Karte lernen pausiert",
+                    "SpotMow": "SpotMow",
+                    "Mowing randomly": "Zufälliges Mähen",
+                    "Diagnostic mode": "Diagnose Modus",
+                    "End of life": "Lebensende",
+                    "Software update": "Software Update",
+                    "Energy save mode": "Energiesparmodus",
+                    "Relocalising": "Position bestimmen",
+                    "Loading map": "Karte laden",
+                    "Learning lawn": "Karte lernen",
+                    "Paused": "Pausiert",
+                    "Border cut": "Kantenmähen",
+                    "Idle in lawn": "Leerlauf",
+                    "Stuck on lawn, help needed": "Festgefahren, Hilfe nötig",
+                    "Returning to Dock": "Zurück zur Ladestation",
+                    "Returning to Dock - Battery low": "Zurück zur Ladestation - Batteriestand niedrig",
+                    "Returning to dock - Calendar timeslot ended": "Zurück zur Ladestation - Kalender Zeitfenser zu Ende",
+                    "Returning to dock - Battery temp range": "Zurück zur Ladestation - Batterie Temperaturfenster",
+                    "Returning to dock - Lawn complete": "Zurück zur Ladestation - Rasen vollständig gemäht",
+                    "Returning to dock - Relocalising": "Zurück zur Ladestation - Position bestimmen",
+                    "Returning to dock - requested by user/app": "Zurück zur Ladestation - Angefordert vom Benutzer"
+                }
+            }
+        }
+    },
+    "services": {
+        "command": {
+            "description": "Befehle an den Mähroboter senden. Möglich Befehle sind mow, returnToDock und pause.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Seriennummer des Mähroboters. Wird nur benötigt, wenn mehrere Mähroboter eingerichtet sind."
+                },
+                "command": {
+                    "description": "Befehl für den Mähroboter."
+                }
+            }
+        },
+        "smartmowing": {
+            "description": "SmartMowing aktivieren oder deaktivieren. Mögliche Befehle sind true oder false.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Seriennummer des Mähroboters. Wird nur benötigt, wenn mehrere Mähroboter eingerichtet sind."
+                },
+                "enable": {
+                    "description": "SmartMowing aktivieren."
+                }
+            }
+        },
+        "delete_alert": {
+            "description": "Löscht den ausgewählten Fehler.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Seriennummer des Mähroboters. Wird nur benötigt, wenn mehrere Mähroboter eingerichtet sind."
+                },
+                "alert_index": {
+                    "description": "Den ausgewählten Fehler löschen. Mit 0 wird der letzte/aktuellste Fehler gelöscht."
+                }
+            }
+        },
+        "delete_alert_all": {
+            "description": "Löscht alle Fehler.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Seriennummer des Mähroboters. Wird nur benötigt, wenn mehrere Mähroboter eingerichtet sind."
+                }
+            }
+        },
+        "read_alert": {
+            "description": "Markiert den ausgewählten Fehler als gelesen.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Seriennummer des Mähroboters. Wird nur benötigt, wenn mehrere Mähroboter eingerichtet sind."
+                },
+                "alert_index": {
+                    "description": "Den ausgewählten Fehler als gelesen markieren. Mit 0 wird der letzte/aktuellste Fehler ausgewählt."
+                }
+            }
+        },
+        "read_alert_all": {
+            "description": "Markiert alle Fehler als gelesen.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Seriennummer des Mähroboters. Wird nur benötigt, wenn mehrere Mähroboter eingerichtet sind."
+                }
+            }
+        }
+    }
+}
