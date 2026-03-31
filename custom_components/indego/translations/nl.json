@@ -14,7 +14,7 @@
                     "expose_vacuum": "Voeg de Indego robotmaaier toe als stofzuiger entiteit aan HomeAssistant"
                 },
                 "data_description": {
-                    "user_agent": "In case of HTTP 4XX errors (especially Reason: 403, message='Forbidden') it might help to change the User Agent. Should not contain Homeassistant or HA."
+                    "user_agent": "Bij HTTP 4XX-fouten (met name Reason: 403, message=‘Forbidden’) kan het helpen om de User Agent aan te passen. Deze mag geen Homeassistant of HA bevatten."
                 },
                 "description": "Geavanceerde instellingen van het Bosch Indego component."
             },
@@ -43,7 +43,7 @@
                   "show_all_alerts": "Toon de volledige melding/waarschuwing geschiedenis in HomeAssistant. Dit wordt niet aangeraden voor de meeste gebruikers, het heeft mogelijk een significante impact op de HomeAssistant database!"
               },
               "data_description": {
-                  "user_agent": "In case of HTTP 4XX errors (especially Reason: 403, message='Forbidden') it might help to change the User Agent. Should not contain Homeassistant or HA."
+                  "user_agent": "Bij HTTP 4XX-fouten (met name Reason: 403, message=‘Forbidden’) kan het helpen om de User Agent aan te passen. Deze mag geen Homeassistant of HA bevatten."
               }
           }
       }
