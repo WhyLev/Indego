@@ -5,29 +5,45 @@ ERROR_CODE_MAP = {
     # No error
     "0": "No error",
 
-    # Wheel/Motor errors (100-199)
-    "101": "Mower was lifted / Mäher wurde angehoben",
-    "102": "Left wheel motor blocked",
-    "103": "Right wheel motor blocked",
-    "110": "Mower motor blocked",
-    "111": "Battery error / Akkufehler",
-    "115": "Permanent tactile detected / Dauerhaftes Hindernis erkannt",
-    "130": "Cutter motor load too high / Messermotor überlastet",
-    "143": "Intermittent error / Intermittierender Fehler",
+    # Internal/System errors (40-70)
+    "45": "Unknown internal error",
+    "55": "Button cell almost empty",
+    "57": "Compass error",
+    "58": "No data from mobile module",
+    "60": "Mower tilted",
 
-    # Perimeter/Wire errors (140-160)
-    "149": "Mower out of perimeter limit / Mäher außerhalb der Begrenzung",
-    "151": "Wire signal / Communication fault / Drahtsignal / Kommunikationsfehler",
+    # Wheel/Motor/Sensor errors (100-220)
+    "101": "Mower was lifted",
+    "102": "Lift sensor right front steering wheel",
+    "103": "Lift sensor left front steering wheel",
+    "104": "Stop button pressed",
+    "105": "Mower tilted >45°",
+    "106": "Invalid input",
+    "107": "System error",
+    "108": "System error",
+    "109": "System error",
+    "115": "Permanent tactile detected",
+    "126": "Charging current/voltage too high",
+    "127": "Charging current/voltage too high",
+    "129": "Cutter load too high",
+    "130": "Cutter load too high",
+    "131": "Cutter load too high",
+    "133": "Internal error",
+    "134": "Internal error",
+    "136": "Left wheel blocked",
+    "137": "Right wheel blocked",
+    "142": "Internal wheel drive error",
+    "143": "Intermittent error",
 
-    # Sensor errors (600-699)
-    "57": "Compass error / Kompassfehler",
-    "601": "Ultrasonic sensor error",
-    "602": "Collision sensor error",
-    "603": "Gyroscope error",
-    "604": "Accelerometer error",
-    "605": "Compass error",
-    "606": "GPS error",
-    "607": "Wheel speed sensor error",
+    # Perimeter/Wire errors (149-194)
+    "149": "Mower out of perimeter limit",
+    "150": "No signal from perimeter wire",
+    "151": "Waiting for loop signal",
+    "162": "Charging error",
+    "194": "No perimeter signal detected",
+
+    # Drive errors (216)
+    "216": "Left wheel stuck",
 
     # Navigation/Stuck errors (700-799)
     "701": "Mower stuck",
@@ -36,7 +52,6 @@ ERROR_CODE_MAP = {
     "704": "Unable to proceed",
     "705": "Uneven ground",
     "706": "Grass too high",
-    "1138": "Mower stuck / Sensor after cleaning / Mäher steckt fest / Sensor nach Reinigung",
 
     # Communication errors (800-899)
     "801": "Bluetooth error",
@@ -46,20 +61,21 @@ ERROR_CODE_MAP = {
     "805": "Communication timeout",
 
     # Firmware/Software errors (900-999)
-    "580": "Software version outdated / Software-Version veraltet",
     "901": "Firmware error",
     "902": "Software error",
     "903": "Configuration error",
     "904": "Memory error",
 
-    # Battery errors (1100+)
-    "1111": "Battery error / Akkufehler",
-    "1156": "Unsupported battery pack / Communication fault battery pack / Akkupack nicht unterstützt",
+    # Battery/System errors (1100+)
+    "1138": "Last run error",
+    "1146": "Orientation filter error",
+    "1156": "Unsupported battery pack",
 
     # System errors (1000+)
     "1000": "System error",
     "1001": "Unknown error",
     "1002": "Shutdown detected",
+    "1008": "Mower is stuck",
 }
 
 def get_error_description(error_code: str) -> str:
