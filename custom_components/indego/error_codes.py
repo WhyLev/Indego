@@ -6,40 +6,21 @@ ERROR_CODE_MAP = {
     "0": "No error",
 
     # Wheel/Motor errors (100-199)
-    "101": "Wheel motor blocked",
+    "101": "Mower was lifted / Mäher wurde angehoben",
     "102": "Left wheel motor blocked",
     "103": "Right wheel motor blocked",
     "110": "Mower motor blocked",
-    "111": "Mower motor overloaded",
+    "111": "Battery error / Akkufehler",
+    "115": "Permanent tactile detected / Dauerhaftes Hindernis erkannt",
+    "130": "Cutter motor load too high / Messermotor überlastet",
+    "143": "Intermittent error / Intermittierender Fehler",
 
-    # Battery/Charging errors (200-299)
-    "201": "Battery disconnect",
-    "202": "Battery low",
-    "203": "Battery empty",
-    "204": "Charging error",
-    "205": "Battery temperature too high",
-    "206": "Battery temperature too low",
-    "207": "Battery disconnected",
-
-    # Blade/Cutting errors (300-399)
-    "301": "Blade/Motor blocked",
-    "302": "Blade stuck",
-    "303": "Blade jam detected",
-    "304": "Blade motor overload",
-
-    # Docking station errors (400-499)
-    "401": "Docking station error",
-    "402": "Docking station not found",
-    "403": "Cannot go to dock",
-    "404": "Docking charger not detected",
-
-    # Perimeter/Wire errors (500-599)
-    "501": "Perimeter signal weak",
-    "502": "Perimeter wire cut",
-    "503": "Perimeter signal malfunction",
-    "504": "Perimeter wire not found",
+    # Perimeter/Wire errors (140-160)
+    "149": "Mower out of perimeter limit / Mäher außerhalb der Begrenzung",
+    "151": "Wire signal / Communication fault / Drahtsignal / Kommunikationsfehler",
 
     # Sensor errors (600-699)
+    "57": "Compass error / Kompassfehler",
     "601": "Ultrasonic sensor error",
     "602": "Collision sensor error",
     "603": "Gyroscope error",
@@ -55,6 +36,7 @@ ERROR_CODE_MAP = {
     "704": "Unable to proceed",
     "705": "Uneven ground",
     "706": "Grass too high",
+    "1138": "Mower stuck / Sensor after cleaning / Mäher steckt fest / Sensor nach Reinigung",
 
     # Communication errors (800-899)
     "801": "Bluetooth error",
@@ -64,10 +46,15 @@ ERROR_CODE_MAP = {
     "805": "Communication timeout",
 
     # Firmware/Software errors (900-999)
+    "580": "Software version outdated / Software-Version veraltet",
     "901": "Firmware error",
     "902": "Software error",
     "903": "Configuration error",
     "904": "Memory error",
+
+    # Battery errors (1100+)
+    "1111": "Battery error / Akkufehler",
+    "1156": "Unsupported battery pack / Communication fault battery pack / Akkupack nicht unterstützt",
 
     # System errors (1000+)
     "1000": "System error",
