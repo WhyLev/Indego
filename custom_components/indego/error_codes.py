@@ -69,6 +69,7 @@ ERROR_CODE_MAP = {
     # Battery/System errors (1100+)
     "1138": "Last run error",
     "1146": "Orientation filter error",
+    "1148": "On-/Off error. Need PIN code to unlock",
     "1156": "Unsupported battery pack",
 
     # System errors (1000+)

@@ -281,6 +281,46 @@ ENTITY_DEFINITIONS = {
         CONF_UNIT_OF_MEASUREMENT: None,
         CONF_ATTR: [],
     },
+    ENTITY_BATTERY_VOLTAGE: {
+        CONF_TYPE: SENSOR_TYPE,
+        CONF_NAME: "battery voltage",
+        CONF_ICON: "mdi:lightning-bolt",
+        CONF_DEVICE_CLASS: SensorDeviceClass.VOLTAGE,
+        CONF_UNIT_OF_MEASUREMENT: "V",
+        CONF_ATTR: [],
+    },
+    ENTITY_BATTERY_TEMPERATURE: {
+        CONF_TYPE: SENSOR_TYPE,
+        CONF_NAME: "battery temperature",
+        CONF_ICON: "mdi:thermometer",
+        CONF_DEVICE_CLASS: SensorDeviceClass.TEMPERATURE,
+        CONF_UNIT_OF_MEASUREMENT: UnitOfTemperature.CELSIUS,
+        CONF_ATTR: [],
+    },
+    ENTITY_AMBIENT_TEMPERATURE: {
+        CONF_TYPE: SENSOR_TYPE,
+        CONF_NAME: "ambient temperature",
+        CONF_ICON: "mdi:thermometer",
+        CONF_DEVICE_CLASS: SensorDeviceClass.TEMPERATURE,
+        CONF_UNIT_OF_MEASUREMENT: UnitOfTemperature.CELSIUS,
+        CONF_ATTR: [],
+    },
+    ENTITY_BATTERY_CYCLES: {
+        CONF_TYPE: SENSOR_TYPE,
+        CONF_NAME: "battery cycles",
+        CONF_ICON: "mdi:battery-sync",
+        CONF_DEVICE_CLASS: None,
+        CONF_UNIT_OF_MEASUREMENT: None,
+        CONF_ATTR: [],
+    },
+    ENTITY_BATTERY_DISCHARGE: {
+        CONF_TYPE: SENSOR_TYPE,
+        CONF_NAME: "battery discharge",
+        CONF_ICON: "mdi:battery-minus",
+        CONF_DEVICE_CLASS: None,
+        CONF_UNIT_OF_MEASUREMENT: "Ah",
+        CONF_ATTR: [],
+    },
 }
 
 
@@ -845,16 +885,40 @@ class IndegoHub:
                     self.entities[ENTITY_BATTERY].state = battery_percent
                     _LOGGER.debug("Battery updated: %s%%", battery_percent)
 
+                    # Get battery values
+                    voltage = getattr(self._indego_client.operating_data.battery, 'voltage', None)
+                    discharge = getattr(self._indego_client.operating_data.battery, 'discharge', None)
+                    cycles = getattr(self._indego_client.operating_data.battery, 'cycles', None)
+                    battery_temp = getattr(self._indego_client.operating_data.battery, 'battery_temp', None)
+                    ambient_temp = getattr(self._indego_client.operating_data.battery, 'ambient_temp', None)
+
+                    # Update main battery sensor attributes (keep for backward compatibility)
                     self.entities[ENTITY_BATTERY].add_attributes(
                         {
                             "last_updated": last_updated_now(),
-                            "voltage_V": getattr(self._indego_client.operating_data.battery, 'voltage', 'N/A'),
-                            "discharge_Ah": getattr(self._indego_client.operating_data.battery, 'discharge', 'N/A'),
-                            "cycles": getattr(self._indego_client.operating_data.battery, 'cycles', 'N/A'),
-                            f"battery_temp_{UnitOfTemperature.CELSIUS}": getattr(self._indego_client.operating_data.battery, 'battery_temp', 'N/A'),
-                            f"ambient_temp_{UnitOfTemperature.CELSIUS}": getattr(self._indego_client.operating_data.battery, 'ambient_temp', 'N/A'),
+                            "voltage_V": voltage if voltage is not None else 'N/A',
+                            "discharge_Ah": discharge if discharge is not None else 'N/A',
+                            "cycles": cycles if cycles is not None else 'N/A',
+                            f"battery_temp_{UnitOfTemperature.CELSIUS}": battery_temp if battery_temp is not None else 'N/A',
+                            f"ambient_temp_{UnitOfTemperature.CELSIUS}": ambient_temp if ambient_temp is not None else 'N/A',
                         }
                     )
+
+                    # Update individual battery sensors
+                    if ENTITY_BATTERY_VOLTAGE in self.entities:
+                        self.entities[ENTITY_BATTERY_VOLTAGE].state = voltage if voltage is not None else STATE_UNKNOWN
+
+                    if ENTITY_BATTERY_DISCHARGE in self.entities:
+                        self.entities[ENTITY_BATTERY_DISCHARGE].state = discharge if discharge is not None else STATE_UNKNOWN
+
+                    if ENTITY_BATTERY_CYCLES in self.entities:
+                        self.entities[ENTITY_BATTERY_CYCLES].state = cycles if cycles is not None else STATE_UNKNOWN
+
+                    if ENTITY_BATTERY_TEMPERATURE in self.entities:
+                        self.entities[ENTITY_BATTERY_TEMPERATURE].state = battery_temp if battery_temp is not None else STATE_UNKNOWN
+
+                    if ENTITY_AMBIENT_TEMPERATURE in self.entities:
+                        self.entities[ENTITY_AMBIENT_TEMPERATURE].state = ambient_temp if ambient_temp is not None else STATE_UNKNOWN
                 else:
                     _LOGGER.warning("Battery attribute not available in operating_data")
                     self.entities[ENTITY_BATTERY].state = STATE_UNKNOWN
