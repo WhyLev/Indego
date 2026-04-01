@@ -1,241 +1,276 @@
 [![GitHub release](https://img.shields.io/github/release/sander1988/Indego.svg)](https://github.com/sander1988/Indego/releases/) [![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg)](https://github.com/custom-components/hacs)
 
-# Indego
-Join the Discord channel to discuss around this integration and vote for your favourite change to happen!
-https://discord.gg/aD33GsP
+# Bosch Indego Mower
 
-Home Assistant Custom Component for Bosch Indego Lawn Mower.
+**Home Assistant Custom Component for Bosch Indego robotic lawn mowers**
 
-![Entities in Home Asistant](/doc/0-Sensors_3.png)
+A comprehensive Home Assistant integration that provides full control and monitoring of your Bosch Indego lawn mower. Get real-time status, battery information, mowing schedules, and more.
+
+![Entities in Home Assistant](/doc/0-Sensors_3.png)
+
+## ✨ Features
+
+- 🎮 **Full Mower Control** - Start, pause, dock, and schedule mowing
+- 📊 **Real-time Monitoring** - Battery, location, alerts, and more
+- 📍 **Lawn Mapping** - Visual SVG map with mower position overlay
+- 🤖 **SmartMowing** - Automatic schedule optimization based on weather
+- ⚠️ **Alert Management** - Monitor and manage mower alerts
+- 🌍 **Multi-language** - German, English, Dutch, French, Spanish, Italian, and more
+- 🏠 **Native Entities** - Lawn Mower and Vacuum entities for seamless Home Assistant integration
+- 📱 **Multiple Mowers** - Support for multiple mowers in one Home Assistant instance
+
+## 📖 Table of Contents
+
+- [Features](#-features)
+- [Community](#-community)
+- [Installation](#installation)
+- [Getting Started](#getting-started)
+- [Monitored Entities](#-monitored-entities)
+- [Services & Control](#-services--control)
+- [Examples](#-examples)
+- [Debugging](#-debugging)
+- [Supported Models](#-supported-models)
+- [Known Issues](#️-known-issues)
+- [Contribution & Support](#-contribution--support)
+- [Credits](#-credits)
+
+## 💬 Community
+
+Join our Discord community to discuss features, vote on improvements, and get support:
+[discord.gg/aD33GsP](https://discord.gg/aD33GsP)
 
 ## Installation
 
-### Alternative 1
-Install via HACS Community Store: https://hacs.xyz/
+### Option 1: Via HACS (Recommended)
 
-### Alternative 2
-Copy the folder `indego` in `custom_components` into your `custom_components` in your Home Assistant.
+1. Add this repository to HACS (Community Store)
+2. Search for "Bosch Indego"
+3. Click "Install"
+4. Restart Home Assistant
 
-## Reboot
-Reboot HA in order to get HA to find the newly added custom component.
+[HACS Repository](https://hacs.xyz/)
 
-## Configuration
+### Option 2: Manual Installation
 
-### Authentication using Bosch SingleKey ID
-Bosch moved to a new authentication method called Bosch SingleKey ID (using OAuth) at the beginning of 2023. 
-Therefore we needed to rewrite the authentication flow. 
+1. Copy the `indego` folder from `custom_components` to your Home Assistant `custom_components` folder
+2. Restart Home Assistant
 
-Currently **only** Google Chrome is the supported for authenticating with the Bosch SingleKey ID servers when adding the integration in HA.
-Also a small extension needs to be installed (temporarily) in Google Chrome to handle the response from the Bosch authentication servers. 
-More (technical) information on the why can be found in this [issue](https://github.com/sander1988/Indego/issues/171).
+## Getting Started
 
-Optionally you can remove or disable the extension after adding the Bosch Indego integration to HomeAssistant.
+### 1. Install Chrome Extension (Required for Authentication)
 
-### Installing the Chrome extension
-1. The **HomeAssistant Indego authentication helper** extension can be downloaded [here](/chrome-extension.zip). 
-2. Extract the ZIP archive.
-3. Go to [extensions](chrome://extensions/) in Google Chrome.
-4. Enable **Developer mode** (right top).
-5. Choose **Load unpacked** and select the unpacked extension.
+Bosch Indego uses OAuth authentication (Bosch SingleKey ID). To complete authentication, you need a Chrome extension:
+
+1. Download: [HomeAssistant Indego authentication helper](/chrome-extension.zip)
+2. Extract the ZIP file
+3. Go to `chrome://extensions/` in Google Chrome
+4. Enable **Developer mode** (top right)
+5. Click **Load unpacked** and select the extracted folder
+6. ✅ You can disable the extension after setup if you prefer
+
+**Note:** Currently only Google Chrome supports the Bosch authentication flow.
+
+### 2. Add the Integration
+
+1. In Home Assistant: **Settings → Devices & Services → Create Integration**
+2. Search for **"Bosch Indego"**
+3. Click **Create**
+4. Follow the authentication flow (uses the Chrome extension above)
+5. All sensors will appear as "Unused Entities" after setup
+
+**You can add this integration multiple times if you own multiple mowers.**
+
+## 📊 Monitored Entities
+
+All sensors are automatically discovered after setup and will appear as "Unused Entities" in Home Assistant.
+
+### Mowing Status
+
+| Sensor | Description |
+|--------|-------------|
+| **Mower State** | Current state of the mower (e.g., mowing, paused, charging) |
+| **State Detail** | Detailed state information with more context |
+| **Lawn Mowed** | Percentage of lawn mowed (%) |
+| **Total Mowing Time** | Total cumulative mowing time (hours) |
+| **Session Count** | Total number of completed mowing sessions |
+| **Estimated Session Duration** | Estimated duration of current session (minutes) |
+
+### Battery & Charging
+
+| Sensor | Description |
+|--------|-------------|
+| **Battery Level** | Current battery charge (%) |
+| **Battery Health** | Battery health status |
+
+### Location & Movement
+
+| Sensor | Description |
+|--------|-------------|
+| **Mower Position X** | X coordinate on map (pixels) |
+| **Mower Position Y** | Y coordinate on map (pixels) |
+| **Mower Stuck** | Binary sensor - indicates if mower is stuck |
+| **Garden Size** | Total lawn area (m²) |
+
+### Alerts & Maintenance
+
+| Sensor | Description |
+|--------|-------------|
+| **Alerts** | Active alert status with count and last message |
+| **Last Error** | Last error code and timestamp |
+| **Firmware Version** | Current firmware version |
+| **Maintenance Hours** | Maintenance counter (hours) |
+
+### Other Information
+
+| Sensor | Description |
+|--------|-------------|
+| **Mowing Mode** | Current mowing mode setting |
+| **Online Status** | Whether mower is connected (True/False) |
+| **Update Available** | Firmware update availability (On/Off) |
+| **Last Completed Mow** | Last full lawn mowing completion time |
+| **Next Mow Time** | Scheduled next mowing time |
+| **Lawn Mower Entity** | Native Home Assistant Lawn Mower entity (Start, Pause, Dock) |
+| **Vacuum Entity** | Legacy Home Assistant Vacuum entity (Start, Pause, Return, Battery) |
+| **Lawn Map** | SVG lawn map with mower position overlay |
 
 
-### Adding a mower
-_Make sure you are accessing your HomeAssistant through Google Chrome and have the **HomeAssistant Indego authentication helper** extension enabled (as described above)._
 
-Please add this integration through the HomeAssistant interface (Settings > Devices & Services > Add Integration). Search for **Bosch Indego Mower**. 
-Configuration through YAML (configuration) files is no longer supported.
+## 🎮 Services & Control
 
-You can add this integration multiple times in case you own multiple Indego mowers.
+Control your mower through Home Assistant services. All services support multiple mowers via the `mower_serial` parameter.
 
-## Usage
+### Send Command
 
-### Entities
- All sensors are autodiscovered and should appear as "unused entities" after adding the component.
+**Service:** `indego.command`
 
-| Description | Screenshot |
-|-------------|------------|
-| <img width=400/> | <img width=325/> |
-***Mower state***<br>Shows state of the mower. | ![State](/doc/1-State_3.png)
-***Mower state detail***<br>Shows detailed state of the mower. | ![State Detail](/doc/2-StateDetail_1.png)
-***Lawn mowed***<br>Shows percentage of lawn mowed. | ![Lawn mowed](/doc/3-LawnMowed_3.png)
-***Total mowing time***<br>Shows the total mowing time for the mower (hours). | ![Mowtime total](/doc/4-MowTime_3.png)
-***Battery***<br>Shows the battery charge level in percent. | ![Battery sensor percent](/doc/5-Battery_3.png)
-***Battery health***<br>Shows the health status of the battery. | ![Battery sensor percent](/doc/5-Battery_3.png)
-***Alert***<br>Shows whether an alert is active. Attributes include alert count and last alert message. | ![Alerts sensor](/doc/7-Alerts_3.png)
-***Last completed mow***<br>Shows when the lawn was last completely mowed. | ![Last mow](/doc/8-LastCompleted_3.png)
-***Next mow time***<br>Shows the next planned mow. | ![Next mow](/doc/9-NextMow_3.png)
-***Mowing mode***<br>Shows the mowing mode set. | ![Mowing mode](/doc/10-MowingMode_2.png)
-***Online***<br>Shows if the mower is online/offline. Possible values:<br> *True, False* | ![Online status](/doc/11-Online_3.png)
-***Update available***<br>Shows if there is an update available for the firmware. Possible values:<br> *On, Off* | ![Update available](/doc/12-Update_4.png)
-***Garden size***<br>Shows the size of the garden in m². | ![Entities in Home Assistant](/doc/0-Sensors_3.png)
-***Mower position X***<br>Shows the X position of the mower on the map in pixels. | ![Entities in Home Assistant](/doc/0-Sensors_3.png)
-***Mower position Y***<br>Shows the Y position of the mower on the map in pixels. | ![Entities in Home Assistant](/doc/0-Sensors_3.png)
-***Mower stuck***<br>Binary sensor indicating whether the mower is stuck. | ![Entities in Home Assistant](/doc/0-Sensors_3.png)
-***Last error***<br>Shows the last error code and timestamp. | ![Entities in Home Assistant](/doc/0-Sensors_3.png)
-***Firmware version***<br>Shows the current firmware version of the mower. | ![Entities in Home Assistant](/doc/0-Sensors_3.png)
-***Maintenance hours***<br>Shows the maintenance hours counter (hours). | ![Entities in Home Assistant](/doc/0-Sensors_3.png)
-***Estimated session duration***<br>Shows the estimated duration of the current mowing session in minutes. | ![Entities in Home Assistant](/doc/0-Sensors_3.png)
-***Session count***<br>Shows the total number of mowing sessions. | ![Entities in Home Assistant](/doc/0-Sensors_3.png)
-***Lawn Mower entity***<br>Exposes the mower as a native Home Assistant Lawn Mower entity (supports Start, Pause, Dock). | ![Entities in Home Assistant](/doc/0-Sensors_3.png)
-***Vacuum entity***<br>Exposes the mower as a Home Assistant Vacuum entity (legacy, supports Start, Pause, Return to base, Battery). | ![Entities in Home Assistant](/doc/0-Sensors_3.png)
-***Camera***<br>Displays the SVG lawn map with the current mower position overlaid. | ![Entities in Home Assistant](/doc/0-Sensors_3.png)
+Sends control commands to your mower.
 
+**Parameters:**
+- `command` (required): `mow` | `pause` | `returnToDock`
+- `mower_serial` (optional): Serial number (only needed for multiple mowers)
 
-
-## Service
-This list might incomplete. You can find all services provided by this component in HomeAssistant under Developer tools > Services and search for 'Bosch Indego Mower'.
-
-### indego.command ####
-Sends a command to the mower. Example code:<br>
-`command: mow`
-
-Accepted values are:
-|Command         |Description           |
-|----------------|----------------------|
-| `mow`          | Start/continue mowing|
-| `pause`        | Pause mower          |
-| `returnToDock` | Return mower to dock |
-
-![Services](/doc/S1-Command1.png)
-
-### indego.smartmowing ####
-Changes mowing mode. Example:<br>
-`enable: true`
-
-Accepted values are:
-|value        |Description           |
-|-------------|----------------------|
-| `true`      | SmartMowing enabled  |
-| `false`     | SmartMowing disabled |
-
-### indego.delete_alert ####
-Deletes one specific Alert. Example:<br>
-`alert_index: 0` deletes the latest alert.
-
-Accepted values are:
-|value               |Description                           |
-|--------------------|--------------------------------------|
-| `each number`      | Delete Alert number X (0 for latest) |
-
-### indego.delete_alert_all ####
-Deletes all Alerts. Example:<br>
-`alert_index: 0` 
-
-Accepted values are:
-|value     |Description         |
-|----------|--------------------|
-| `0`      | Delete all Alerts  |
-
-### indego.read_alert ####
-Marks one specific Alert as read. Example:<br>
-`alert_index: 0` marks the latest alert.
-
-Accepted values are:
-|value               |Description                                 |
-|--------------------|--------------------------------------------|
-| `each number`      | Mark Alert number X as read (0 for latest) |
-
-### indego.read_alert_all ####
-Marks all Alerts as read. Example:<br>
-`alert_index: 0` 
-
-Accepted values are:
-|value     |Description               |
-|----------|--------------------------|
-| `0`      | Mark all Alerts as read  |
-
-### indego.download_map ####
-Downloads the current lawn map from the Bosch API and saves it as `www/indego_map_base.svg` in your Home Assistant configuration directory. This map is also used by the Camera entity.
-
-No required fields. Optional field:
-|Field               |Description                                                   |
-|--------------------|--------------------------------------------------------------|
-| `mower_serial`     | Mower serial (only needed when you have multiple mowers)     |
-
-## Examples
-Creating automation in HA gui:
-
-Example for automations.yaml:
-
-``` yaml
-# automations.yaml
-- id: '1564475250261'
-  alias: Mower start
-  trigger:
-  - at: '10:30'
-    platform: time
-  condition: []
-  action:
-  - data:
-      command: mow
-    service: indego.command
+**Example:**
+```yaml
+service: indego.command
+data:
+  command: mow
 ```
 
-## Debugging
-To see the debug logs from the component (and the pyIndego library) in your log file, specify these options in your configuration file:
+### SmartMowing Control
 
-``` yaml
-#configuration.yaml
+**Service:** `indego.smartmowing`
+
+Enable or disable SmartMowing feature (automatic schedule adjustment based on weather and lawn growth).
+
+**Parameters:**
+- `enable` (required): `true` | `false`
+- `mower_serial` (optional): Serial number (only needed for multiple mowers)
+
+### Alert Management
+
+#### Delete Specific Alert
+**Service:** `indego.delete_alert`
+
+**Parameters:**
+- `alert_index` (required): 0 = most recent, 1 = second most recent, etc.
+- `mower_serial` (optional)
+
+#### Delete All Alerts
+**Service:** `indego.delete_alert_all`
+
+**Parameters:**
+- `mower_serial` (optional)
+
+#### Mark Alert as Read
+**Service:** `indego.read_alert`
+
+**Parameters:**
+- `alert_index` (required): 0 = most recent, 1 = second most recent, etc.
+- `mower_serial` (optional)
+
+#### Mark All Alerts as Read
+**Service:** `indego.read_alert_all`
+
+**Parameters:**
+- `mower_serial` (optional)
+
+### Download Lawn Map
+
+**Service:** `indego.download_map`
+
+Downloads the current lawn map from Bosch Cloud API and saves as `www/indego_map_base.svg` in your Home Assistant configuration directory. Used by the camera entity.
+
+**Parameters:**
+- `mower_serial` (optional): Serial number (only needed for multiple mowers)
+
+## 🐛 Debugging
+
+To enable debug logging for troubleshooting, add this to your Home Assistant configuration:
+
+```yaml
 logger:
-  logs: 
+  logs:
     custom_components.indego: debug
     pyIndego: debug
 ```
 
-## Supported models
-As known today the following models are supported:
-* Indego 1000
-* Indego 1100
-* Indego 1200
-* Indego 10C
-* Indego 13C
-* Indego 350
-* Indego 400
-* Indego S+ 350 1gen
-* Indego S+ 350 2gen
-* Indego S+ 400 1gen
-* Indego S+ 400 2gen
-* Indego S+ 500
-* Indego M+ 700 1gen
-* Indego M+ 700 2gen
+Then check your logs in **Settings → System → Logs** for detailed debugging information.
 
-## Contribution
-If you experience any readings from your mower that the sensor does not read out correct (could be Alerts or mower state), please dont hesitate to write an issue. I need your input in order to make this component as useful as possible. All suggestions are welcome!
+## 📋 Supported Models
 
-## Known issues
-* A special [Chrome plugin](#installing-the-chrome-extension) is required to complete the account linking in HomeAssistant.
-* The Bosch Cloud (running on Azure) might block this integration from time to time. You might see HTTP 4XX errors like 'The connection to the Bosch Indego API failed!'. This might happen during component setup or during state updates. In that case you might be able to workaround the issue by changing the user agent (during initial component setup or for existing components under Settings > Devices & services > Bosch Indego Mower > Configure).
-* You might see HTTP 5XX errors from time to time (most of time once a day). In that case there is a problem on the Bosch Cloud side which is temporary unavailable.
-* HTTP 5XX errors can also occur right after you have sent an impossible command to the mower. Like docking the mower while it's already docked. 
+The integration supports the following Bosch Indego models:
 
-## New issues
-If you experience issues/bugs with this the best way to report them is to open an issue in **this** repo.
+- Indego 1000, 1100, 1200
+- Indego 10C, 13C
+- Indego 350, 400
+- Indego S+ 350 (1st & 2nd Gen)
+- Indego S+ 400 (1st & 2nd Gen)
+- Indego S+ 500
+- Indego M+ 700 (1st & 2nd Gen)
 
-[Issue link](https://github.com/sander1988/Indego/issues)
+_Not seeing your model? Please [open an issue](https://github.com/sander1988/Indego/issues) to request support._
 
+## ⚠️ Known Issues
 
-## Credits
+1. **Chrome Extension Required**
+   - A [Chrome extension](/chrome-extension.zip) is required to complete the authentication setup (Bosch SingleKey ID OAuth flow)
+   - Can be disabled/removed after initial setup
 
-### Thanks to
-[Eduard](https://github.com/eavanvalkenburg)
-[Jumper78](https://github.com/Jumper78)
-[dykandDK](https://github.com/dykandDK)
-[ultrasub](https://github.com/UltraSub)
-[Gnol86](https://github.com/Gnol86)
-naethan bekkm onkelfarmor ltjessem nsimb jjandersson
-[Shamshala](https://github.com/Shamshala)
-nath
-[bekkm](https://github.com/bekkm)
-[urbatecte](https://github.com/urbatecte)
-[Windmelodie](https://github.com/Windmelodie)
-[Fuempel](https://github.com/Fuempel)
-[MagaliDB](https://github.com/MagaliDB)
-[mhosse](https://github.com/mhosse)
-[Promises](https://github.com/Pr0mises)
-[Sander1988](https://github.com/sander1988)
+2. **Bosch Cloud API Issues**
+   - The Bosch Cloud (Azure) may occasionally block the integration: `HTTP 4XX` errors ("The connection to the Bosch Indego API failed!")
+   - **Workaround:** Try changing the user agent during setup or in **Settings → Devices & Services → Bosch Indego Mower → Configure**
 
-Inspiration from http://grauonline.de/wordpress/?page_id=219
+3. **Temporary Bosch Cloud Outages**
+   - `HTTP 5XX` errors typically indicate temporary Bosch Cloud unavailability (often occurs once daily)
+   - These are temporary and resolve automatically
 
-Inspiration from https://github.com/jofleck/iot-device-bosch-indego-controller
+4. **Invalid Commands**
+   - Sending impossible commands (e.g., docking while already docked) may cause temporary `HTTP 5XX` errors from Bosch
 
-<a href="https://www.buymeacoffee.com/jm73" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>
+## 💡 Contribution & Support
+
+### Found a Bug or Have a Suggestion?
+
+1. Check [existing issues](https://github.com/sander1988/Indego/issues) first
+2. Open a [new issue](https://github.com/sander1988/Indego/issues/new) with:
+   - Your mower model and firmware version
+   - Steps to reproduce
+   - Relevant logs (with debug enabled)
+   - Screenshots if applicable
+
+### Getting Help
+
+- 📚 [Documentation & Issues](https://github.com/sander1988/Indego/issues)
+- 💬 [Discord Community](https://discord.gg/aD33GsP)
+- 📋 Services reference: **Developer Tools → Services** (search "Bosch Indego")
+
+## 🙏 Credits
+
+**Maintainers:** [@whylev](https://github.com/whylev), [@sander1988](https://github.com/sander1988)
+
+**Contributors:**
+[Eduard](https://github.com/eavanvalkenburg), [Jumper78](https://github.com/Jumper78), [dykandDK](https://github.com/dykandDK), [ultrasub](https://github.com/UltraSub), [Gnol86](https://github.com/Gnol86), naethan, bekkm, onkelfarmor, ltjessem, nsimb, jjandersson, [Shamshala](https://github.com/Shamshala), nath, [urbatecte](https://github.com/urbatecte), [Windmelodie](https://github.com/Windmelodie), [Fuempel](https://github.com/Fuempel), [MagaliDB](https://github.com/MagaliDB), [mhosse](https://github.com/mhosse), [Promises](https://github.com/Pr0mises)
+
+**Inspiration:**
+- [Bosch Indego API Documentation](http://grauonline.de/wordpress/?page_id=219)
+- [Bosch Indego Controller](https://github.com/jofleck/iot-device-bosch-indego-controller)
