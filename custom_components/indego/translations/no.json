@@ -13,6 +13,9 @@
                     "expose_mower": "Vis Indego-gressklipperen som en mower-enhet i Home Assistant",
                     "expose_vacuum": "Vis Indego-gressklipperen som en støvsuger-enhet i Home Assistant"
                 },
+                "data_description": {
+                    "user_agent": "Brukerdefinert User-Agent header for API-forespørsler til Bosch Indego Cloud. La være tom for å bruke standard. Noen brukere må kanskje angi en brukerdefinert verdi hvis kontoen deres har API-tilgangsbegrensninger."
+                },
                 "description": "Avanserte innstillinger for Bosch Indego-komponenten."
             },
             "mower": {
@@ -38,6 +41,9 @@
                   "expose_mower": "Vis Indego-gressklipperen som en mower-enhet i Home Assistant",
                   "expose_vacuum": "Vis Indego-gressklipperen som en støvsuger-enhet i Home Assistant",
                   "show_all_alerts": "Vis hele advarselshistorikken i Home Assistant. Dette anbefales ikke for de fleste brukere, da det kan ha en betydelig innvirkning på Home Assistant-databasens størrelse!"
+              },
+              "data_description": {
+                  "user_agent": "Brukerdefinert User-Agent header for API-forespørsler til Bosch Indego Cloud. La være tom for å bruke standard. Noen brukere må kanskje angi en brukerdefinert verdi hvis kontoen deres har API-tilgangsbegrensninger."
               }
           }
       }

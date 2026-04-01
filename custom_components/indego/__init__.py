@@ -845,9 +845,6 @@ class IndegoHub:
                     self.entities[ENTITY_BATTERY].state = battery_percent
                     _LOGGER.debug("Battery updated: %s%%", battery_percent)
 
-                    if ENTITY_VACUUM in self.entities:
-                        self.entities[ENTITY_VACUUM].battery_level = battery_percent
-
                     self.entities[ENTITY_BATTERY].add_attributes(
                         {
                             "last_updated": last_updated_now(),
@@ -1036,7 +1033,6 @@ class IndegoHub:
             if ENTITY_VACUUM in self.entities:
                 try:
                     self.entities[ENTITY_VACUUM].indego_state = getattr(self._indego_client.state, 'state', None)
-                    self.entities[ENTITY_VACUUM].battery_charging = self.entities[ENTITY_BATTERY].charging
                 except Exception as exc:
                     _LOGGER.error("Failed to update vacuum state: %s", str(exc))
 

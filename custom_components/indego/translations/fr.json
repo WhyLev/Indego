@@ -13,6 +13,9 @@
                     "expose_mower": "Exposer la tondeuse Indego comme une entité tondeuse dans Home Assistant",
                     "expose_vacuum": "Exposer la tondeuse Indego comme une entité aspirateur dans Home Assistant"
                 },
+                "data_description": {
+                    "user_agent": "En-tête User-Agent personnalisé pour les requêtes API vers Bosch Indego Cloud. Laisser vide pour utiliser la valeur par défaut. Certains utilisateurs devront peut-être définir une valeur personnalisée si leur compte a des restrictions d'accès à l'API."
+                },
                 "description": "Réglages avancés du composant Bosch Indego. Peuvent être laissés inchangés pour la plupart des utilisateurs."
             },
             "mower": {
@@ -38,6 +41,9 @@
                   "expose_mower": "Exposer la tondeuse Indego comme une entité tondeuse dans Home Assistant",
                   "expose_vacuum": "Exposer la tondeuse Indego comme une entité aspirateur dans Home Assistant",
                   "show_all_alerts": "Montrer l'historique complet des alertes dans Home Assistant. Non recommandé pour la plupart des utilisateurs, l'impact sur la taille de la base de données Home Assistant peut être assez important !"
+              },
+              "data_description": {
+                  "user_agent": "En-tête User-Agent personnalisé pour les requêtes API vers Bosch Indego Cloud. Laisser vide pour utiliser la valeur par défaut. Certains utilisateurs devront peut-être définir une valeur personnalisée si leur compte a des restrictions d'accès à l'API."
               }
           }
       }

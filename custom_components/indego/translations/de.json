@@ -13,6 +13,9 @@
                     "expose_mower": "Indego Mähroboter als Mower Entität in Home Assistant anlegen",
                     "expose_vacuum": "Indego Mähroboter als Vacuum Entität in Home Assistant anlegen"
                 },
+                "data_description": {
+                    "user_agent": "Custom User-Agent Header für API-Anfragen zur Bosch Indego Cloud. Um die Standardeinstellung zu verwenden, leer lassen. Einige Benutzer müssen möglicherweise einen benutzerdefinierten Wert festlegen, wenn auf ihrem Konto API-Zugriffsbeschränkungen gelten."
+                },
                 "description": "Erweiterte Einstellungen der Bosch Indego Komponente."
             },
             "mower": {
@@ -38,6 +41,9 @@
                     "expose_mower": "Indego Mähroboter als Mower Entität in Home Assistant anlegen",
                     "expose_vacuum": "Indego Mähroboter als Vacuum Entität in Home Assistant anlegen",
                     "show_all_alerts": "Zeige den kompletten Fehlerverlauf in Home Assistant. Dies wird für die meisten Nutzer nicht empfohlen, da es signifikanten Einfluss auf die Größe der Home Assistant Datenbank haben kann."
+                },
+                "data_description": {
+                    "user_agent": "Custom User-Agent Header für API-Anfragen zur Bosch Indego Cloud. Um die Standardeinstellung zu verwenden, leer lassen. Einige Benutzer müssen möglicherweise einen benutzerdefinierten Wert festlegen, wenn auf ihrem Konto API-Zugriffsbeschränkungen gelten."
                 }
             }
         }

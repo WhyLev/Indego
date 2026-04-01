@@ -5,14 +5,10 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.entity import DeviceInfo
-from homeassistant.helpers.icon import icon_for_battery_level
 from homeassistant.components.vacuum import (
     StateVacuumEntity,
     VacuumEntityFeature,
-    VacuumActivity
-)
-
-from homeassistant.components.vacuum import (
+    VacuumActivity,
     ENTITY_ID_FORMAT as VACUUM_SENSOR_FORMAT,
 )
 
@@ -70,7 +66,6 @@ INDEGO_VACUUM_FEATURES = (
     VacuumEntityFeature.STATE
     | VacuumEntityFeature.PAUSE
     | VacuumEntityFeature.RETURN_HOME
-    | VacuumEntityFeature.BATTERY
     | VacuumEntityFeature.START
 )
 
@@ -98,9 +93,7 @@ class IndegoVacuum(IndegoEntity, StateVacuumEntity):
         self._indego_hub = indego_hub
         self._attr_supported_features = INDEGO_VACUUM_FEATURES
         self._attr_indego_state = None
-        self._attr_state = None
-        self._attr_battery_level = None
-        self._attr_battery_charging = False
+        self._attr_activity = None
 
     async def async_start(self) -> None:
         """Start or resume the cleaning task."""
@@ -115,6 +108,11 @@ class IndegoVacuum(IndegoEntity, StateVacuumEntity):
         await self._indego_hub.async_send_command_to_client("returnToDock")
 
     @property
+    def activity(self) -> VacuumActivity:
+        """Return the current activity of the vacuum."""
+        return self._attr_activity
+
+    @property
     def indego_state(self) -> int:
         """Get the Indego mower state."""
         return self._attr_indego_state
@@ -123,48 +121,14 @@ class IndegoVacuum(IndegoEntity, StateVacuumEntity):
     def indego_state(self, indego_state: int):
         """Set the mower state by converting the Indego mower state to a vacuum state."""
         self._attr_indego_state = indego_state
-        new_state = INDEGO_STATE_TO_VACUUM_MAPPING[indego_state] \
+        new_activity = INDEGO_STATE_TO_VACUUM_MAPPING[indego_state] \
             if indego_state in INDEGO_STATE_TO_VACUUM_MAPPING \
             else None
 
-        if self._attr_state != new_state:
-            self._attr_state = new_state
+        if self._attr_activity != new_activity:
+            self._attr_activity = new_activity
             self.async_schedule_update_ha_state()
-            _LOGGER.debug("Mower/vacuum state updated to: %s", self._attr_state)
+            _LOGGER.debug("Mower/vacuum activity updated to: %s", self._attr_activity)
 
-            if self._attr_state is None:
+            if self._attr_activity is None:
                 _LOGGER.warning("Received unsupported Indego mower state: %i", indego_state)
-
-    @property
-    def battery_level(self) -> int | None:
-        """Get the battery level of the mower."""
-        return self._attr_battery_level
-
-    @battery_level.setter
-    def battery_level(self, level: int):
-        """Set the battery level of the mower."""
-        try:
-            self._attr_battery_level = int(level)
-            _LOGGER.debug("Battery level updated to %i%%", self._attr_battery_level)
-
-        except ValueError:
-            _LOGGER.debug("Battery level update failed for value: %s", level)
-            self._attr_battery_level = None
-
-    @property
-    def battery_charging(self) -> bool:
-        """Get the battery charging state of the mower."""
-        return self._attr_battery_charging
-
-    @battery_charging.setter
-    def battery_charging(self, charging: bool):
-        """Set the battery charging state of the mower."""
-        self._attr_battery_charging = bool(charging)
-        _LOGGER.debug("Battery charging state updated to %s", self._attr_battery_charging)
-
-    @property
-    def battery_icon(self) -> str:
-        """Return the battery icon for the vacuum cleaner."""
-        return icon_for_battery_level(
-            battery_level=self.battery_level, charging=self.battery_charging
-        )

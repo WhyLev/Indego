@@ -13,6 +13,9 @@
                     "expose_mower": "Expose Indego mower as mower entity in Home Assistant",
                     "expose_vacuum": "Expose Indego mower as vacuum entity in Home Assistant"
                 },
+                "data_description": {
+                    "user_agent": "Custom User-Agent header for API requests to Bosch Indego Cloud. Leave empty to use default. Some users may need to set a custom value if their account has API access restrictions."
+                },
                 "description": "Advanced settings of the Bosch Indego component."
             },
             "mower": {
@@ -38,6 +41,9 @@
                   "expose_mower": "Expose Indego mower as mower entity in Home Assistant",
                   "expose_vacuum": "Expose Indego mower as vacuum entity in Home Assistant",
                   "show_all_alerts": "Show the full alert history in Home Assistant. This is not recommended for most users, as it might have a significant impact on the Home Assistant database size!"
+              },
+              "data_description": {
+                  "user_agent": "Custom User-Agent header for API requests to Bosch Indego Cloud. Leave empty to use default. Some users may need to set a custom value if their account has API access restrictions."
               }
           }
       }

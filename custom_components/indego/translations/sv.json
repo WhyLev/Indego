@@ -13,6 +13,9 @@
                     "expose_mower": "Exponera Indego-gräsklippare som mower-enhet i Home Assistant",
                     "expose_vacuum": "Exponera Indego-gräsklippare som dammsugare-enhet i Home Assistant"
                 },
+                "data_description": {
+                    "user_agent": "Anpassad User-Agent header för API-förfrågningar till Bosch Indego Cloud. Lämna tom för att använda standard. Vissa användare kan behöva ange ett anpassat värde om deras konto har API-åtkomstbegränsningar."
+                },
                 "description": "Avancerade inställningar för Bosch Indego-komponenten."
             },
             "mower": {
@@ -38,6 +41,9 @@
                   "expose_mower": "Exponera Indego-gräsklippare som mower-enhet i Home Assistant",
                   "expose_vacuum": "Exponera Indego-gräsklippare som dammsugare-enhet i Home Assistant",
                   "show_all_alerts": "Visa hela aviseringshistoriken i Home Assistant. Detta rekommenderas inte för de flesta användare, eftersom det kan ha en betydande inverkan på Home Assistant-databasens storlek!"
+              },
+              "data_description": {
+                  "user_agent": "Anpassad User-Agent header för API-förfrågningar till Bosch Indego Cloud. Lämna tom för att använda standard. Vissa användare kan behöva ange ett anpassat värde om deras konto har API-åtkomstbegränsningar."
               }
           }
       }

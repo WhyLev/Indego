@@ -13,6 +13,9 @@
                     "expose_mower": "Wyświetl kosiarkę Indego jako encję kosiarki w Home Assistant",
                     "expose_vacuum": "Wyświetl kosiarkę Indego jako encję odkurzacza w Home Assistant"
                 },
+                "data_description": {
+                    "user_agent": "Niestandardowy nagłówek User-Agent dla żądań API do Bosch Indego Cloud. Pozostaw puste, aby użyć wartości domyślnej. Niektórzy użytkownicy mogą potrzebować ustawić wartość niestandardową, jeśli ich konto ma ograniczenia dostępu do API."
+                },
                 "description": "Ustawienia zaawansowane komponentu Bosch Indego."
             },
             "mower": {
@@ -38,6 +41,9 @@
                   "expose_mower": "Wyświetl kosiarkę Indego jako encję kosiarki w Home Assistant",
                   "expose_vacuum": "Wyświetl kosiarkę Indego jako encję odkurzacza w Home Assistant",
                   "show_all_alerts": "Pokaż pełną historię alertów w Home Assistant. Nie rekomendowane dla większości użytkowników, może mieć wpływ na znaczące zwiększenie rozmiaru bazy danych Home Assistant!"
+              },
+              "data_description": {
+                  "user_agent": "Niestandardowy nagłówek User-Agent dla żądań API do Bosch Indego Cloud. Pozostaw puste, aby użyć wartości domyślnej. Niektórzy użytkownicy mogą potrzebować ustawić wartość niestandardową, jeśli ich konto ma ograniczenia dostępu do API."
               }
           }
       }

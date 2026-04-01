@@ -99,7 +99,7 @@ class IndegoOptionsFlowHandler(OptionsFlowWithConfigEntry):
         return self.async_create_entry(title="", data=data)
 
 
-class IndegoFlowHandler(config_entry_oauth2_flow.AbstractOAuth2FlowHandler, domain=DOMAIN):
+class IndegoFlowHandler(config_entry_oauth2_flow.AbstractOAuth2FlowHandler):
     """Handle a config flow."""
 
     DOMAIN = DOMAIN

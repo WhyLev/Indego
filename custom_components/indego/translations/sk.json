@@ -13,6 +13,9 @@
                     "expose_mower": "Zobraziť kosačku Indego ako entitu kosačky v Home Assistant",
                     "expose_vacuum": "Zobraziť kosačku Indego ako entitu vysávača v Home Assistant"
                 },
+                "data_description": {
+                    "user_agent": "Vlastná hlavička User-Agent pre požiadavky API na Bosch Indego Cloud. Nechajte prázdne na použitie štandardnej hodnoty. Niektorí používatelia budú musieť nastaviť vlastnú hodnotu, ak má ich účet obmedzenia prístupu k API."
+                },
                 "description": "Rozšírené nastavenia komponentu Bosch Indego."
             },
             "mower": {

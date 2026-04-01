@@ -13,6 +13,9 @@
                     "expose_mower": "Esponi il rasaerba Indego come entità mower in Home Assistant",
                     "expose_vacuum": "Esponi il rasaerba Indego come entità aspirapolvere in Home Assistant"
                 },
+                "data_description": {
+                    "user_agent": "Intestazione User-Agent personalizzata per le richieste API a Bosch Indego Cloud. Lasciare vuoto per utilizzare il valore predefinito. Alcuni utenti potrebbero aver bisogno di impostare un valore personalizzato se il loro account ha restrizioni di accesso all'API."
+                },
                 "description": "Impostazioni avanzate del componente Bosch Indego."
             },
             "mower": {
@@ -38,6 +41,9 @@
                   "expose_mower": "Esponi il rasaerba Indego come entità mower in Home Assistant",
                   "expose_vacuum": "Esponi il rasaerba Indego come entità aspirapolvere in Home Assistant",
                   "show_all_alerts": "Mostra la cronologia completa degli avvisi in Home Assistant. Questo non è consigliato per la maggior parte degli utenti, in quanto potrebbe avere un impatto significativo sulla dimensione del database di Home Assistant!"
+              },
+              "data_description": {
+                  "user_agent": "Intestazione User-Agent personalizzata per le richieste API a Bosch Indego Cloud. Lasciare vuoto per utilizzare il valore predefinito. Alcuni utenti potrebbero aver bisogno di impostare un valore personalizzato se il loro account ha restrizioni di accesso all'API."
               }
           }
       }

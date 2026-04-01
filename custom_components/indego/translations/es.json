@@ -13,6 +13,9 @@
                     "expose_mower": "Exponer el robot cortacésped Indego como entidad mower en Home Assistant",
                     "expose_vacuum": "Exponer el robot cortacésped Indego como entidad vacuum en Home Assistant"
                 },
+                "data_description": {
+                    "user_agent": "Encabezado User-Agent personalizado para solicitudes API a Bosch Indego Cloud. Dejar vacío para usar el valor por defecto. Algunos usuarios pueden necesitar establecer un valor personalizado si su cuenta tiene restricciones de acceso a la API."
+                },
                 "description": "Configuración avanzada del componente Bosch Indego."
             },
             "mower": {
@@ -38,6 +41,9 @@
                   "expose_mower": "Exponer el robot cortacésped Indego como entidad mower en Home Assistant",
                   "expose_vacuum": "Exponer el robot cortacésped Indego como entidad vacuum en Home Assistant",
                   "show_all_alerts": "Mostrar el historial completo de alertas en Home Assistant. Esto no se recomienda para la mayoría de los usuarios, ya que podría tener un impacto significativo en el tamaño de la base de datos de Home Assistant."
+              },
+              "data_description": {
+                  "user_agent": "Encabezado User-Agent personalizado para solicitudes API a Bosch Indego Cloud. Dejar vacío para usar el valor por defecto. Algunos usuarios pueden necesitar establecer un valor personalizado si su cuenta tiene restricciones de acceso a la API."
               }
           }
       }
