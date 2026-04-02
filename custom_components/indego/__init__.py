@@ -165,6 +165,16 @@ ENTITY_DEFINITIONS = {
             "last_session_charge_min",
         ],
     },
+    ENTITY_LAWN_MOWED_SIZE: {
+        CONF_TYPE: SENSOR_TYPE,
+        CONF_NAME: "lawn mowed size",
+        CONF_ICON: "mdi:grass",
+        CONF_DEVICE_CLASS: None,
+        CONF_UNIT_OF_MEASUREMENT: "m²",
+        CONF_ATTR: [
+            "last_updated",
+        ],
+    },
     ENTITY_LAST_COMPLETED: {
         CONF_TYPE: SENSOR_TYPE,
         CONF_NAME: "last completed",
@@ -288,6 +298,7 @@ ENTITY_DEFINITIONS = {
         CONF_DEVICE_CLASS: SensorDeviceClass.VOLTAGE,
         CONF_UNIT_OF_MEASUREMENT: "V",
         CONF_ATTR: [],
+        CONF_ENABLED_BY_DEFAULT: False,
     },
     ENTITY_BATTERY_TEMPERATURE: {
         CONF_TYPE: SENSOR_TYPE,
@@ -296,6 +307,7 @@ ENTITY_DEFINITIONS = {
         CONF_DEVICE_CLASS: SensorDeviceClass.TEMPERATURE,
         CONF_UNIT_OF_MEASUREMENT: UnitOfTemperature.CELSIUS,
         CONF_ATTR: [],
+        CONF_ENABLED_BY_DEFAULT: False,
     },
     ENTITY_AMBIENT_TEMPERATURE: {
         CONF_TYPE: SENSOR_TYPE,
@@ -304,6 +316,7 @@ ENTITY_DEFINITIONS = {
         CONF_DEVICE_CLASS: SensorDeviceClass.TEMPERATURE,
         CONF_UNIT_OF_MEASUREMENT: UnitOfTemperature.CELSIUS,
         CONF_ATTR: [],
+        CONF_ENABLED_BY_DEFAULT: False,
     },
     ENTITY_BATTERY_CYCLES: {
         CONF_TYPE: SENSOR_TYPE,
@@ -312,6 +325,7 @@ ENTITY_DEFINITIONS = {
         CONF_DEVICE_CLASS: None,
         CONF_UNIT_OF_MEASUREMENT: None,
         CONF_ATTR: [],
+        CONF_ENABLED_BY_DEFAULT: False,
     },
     ENTITY_BATTERY_DISCHARGE: {
         CONF_TYPE: SENSOR_TYPE,
@@ -320,6 +334,7 @@ ENTITY_DEFINITIONS = {
         CONF_DEVICE_CLASS: None,
         CONF_UNIT_OF_MEASUREMENT: "Ah",
         CONF_ATTR: [],
+        CONF_ENABLED_BY_DEFAULT: False,
     },
 }
 
@@ -597,6 +612,7 @@ class IndegoHub:
                     entity[CONF_ATTR],
                     device_info,
                     translation_key=entity[CONF_TRANSLATION_KEY] if CONF_TRANSLATION_KEY in entity else None,
+                    enabled_by_default=entity.get(CONF_ENABLED_BY_DEFAULT, True),
                 )
 
             elif entity[CONF_TYPE] == BINARY_SENSOR_TYPE:
@@ -1030,9 +1046,26 @@ class IndegoHub:
                 mowed = getattr(self._indego_client.state, 'mowed', None)
                 self.entities[ENTITY_LAWN_MOWED].state = mowed if mowed is not None else STATE_UNKNOWN
                 _LOGGER.debug("Lawn mowed: %s", mowed)
+
+                # Calculate lawn mowed size in m²
+                if ENTITY_LAWN_MOWED_SIZE in self.entities:
+                    garden_size = None
+                    if self._indego_client.operating_data:
+                        garden = self._indego_client.operating_data.garden
+                        if garden and garden.size:
+                            garden_size = garden.size
+
+                    if mowed is not None and garden_size is not None and garden_size > 0:
+                        mowed_size = (garden_size * mowed) / 100
+                        self.entities[ENTITY_LAWN_MOWED_SIZE].state = round(mowed_size, 2)
+                        _LOGGER.debug("Lawn mowed size: %.2f m²", mowed_size)
+                    else:
+                        self.entities[ENTITY_LAWN_MOWED_SIZE].state = STATE_UNKNOWN
             except Exception as exc:
                 _LOGGER.error("Failed to update lawn mowed: %s", str(exc))
                 self.entities[ENTITY_LAWN_MOWED].state = STATE_UNKNOWN
+                if ENTITY_LAWN_MOWED_SIZE in self.entities:
+                    self.entities[ENTITY_LAWN_MOWED_SIZE].state = STATE_UNKNOWN
 
             # Update runtime
             try:
@@ -1079,6 +1112,12 @@ class IndegoHub:
                     mow_attrs["last_session_cut_min"] = getattr(self._indego_client.state.runtime.session, 'cut', 'N/A')
                     mow_attrs["last_session_charge_min"] = getattr(self._indego_client.state.runtime.session, 'charge', 'N/A')
                 self.entities[ENTITY_LAWN_MOWED].add_attributes(mow_attrs)
+
+                # Update lawn mowed size attributes
+                if ENTITY_LAWN_MOWED_SIZE in self.entities:
+                    self.entities[ENTITY_LAWN_MOWED_SIZE].add_attributes({
+                        "last_updated": last_updated_now(),
+                    })
             except Exception as exc:
                 _LOGGER.error("Failed to update lawn mowed attributes: %s", str(exc))
 

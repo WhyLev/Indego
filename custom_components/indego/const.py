@@ -24,6 +24,7 @@ CONF_ATTR: Final = "attributes"
 CONF_SEND_COMMAND: Final = "command"
 CONF_SMARTMOWING: Final = "enable"
 CONF_POLLING: Final = "polling"
+CONF_ENABLED_BY_DEFAULT: Final = "enabled_by_default"
 
 DEFAULT_NAME: Final = "Indego"
 DEFAULT_NAME_COMMANDS: Final = None
@@ -43,7 +44,6 @@ BINARY_SENSOR_TYPE: Final = "binary_sensor"
 VACUUM_TYPE: Final = "vacuum"
 LAWN_MOWER_TYPE: Final = "lawn_mower"
 INDEGO_PLATFORMS: Final = [SENSOR_TYPE, BINARY_SENSOR_TYPE, VACUUM_TYPE, LAWN_MOWER_TYPE, CAMERA_TYPE]
-
 ENTITY_ONLINE: Final = "online"
 ENTITY_UPDATE_AVAILABLE: Final = "update_available"
 ENTITY_ALERT: Final = "alert"
@@ -51,6 +51,7 @@ ENTITY_MOWER_STATE: Final = "mower_state"
 ENTITY_MOWER_STATE_DETAIL: Final = "mower_state_detail"
 ENTITY_BATTERY: Final = "battery_percentage"
 ENTITY_LAWN_MOWED: Final = "lawn_mowed"
+ENTITY_LAWN_MOWED_SIZE: Final = "lawn_mowed_size"
 ENTITY_LAST_COMPLETED: Final = "last_completed"
 ENTITY_NEXT_MOW: Final = "next_mow"
 ENTITY_MOWING_MODE: Final = "mowing_mode"

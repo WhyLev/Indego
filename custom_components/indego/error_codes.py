@@ -77,6 +77,11 @@ ERROR_CODE_MAP = {
     "1001": "Unknown error",
     "1002": "Shutdown detected",
     "1008": "Mower is stuck",
+
+    # Others
+    "ntfy_blade_life": "Reminder blade life",
+    "smartMow.mowerUnreachable": "SmartMowing disabled",
+    "firmware.updateComplete": "Software update complete",
 }
 
 def get_error_description(error_code: str) -> str:
