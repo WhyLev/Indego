@@ -94,4 +94,4 @@ class IndegoBinarySensor(IndegoEntity, BinarySensorEntity):
         """Set state."""
         if self._is_on != new_on:
             self._is_on = new_on
-            self.async_schedule_update_ha_state()
+            self.async_write_ha_state()

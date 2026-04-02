@@ -8,6 +8,7 @@ OAUTH2_TOKEN: Final = "https://prodindego.b2clogin.com/prodindego.onmicrosoft.co
 OAUTH2_CLIENT_ID: Final = "65bb8c9d-1070-4fb4-aa95-853618acc876"
 
 STATUS_UPDATE_FAILURE_DELAY_TIME: Final = [0, 10, 30, 60]
+ONLINE_TIMEOUT_SECONDS: Final = 300  # 5 minutes - mark mower as offline if no successful API response
 
 DATA_UPDATED: Final = f"{DOMAIN}_data_updated"
 

@@ -128,7 +128,7 @@ class IndegoVacuum(IndegoEntity, StateVacuumEntity):
         if self._attr_activity != new_activity:
             self._attr_activity = new_activity
             self.async_schedule_update_ha_state()
-            _LOGGER.debug("Mower/vacuum activity updated to: %s", self._attr_activity)
+            _LOGGER.debug("Vacuum activity: %s (mower state: %d)", self._attr_activity, indego_state)
 
             if self._attr_activity is None:
-                _LOGGER.warning("Received unsupported Indego mower state: %i", indego_state)
+                _LOGGER.warning("Unsupported mower state received: %d - vacuum activity cannot be determined", indego_state)

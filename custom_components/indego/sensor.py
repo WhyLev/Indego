@@ -77,7 +77,7 @@ class IndegoSensor(IndegoEntity, SensorEntity):
         """Set the state to new."""
         if self._state != new:
             self._state = new
-            self.async_schedule_update_ha_state()
+            self.async_write_ha_state()
 
     @property
     def device_class(self) -> str:

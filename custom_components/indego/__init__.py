@@ -353,6 +353,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Load a config entry."""
     hass.data.setdefault(DOMAIN, {})
 
+    _LOGGER.info("Setting up Indego integration: %s (Serial: %s)",
+                 entry.data[CONF_MOWER_NAME], entry.data[CONF_MOWER_SERIAL])
+
     entry_implementation = await async_get_config_entry_implementation(hass, entry)
     oauth_session = IndegoOAuth2Session(hass, entry, entry_implementation)
     indego_hub = hass.data[DOMAIN][entry.entry_id] = IndegoHub(
@@ -371,22 +374,23 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     await indego_hub.start_periodic_position_update()
 
     async def load_platforms():
-        _LOGGER.debug("Loading platforms")
+        _LOGGER.debug("Loading Home Assistant platforms: %s", INDEGO_PLATFORMS)
         await hass.config_entries.async_forward_entry_setups(entry, INDEGO_PLATFORMS)
 
     try:
         await indego_hub.update_generic_data_and_load_platforms(load_platforms)
+        _LOGGER.info("Successfully set up Indego integration for: %s", entry.data[CONF_MOWER_NAME])
 
     except ClientResponseError as exc:
         if 400 <= exc.status < 500:
-            _LOGGER.debug("Received 401, triggering ConfigEntryAuthFailed in HA...")
+            _LOGGER.warning("Authentication failed (HTTP %d) - please check your credentials", exc.status)
             raise ConfigEntryAuthFailed from exc
 
-        _LOGGER.warning("Login unsuccessful: %s", str(exc))
+        _LOGGER.error("API connection failed during setup (HTTP %d): %s", exc.status, str(exc))
         return False
 
     except AttributeError as exc:
-        _LOGGER.warning("Login unsuccessful: %s", str(exc))
+        _LOGGER.error("Configuration error - invalid data structure: %s", str(exc))
         return False
 
     def find_instance_for_mower_service_call(call):
@@ -409,7 +413,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         """Handle the mower command service call."""
         instance = find_instance_for_mower_service_call(call)
         command = call.data.get(CONF_SEND_COMMAND, DEFAULT_NAME_COMMANDS)
-        _LOGGER.debug("Indego.send_command service called, with command: %s", command)
+        _LOGGER.info("Sending command '%s' to mower: %s", command, instance._serial)
 
         await instance.async_send_command_to_client(command)
 
@@ -417,7 +421,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         """Handle the smartmowing service call."""
         instance = find_instance_for_mower_service_call(call)
         enable = call.data.get(CONF_SMARTMOWING, DEFAULT_NAME_COMMANDS)
-        _LOGGER.debug("Indego.send_smartmowing service called, enable: %s", enable)
+        _LOGGER.info("Setting smart mowing mode to: %s (Mower: %s)", enable, instance._serial)
 
         await instance._indego_client.put_mow_mode(enable)
         await instance._update_generic_data()
@@ -426,7 +430,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         """Handle the service call."""
         instance = find_instance_for_mower_service_call(call)
         index = call.data.get(SERVER_DATA_ALERT_INDEX, DEFAULT_NAME_COMMANDS)
-        _LOGGER.debug("Indego.delete_alert service called with alert index: %s", index)
+        _LOGGER.info("Deleting alert #%s from mower: %s", index, instance._serial)
 
         await instance._update_alerts()
         await instance._indego_client.delete_alert(index)
@@ -435,7 +439,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     async def async_delete_alert_all(call):
         """Handle the service call."""
         instance = find_instance_for_mower_service_call(call)
-        _LOGGER.debug("Indego.delete_alert_all service called")
+        _LOGGER.info("Deleting all alerts from mower: %s", instance._serial)
 
         await instance._update_alerts()
         await instance._indego_client.delete_all_alerts()
@@ -445,7 +449,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         """Handle the service call."""
         instance = find_instance_for_mower_service_call(call)
         index = call.data.get(SERVER_DATA_ALERT_INDEX, DEFAULT_NAME_COMMANDS)
-        _LOGGER.debug("Indego.read_alert service called with alert index: %s", index)
+        _LOGGER.info("Marking alert #%s as read on mower: %s", index, instance._serial)
 
         await instance._update_alerts()
         await instance._indego_client.put_alert_read(index)
@@ -454,7 +458,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     async def async_read_alert_all(call):
         """Handle the service call."""
         instance = find_instance_for_mower_service_call(call)
-        _LOGGER.debug("Indego.read_alert_all service called")
+        _LOGGER.info("Marking all alerts as read on mower: %s", instance._serial)
 
         await instance._update_alerts()
         await instance._indego_client.put_all_alerts_read()
@@ -463,13 +467,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     async def async_download_map(call):
         """Handle the download_map service call."""
         instance = find_instance_for_mower_service_call(call)
-        _LOGGER.debug("Indego.download_map service called for serial: %s", instance.serial)
+        _LOGGER.info("Downloading lawn map for mower: %s", instance._serial)
         await instance.download_and_store_map()
 
     # In HASS we can have multiple Indego component instances as long as the mower serial is unique.
     # So the mower services should only need to be registered for the first instance.
     if CONF_SERVICES_REGISTERED not in hass.data[DOMAIN]:
-        _LOGGER.debug("Initializing mower service for config entry '%s'", entry.entry_id)
+        _LOGGER.debug("Registering Indego services for config entry: %s", entry.entry_id)
 
         hass.services.async_register(
             DOMAIN,
@@ -485,27 +489,27 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             schema=SERVICE_SCHEMA_SMARTMOWING,
         )
         hass.services.async_register(
-            DOMAIN, 
-            SERVICE_NAME_DELETE_ALERT, 
-            async_delete_alert, 
+            DOMAIN,
+            SERVICE_NAME_DELETE_ALERT,
+            async_delete_alert,
             schema=SERVICE_SCHEMA_DELETE_ALERT
         )
         hass.services.async_register(
-            DOMAIN, 
-            SERVICE_NAME_READ_ALERT, 
-            async_read_alert, 
+            DOMAIN,
+            SERVICE_NAME_READ_ALERT,
+            async_read_alert,
             schema=SERVICE_SCHEMA_READ_ALERT
         )
         hass.services.async_register(
-            DOMAIN, 
-            SERVICE_NAME_DELETE_ALERT_ALL, 
-            async_delete_alert_all, 
+            DOMAIN,
+            SERVICE_NAME_DELETE_ALERT_ALL,
+            async_delete_alert_all,
             schema=SERVICE_SCHEMA_DELETE_ALERT_ALL
         )
         hass.services.async_register(
-            DOMAIN, 
-            SERVICE_NAME_READ_ALERT_ALL, 
-            async_read_alert_all, 
+            DOMAIN,
+            SERVICE_NAME_READ_ALERT_ALL,
+            async_read_alert_all,
             schema=SERVICE_SCHEMA_READ_ALERT_ALL
         )
         hass.services.async_register(
@@ -516,9 +520,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         )
 
         hass.data[DOMAIN][CONF_SERVICES_REGISTERED] = entry.entry_id
+        _LOGGER.info("Successfully registered all Indego services")
 
     else:
-        _LOGGER.debug("Indego mower services already registered. Skipping for config entry '%s'", entry.entry_id)
+        _LOGGER.debug("Indego services already registered - skipping for config entry: %s", entry.entry_id)
 
     return True
 
@@ -577,6 +582,7 @@ class IndegoHub:
         self._last_error_time = None
         self._session_count = 0
         self._last_session_state = None
+        self._last_successful_update = None  # Track last successful API response
 
         async def async_token_refresh() -> str:
             await session.async_ensure_token_valid()
@@ -599,7 +605,7 @@ class IndegoHub:
     def _create_entities(self, device_info):
         """Create sub-entities and add them to Hass."""
 
-        _LOGGER.debug("Creating entities")
+        _LOGGER.debug("Creating entities for mower: %s", self._mower_name)
 
         for entity_key, entity in ENTITY_DEFINITIONS.items():
             if entity[CONF_TYPE] == SENSOR_TYPE:
@@ -654,7 +660,7 @@ class IndegoHub:
 
     async def update_generic_data_and_load_platforms(self, load_platforms):
         """Update the generic mower data, so we can create the HA platforms for the Indego component."""
-        _LOGGER.debug("Getting generic data for device info.")
+        _LOGGER.debug("Fetching generic data for device info from Bosch API")
         generic_data = await self._update_generic_data()
 
         device_info = DeviceInfo(
@@ -683,25 +689,25 @@ class IndegoHub:
 
     async def _initial_update(self, _=None):
         """Do the initial update and create all entities."""
-        _LOGGER.debug("Starting initial update.")
+        _LOGGER.info("Starting initial state synchronization for: %s", self._serial)
 
         self.set_online_state(False)
         await self._create_refresh_state_task()
         await asyncio.gather(*[self.refresh_10m(), self.refresh_24h()])
 
         try:
-            _LOGGER.debug("Refreshing initial operating data.")
+            _LOGGER.debug("Fetching initial operating data (battery, garden size, etc.)")
             await self._update_operating_data()
 
         except Exception as exc:
-            _LOGGER.warning("Error while performing initial update: %s", str(exc))
+            _LOGGER.warning("Error during initial operating data update: %s", str(exc))
 
     async def async_shutdown(self, _=None):
         """Remove all future updates, cancel tasks and close the client."""
         if self._shutdown:
             return
 
-        _LOGGER.debug("Starting shutdown.")
+        _LOGGER.info("Shutting down Indego integration for: %s", self._serial)
         self._shutdown = True
 
         self._cancel_delayed_refresh_state()
@@ -722,12 +728,15 @@ class IndegoHub:
             self._unsub_map_timer = None
 
         await self._indego_client.close()
-        _LOGGER.debug("Shutdown finished.")
+        _LOGGER.debug("Shutdown completed for: %s", self._serial)
 
     async def refresh_state(self):
         """Update the state, if necessary update operating data and recall itself."""
-        _LOGGER.debug("Refreshing state.")
+        _LOGGER.debug("Refreshing mower state")
         self._cancel_delayed_refresh_state()
+
+        # Check if mower should be marked offline due to timeout
+        self._check_offline_timeout()
 
         update_failed = False
         try:
@@ -736,7 +745,7 @@ class IndegoHub:
 
         except Exception as exc:
             update_failed = True
-            _LOGGER.warning("Mower state update failed, reason: %s", str(exc))
+            _LOGGER.warning("Failed to update mower state: %s", str(exc))
             self.set_online_state(False)
 
         if self._shutdown:
@@ -745,8 +754,9 @@ class IndegoHub:
         if update_failed:
             if self._update_fail_count is None:
                 self._update_fail_count = 1
-            _LOGGER.debug("Delaying next status update with %i seconds due to previous failure...", STATUS_UPDATE_FAILURE_DELAY_TIME[self._update_fail_count])
-            when = datetime.now() + timedelta(seconds=STATUS_UPDATE_FAILURE_DELAY_TIME[self._update_fail_count])
+            delay = STATUS_UPDATE_FAILURE_DELAY_TIME[self._update_fail_count]
+            _LOGGER.debug("Next state update scheduled in %d seconds due to previous failure", delay)
+            when = datetime.now() + timedelta(seconds=delay)
             self._update_fail_count = min(self._update_fail_count + 1, len(STATUS_UPDATE_FAILURE_DELAY_TIME) - 1)
             self._unsub_refresh_state = async_track_point_in_time(self._hass, self._create_refresh_state_task, when)
             return
@@ -755,20 +765,20 @@ class IndegoHub:
             state = self._indego_client.state.state
             if (500 <= state <= 799) or (state in (257, 260)):
                 try:
-                    _LOGGER.debug("Refreshing operating data.")
+                    _LOGGER.debug("Mower is actively mowing - fetching detailed operating data")
                     await self._update_operating_data()
 
                 except Exception as exc:
-                    _LOGGER.warning("Mower operating data update failed, reason: %s", str(exc))
+                    _LOGGER.warning("Failed to update operating data: %s", str(exc))
 
             if self._indego_client.state.error != self._latest_alert:
                 self._latest_alert = self._indego_client.state.error
                 try:
-                    _LOGGER.debug("Refreshing alerts, to get new alert.")
+                    _LOGGER.debug("New alert detected - updating alert list")
                     await self._update_alerts()
 
                 except Exception as exc:
-                    _LOGGER.warning("Mower alerts update failed, reason: %s", str(exc))
+                    _LOGGER.warning("Failed to refresh alerts: %s", str(exc))
 
         await self._create_refresh_state_task()
 
@@ -786,7 +796,7 @@ class IndegoHub:
 
     async def refresh_10m(self, _=None):
         """Refresh Indego sensors every 10m."""
-        _LOGGER.debug("Refreshing 10m.")
+        _LOGGER.debug("Performing 10-minute refresh - fetching generic data, alerts, last completed/next mow")
 
         results = await asyncio.gather(
             *[
@@ -805,7 +815,7 @@ class IndegoHub:
                 try:
                     raise res
                 except Exception as exc:
-                    _LOGGER.warning("Error %s for index %i while performing 10m update", str(exc), index)
+                    _LOGGER.warning("Update %d failed during 10-minute refresh: %s", index, str(exc))
             index += 1
 
         self._refresh_10m_remover = async_call_later(
@@ -814,14 +824,14 @@ class IndegoHub:
 
     async def refresh_24h(self, _=None):
         """Refresh Indego sensors every 24h."""
-        _LOGGER.debug("Refreshing 24h.")
+        _LOGGER.debug("Performing 24-hour refresh - checking for firmware updates and availability")
 
         try:
             await self._update_updates_available()
             await self._update_firmware_version()
 
         except Exception as exc:
-            _LOGGER.warning("Error %s while performing 24h update", str(exc))
+            _LOGGER.warning("Error during 24-hour refresh: %s", str(exc))
 
         self._refresh_24h_remover = async_call_later(self._hass, 86400, self.refresh_24h)
 
@@ -830,13 +840,14 @@ class IndegoHub:
 
     async def download_and_store_map(self):
         try:
+            _LOGGER.debug("Downloading lawn map from Bosch API for mower: %s", self._serial)
             svg_bytes = await self._indego_client.get(f"alms/{self._serial}/map")
             if svg_bytes:
                 async with aiofiles.open(self.map_path(), "wb") as f:
                     await f.write(svg_bytes)
-                _LOGGER.info("Map saved in %s", self.map_path())
+                _LOGGER.info("Lawn map successfully saved to: %s", self.map_path())
         except Exception as e:
-            _LOGGER.warning("Error during saving the map [%s]: %s", self._serial, e)
+            _LOGGER.error("Failed to download map from Bosch API for %s: %s", self._serial, e)
 
     async def start_periodic_position_update(self):
         self._unsub_map_timer = async_track_time_interval(
@@ -845,19 +856,19 @@ class IndegoHub:
 
     async def _check_position_and_state(self, now):
         try:
-            _LOGGER.debug("Periodic position and state update started")
+            _LOGGER.debug("Fetching latest mower position and state")
             await self._indego_client.update_state(force=True)
         except asyncio.TimeoutError:
-            _LOGGER.warning("Timeout on update_state() – Mower not available or too slow (timeout exceeded)")
+            _LOGGER.warning("Timeout while fetching position - mower may be offline or API is slow")
             return
         except Exception as e:
-            _LOGGER.exception("Error on update_state() – actual mower_state=%s, error: %s", self._last_state, str(e))
+            _LOGGER.debug("Error fetching position (current state: %s): %s", self._last_state, str(e))
             return
 
         try:
             state = self._indego_client.state
             if not state:
-                _LOGGER.warning("Received invalid state from mower - state object is None")
+                _LOGGER.warning("Received empty state object from API")
                 return
 
             mower_state = getattr(state, "mower_state", "unknown")
@@ -865,33 +876,33 @@ class IndegoHub:
             ypos = getattr(state, "svg_yPos", None)
             self._last_state = mower_state
 
-            _LOGGER.debug("Mower state: %s, Position: x=%s, y=%s", mower_state, xpos, ypos)
+            _LOGGER.debug("Position: x=%s, y=%s | State: %s", xpos, ypos, mower_state)
 
             if mower_state == "docked":
-                _LOGGER.debug("Mower is docked - no position updates")
+                _LOGGER.debug("Mower is docked - skipping position update")
                 return
 
             if xpos is not None and ypos is not None:
                 if (xpos, ypos) != self._last_position:
-                    _LOGGER.info("Position changed: x=%s, y=%s", xpos, ypos)
+                    _LOGGER.info("Mower position changed: (%s, %s)", xpos, ypos)
                     self._last_position = (xpos, ypos)
                     for entity in self.entities.values():
                         if hasattr(entity, "refresh_map"):
                             await entity.refresh_map(mower_state)
         except Exception as e:
-            _LOGGER.error("Unexpected error while processing state update: %s", str(e))
+            _LOGGER.error("Unexpected error processing position update: %s", str(e))
     
     async def _update_operating_data(self):
         try:
             await self._indego_client.update_operating_data()
-            _LOGGER.debug("Updating operating data")
+            _LOGGER.debug("Successfully fetched operating data from Bosch API")
         except Exception as exc:
-            _LOGGER.warning("Failed to fetch operating data from API: %s", str(exc))
+            _LOGGER.warning("Failed to fetch operating data from Bosch API: %s", str(exc))
             return
 
         try:
             if not self._indego_client.operating_data:
-                _LOGGER.warning("Operating data is None - mower may not support this feature")
+                _LOGGER.debug("Operating data is empty - mower may not support this feature")
                 return
 
             # Update battery
@@ -899,7 +910,7 @@ class IndegoHub:
                 if hasattr(self._indego_client.operating_data, 'battery') and self._indego_client.operating_data.battery:
                     battery_percent = self._indego_client.operating_data.battery.percent_adjusted
                     self.entities[ENTITY_BATTERY].state = battery_percent
-                    _LOGGER.debug("Battery updated: %s%%", battery_percent)
+                    _LOGGER.debug("Battery: %d%% | Voltage: %s V", battery_percent, getattr(self._indego_client.operating_data.battery, 'voltage', 'N/A'))
 
                     # Get battery values
                     voltage = getattr(self._indego_client.operating_data.battery, 'voltage', None)
@@ -936,10 +947,10 @@ class IndegoHub:
                     if ENTITY_AMBIENT_TEMPERATURE in self.entities:
                         self.entities[ENTITY_AMBIENT_TEMPERATURE].state = ambient_temp if ambient_temp is not None else STATE_UNKNOWN
                 else:
-                    _LOGGER.warning("Battery attribute not available in operating_data")
+                    _LOGGER.debug("Battery data not available")
                     self.entities[ENTITY_BATTERY].state = STATE_UNKNOWN
             except AttributeError as exc:
-                _LOGGER.error("Battery attribute missing: %s", str(exc))
+                _LOGGER.error("Error accessing battery data: %s", str(exc))
                 self.entities[ENTITY_BATTERY].state = STATE_UNKNOWN
 
             # Update garden size
@@ -952,13 +963,13 @@ class IndegoHub:
 
                     if garden and garden.size:
                         garden_size = garden.size
-                        _LOGGER.info("✓ Garden size: %s m²", garden_size)
+                        _LOGGER.info("Garden size: %d m²", garden_size)
                     elif garden:
-                        _LOGGER.warning("DEBUG: Garden object exists but size is None/0. Garden: %s", garden)
+                        _LOGGER.debug("Garden object exists but size is not set")
                     else:
-                        _LOGGER.warning("DEBUG: Garden object is None")
+                        _LOGGER.debug("Garden data not available from API")
                 else:
-                    _LOGGER.warning("Operating data is None")
+                    _LOGGER.debug("Operating data is None")
 
                 if garden_size is not None and garden_size > 0:
                     self.entities[ENTITY_GARDEN_SIZE].state = garden_size
@@ -966,14 +977,19 @@ class IndegoHub:
                     self.entities[ENTITY_GARDEN_SIZE].state = STATE_UNKNOWN
 
             except Exception as exc:
-                _LOGGER.error("Error accessing garden size: %s", str(exc), exc_info=True)
+                _LOGGER.error("Error accessing garden size: %s", str(exc))
                 self.entities[ENTITY_GARDEN_SIZE].state = STATE_UNKNOWN
 
         except Exception as exc:
             _LOGGER.error("Unexpected error while updating operating data: %s", str(exc))
 
     def set_online_state(self, online: bool):
-        _LOGGER.debug("Set online state: %s", online)
+        current_is_online = self.entities[ENTITY_ONLINE].state
+        if current_is_online != online:
+            if online:
+                _LOGGER.info("Mower is now ONLINE")
+            else:
+                _LOGGER.warning("Mower is now OFFLINE")
 
         self.entities[ENTITY_ONLINE].state = online
         self.entities[ENTITY_MOWER_STATE].set_cloud_connection_state(online)
@@ -987,14 +1003,14 @@ class IndegoHub:
 
     async def _update_state(self, longpoll: bool = True):
         try:
-            _LOGGER.debug("Fetching mower state (longpoll=%s)", longpoll)
+            _LOGGER.debug("Fetching mower state from Bosch API (longpoll: %s)", longpoll)
             await self._indego_client.update_state(longpoll=longpoll, longpoll_timeout=230)
         except asyncio.TimeoutError:
-            _LOGGER.warning("Timeout while fetching mower state - mower may be offline or slow to respond")
+            _LOGGER.warning("Timeout while fetching mower state - mower may be offline or API is slow")
             self.set_online_state(False)
             return
         except Exception as exc:
-            _LOGGER.error("Failed to fetch mower state: %s", str(exc))
+            _LOGGER.error("Failed to fetch mower state from Bosch API: %s", str(exc))
             self.set_online_state(False)
             return
 
@@ -1002,15 +1018,23 @@ class IndegoHub:
             return
 
         if not self._indego_client.state:
-            _LOGGER.warning("State update failed - received empty state from API")
+            _LOGGER.warning("Received empty state from API - cannot process")
             self.set_online_state(False)
             return
 
         try:
-            # Update online state
-            online = self._indego_client.online
-            self.set_online_state(online)
-            _LOGGER.debug("Cloud connection state: %s", online)
+            # Record successful API response
+            self._last_successful_update = time.time()
+
+            # Check for offline error codes (WiFi lost, API error, No connection to server)
+            state_code = getattr(self._indego_client.state, 'state', None)
+            if state_code in (802, 803, 804):
+                _LOGGER.warning("Mower reported offline state (error code: %s)", state_code)
+                self.set_online_state(False)
+            else:
+                # Update online state from API
+                online = self._indego_client.online
+                self.set_online_state(online)
 
             # Refresh Camera map if Position is available
             new_x = self._indego_client.state.svg_xPos
@@ -1028,7 +1052,7 @@ class IndegoHub:
                 self.entities[ENTITY_MOWER_STATE].state = state_desc if state_desc else STATE_UNKNOWN
                 _LOGGER.debug("Mower state: %s", state_desc)
             except Exception as exc:
-                _LOGGER.error("Failed to update mower state: %s", str(exc))
+                _LOGGER.error("Failed to update mower state sensor: %s", str(exc))
                 self.entities[ENTITY_MOWER_STATE].state = STATE_UNKNOWN
 
             # Update mower state detail
@@ -1036,16 +1060,16 @@ class IndegoHub:
                 state_detail = self._indego_client.state_description_detail
                 state_number = getattr(self._indego_client.state, 'state', 'unknown')
                 self.entities[ENTITY_MOWER_STATE_DETAIL].state = state_detail if state_detail else STATE_UNKNOWN
-                _LOGGER.debug("Mower state detail: %s (code: %s)", state_detail, state_number)
+                _LOGGER.debug("Mower detailed state: %s (code: %d)", state_detail, state_number if isinstance(state_number, int) else 0)
             except Exception as exc:
-                _LOGGER.error("Failed to update mower state detail: %s", str(exc))
+                _LOGGER.error("Failed to update mower state detail sensor: %s", str(exc))
                 self.entities[ENTITY_MOWER_STATE_DETAIL].state = STATE_UNKNOWN
 
             # Update lawn mowed
             try:
                 mowed = getattr(self._indego_client.state, 'mowed', None)
                 self.entities[ENTITY_LAWN_MOWED].state = mowed if mowed is not None else STATE_UNKNOWN
-                _LOGGER.debug("Lawn mowed: %s", mowed)
+                _LOGGER.debug("Lawn mowed: %d%%", mowed if mowed is not None else 0)
 
                 # Calculate lawn mowed size in m²
                 if ENTITY_LAWN_MOWED_SIZE in self.entities:
@@ -1058,11 +1082,11 @@ class IndegoHub:
                     if mowed is not None and garden_size is not None and garden_size > 0:
                         mowed_size = (garden_size * mowed) / 100
                         self.entities[ENTITY_LAWN_MOWED_SIZE].state = round(mowed_size, 2)
-                        _LOGGER.debug("Lawn mowed size: %.2f m²", mowed_size)
+                        _LOGGER.debug("Lawn mowed area: %.2f m² (%.1f%%)", mowed_size, mowed)
                     else:
                         self.entities[ENTITY_LAWN_MOWED_SIZE].state = STATE_UNKNOWN
             except Exception as exc:
-                _LOGGER.error("Failed to update lawn mowed: %s", str(exc))
+                _LOGGER.error("Failed to update lawn mowed data: %s", str(exc))
                 self.entities[ENTITY_LAWN_MOWED].state = STATE_UNKNOWN
                 if ENTITY_LAWN_MOWED_SIZE in self.entities:
                     self.entities[ENTITY_LAWN_MOWED_SIZE].state = STATE_UNKNOWN
@@ -1073,11 +1097,11 @@ class IndegoHub:
                 if runtime and hasattr(runtime, 'total'):
                     cut_time = getattr(runtime.total, 'cut', None)
                     self.entities[ENTITY_RUNTIME].state = cut_time if cut_time is not None else STATE_UNKNOWN
-                    _LOGGER.debug("Runtime total cut: %s hours", cut_time)
+                    _LOGGER.debug("Total mowing time: %d hours", cut_time if cut_time is not None else 0)
                 else:
                     self.entities[ENTITY_RUNTIME].state = STATE_UNKNOWN
             except Exception as exc:
-                _LOGGER.error("Failed to update runtime: %s", str(exc))
+                _LOGGER.error("Failed to update runtime data: %s", str(exc))
                 self.entities[ENTITY_RUNTIME].state = STATE_UNKNOWN
 
             # Update battery charging state
@@ -1178,6 +1202,7 @@ class IndegoHub:
                     if ENTITY_MOWER_STUCK in self.entities:
                         self.entities[ENTITY_MOWER_STUCK].state = stuck
                         if stuck:
+                            _LOGGER.warning("Mower appears to be stuck - no movement detected for > 60 seconds")
                             self.entities[ENTITY_MOWER_STUCK].add_attributes({
                                 "stuck_since": self._last_position_change_time.strftime("%Y-%m-%d %H:%M:%S"),
                                 "stuck_x": svg_x,
@@ -1189,7 +1214,7 @@ class IndegoHub:
 
                     self._hass.async_create_task(self._update_map_svg(svg_x, svg_y))
             except Exception as exc:
-                _LOGGER.error("Failed to update position tracking: %s", str(exc))
+                _LOGGER.error("Failed to process position tracking: %s", str(exc))
 
             # Maintenance Hours Tracking
             try:
@@ -1215,9 +1240,9 @@ class IndegoHub:
     async def _update_generic_data(self):
         try:
             await self._indego_client.update_generic_data()
-            _LOGGER.debug("Generic data updated successfully")
+            _LOGGER.debug("Generic data fetched from Bosch API")
         except Exception as exc:
-            _LOGGER.warning("Failed to fetch generic data: %s", str(exc))
+            _LOGGER.warning("Failed to fetch generic data from API: %s", str(exc))
             return None
 
         try:
@@ -1231,11 +1256,11 @@ class IndegoHub:
                     self.entities[ENTITY_MOWING_MODE].state = mowing_mode
                     _LOGGER.debug("Mowing mode: %s", mowing_mode)
             else:
-                _LOGGER.warning("Generic data is None")
+                _LOGGER.debug("Generic data is empty from API")
                 if ENTITY_MOWING_MODE in self.entities:
                     self.entities[ENTITY_MOWING_MODE].state = STATE_UNKNOWN
         except Exception as exc:
-            _LOGGER.error("Error updating mowing mode: %s", str(exc))
+            _LOGGER.error("Error processing generic data: %s", str(exc))
             if ENTITY_MOWING_MODE in self.entities:
                 self.entities[ENTITY_MOWING_MODE].state = STATE_UNKNOWN
 
@@ -1320,7 +1345,7 @@ class IndegoHub:
         """Fetch SVG map and save to www."""
         try:
             if self._map_svg is None:
-                _LOGGER.debug("Fetching SVG map from Bosch API")
+                _LOGGER.debug("Fetching lawn map SVG from Bosch API")
                 svg_bytes = await self._indego_client.get(f"alms/{self._serial}/map")
                 if svg_bytes:
                     self._map_svg = svg_bytes.decode("utf-8") if isinstance(svg_bytes, bytes) else svg_bytes
@@ -1336,7 +1361,7 @@ class IndegoHub:
                 await f.write(self._map_svg)
 
         except Exception as exc:
-            _LOGGER.warning("Failed to update Indego map SVG: %s", str(exc))
+            _LOGGER.debug("Could not update lawn map: %s", str(exc))
 
     def _update_session_tracking(self):
         """Track session count and calculate estimated duration."""
@@ -1352,7 +1377,7 @@ class IndegoHub:
             if is_mowing and self._last_session_state != current_state:
                 if not (500 <= (self._last_session_state or 0) <= 799):
                     self._session_count += 1
-                    _LOGGER.debug("New mowing session started, count: %d", self._session_count)
+                    _LOGGER.info("New mowing session started - Total sessions: %d", self._session_count)
 
             self._last_session_state = current_state
 
@@ -1365,11 +1390,11 @@ class IndegoHub:
                 self.entities[ENTITY_ESTIMATED_DURATION].state = estimated_mins
 
                 self.entities[ENTITY_ESTIMATED_DURATION].add_attributes({
-                    "based_on_battery": f"{estimated_mins} min (from battery capacity)",
-                    "based_on_garden_size": f"{estimated_mins} min (from garden size)",
+                    "based_on_battery": f"{estimated_mins} min (battery capacity)",
+                    "based_on_garden_size": f"{estimated_mins} min (garden size)",
                 })
         except Exception as exc:
-            _LOGGER.error("Failed to update session tracking: %s", str(exc))
+            _LOGGER.error("Error updating session tracking: %s", str(exc))
 
     def _calculate_estimated_duration(self) -> int:
         """Calculate estimated session duration based on battery and garden size."""
@@ -1378,10 +1403,10 @@ class IndegoHub:
             if hasattr(self._indego_client.state, 'battery') and self._indego_client.state.battery:
                 battery_percent = getattr(self._indego_client.state.battery, 'percent', None)
                 if battery_percent is None:
-                    _LOGGER.debug("Battery percent not available for duration estimation")
+                    _LOGGER.debug("Battery percent not available - using default estimate")
                     battery_percent = 50  # Use default estimate
             else:
-                _LOGGER.debug("Battery data not available for duration estimation")
+                _LOGGER.debug("Battery data not available - using default estimate")
                 battery_percent = 50  # Use default estimate
 
             garden_size = getattr(self._indego_client.generic_data, "garden_size", 0) or 100
@@ -1398,7 +1423,7 @@ class IndegoHub:
             estimated = min(battery_based, garden_based)
             return max(5, estimated)  # At least 5 minutes
         except Exception as exc:
-            _LOGGER.debug("Failed to calculate estimated duration: %s", str(exc))
+            _LOGGER.debug("Error calculating estimated duration: %s", str(exc))
             return 30  # Return safe default
 
     def _update_error_tracking(self):
@@ -1420,7 +1445,7 @@ class IndegoHub:
                     "error_code": error_code,
                     "error_time": format_indego_date(latest_alert.date),
                 })
-                _LOGGER.debug("Last error updated: %s (code: %s)", error_description, error_code)
+                _LOGGER.warning("Latest mower error: %s (Code: %s)", error_description, error_code)
             else:
                 self.entities[ENTITY_LAST_ERROR_CODE].state = "No errors"
                 self.entities[ENTITY_LAST_ERROR_CODE].add_attributes({
@@ -1428,8 +1453,22 @@ class IndegoHub:
                     "error_time": "N/A",
                 })
         except Exception as exc:
-            _LOGGER.error("Failed to update error tracking: %s", str(exc))
+            _LOGGER.error("Failed to process error tracking: %s", str(exc))
             self.entities[ENTITY_LAST_ERROR_CODE].state = STATE_UNKNOWN
+
+    def _check_offline_timeout(self):
+        """Check if mower should be marked offline due to timeout (no successful API response)."""
+        if self._last_successful_update is None:
+            # No successful update yet, don't set offline by timeout
+            return
+
+        current_time = time.time()
+        time_since_success = current_time - self._last_successful_update
+
+        if time_since_success > ONLINE_TIMEOUT_SECONDS:
+            _LOGGER.warning("Mower offline - no successful API response for %d seconds (timeout threshold: %d seconds)",
+                           int(time_since_success), ONLINE_TIMEOUT_SECONDS)
+            self.set_online_state(False)
 
     async def _update_firmware_version(self):
         """Update firmware version sensor."""
@@ -1442,15 +1481,15 @@ class IndegoHub:
                 firmware_version = getattr(self._indego_client.generic_data, "alm_firmware_version", None)
                 if firmware_version:
                     self.entities[ENTITY_FIRMWARE_VERSION].state = str(firmware_version)
-                    _LOGGER.debug("Firmware version updated: %s", firmware_version)
+                    _LOGGER.debug("Firmware version: %s", firmware_version)
                 else:
-                    _LOGGER.warning("alm_firmware_version not available in generic_data")
+                    _LOGGER.debug("Firmware version not available from API")
                     self.entities[ENTITY_FIRMWARE_VERSION].state = STATE_UNKNOWN
             else:
-                _LOGGER.warning("generic_data not available for firmware version")
+                _LOGGER.debug("Generic data not available for firmware check")
                 self.entities[ENTITY_FIRMWARE_VERSION].state = STATE_UNKNOWN
         except Exception as e:
-            _LOGGER.error("Failed to fetch firmware version: %s", str(e))
+            _LOGGER.error("Error fetching firmware version: %s", str(e))
             self.entities[ENTITY_FIRMWARE_VERSION].state = STATE_UNKNOWN
 
     def _update_maintenance_hours(self):
@@ -1461,7 +1500,7 @@ class IndegoHub:
         try:
             runtime = getattr(self._indego_client.state, 'runtime', None)
             if not runtime:
-                _LOGGER.debug("Runtime data not available for maintenance hours")
+                _LOGGER.debug("Runtime data not available for maintenance calculation")
                 return
 
             total_hours = getattr(runtime.total if hasattr(runtime, 'total') else runtime, 'operate', None)
@@ -1482,9 +1521,9 @@ class IndegoHub:
             self.entities[ENTITY_MAINTENANCE_HOURS].add_attributes({
                 "maintenance_status": maintenance_status,
             })
-            _LOGGER.debug("Maintenance hours updated: %d hours (%s)", int(total_hours), maintenance_status)
+            _LOGGER.debug("Maintenance status: %d hours - %s", int(total_hours), maintenance_status)
         except Exception as exc:
-            _LOGGER.error("Failed to update maintenance hours: %s", str(exc))
+            _LOGGER.error("Error calculating maintenance status: %s", str(exc))
             self.entities[ENTITY_MAINTENANCE_HOURS].state = STATE_UNKNOWN
 
     @property

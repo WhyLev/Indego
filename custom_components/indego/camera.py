@@ -50,22 +50,22 @@ class IndegoCamera(IndegoEntity, Camera):
     async def async_camera_image(self, width: int | None = None, height: int | None = None) -> bytes | None:
         if self._svg_map is None:
             svg_path = self._indego_hub.map_path()
-            _LOGGER.debug("Camera: loading map from file %s (fallback)", svg_path)
+            _LOGGER.debug("Camera: Loading lawn map from disk")
             if not os.path.exists(svg_path):
-                _LOGGER.warning("Camera: SVG-File not available - no picture")
+                _LOGGER.warning("Camera: Lawn map file not found - no image available")
                 return None
             try:
                 async with aiofiles.open(svg_path, "r") as f:
                     self._svg_map = await f.read()
             except Exception as e:
-                _LOGGER.error("Camera: Error during reading of SVG-File: %s", e)
+                _LOGGER.error("Camera: Failed to read lawn map file: %s", e)
                 return None
 
         return self._svg_map.encode("utf-8")
 
     def update_streaming_state(self, is_streaming: bool) -> None:
         if not is_streaming and self._attr_is_streaming:
-            _LOGGER.debug("Streaming updated to %s, forcing reload of map", is_streaming)
+            _LOGGER.debug("Map reload triggered - mower movement detected")
             self._svg_map = None
         if self._attr_is_streaming != bool(is_streaming):
             self._attr_is_streaming = bool(is_streaming)
@@ -75,7 +75,7 @@ class IndegoCamera(IndegoEntity, Camera):
         try:
             svg_path = self._indego_hub.map_path()
             if not os.path.exists(svg_path):
-                _LOGGER.warning("Camera: SVG-File %s not present – no update", svg_path)
+                _LOGGER.debug("Camera: Lawn map file not yet available")
                 return
 
             async with aiofiles.open(svg_path, "r") as f:
@@ -100,4 +100,4 @@ class IndegoCamera(IndegoEntity, Camera):
             self.async_write_ha_state()
 
         except Exception as e:
-            _LOGGER.error("Camera: Error during map update: %s", e)
+            _LOGGER.debug("Camera: Error updating lawn map: %s", e)

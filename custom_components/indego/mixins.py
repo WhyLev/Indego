@@ -31,7 +31,7 @@ class IndegoEntity(RestoreEntity):
     def async_write_ha_state(self) -> None:
         """Prevent write state calls when the entity is disabled."""
         if not self.enabled:
-            _LOGGER.debug("%s is disabled, preventing HA state update", self.entity_id)
+            _LOGGER.debug("Entity %s is disabled - state update skipped", self.entity_id)
             return
         super().async_write_ha_state()
 
