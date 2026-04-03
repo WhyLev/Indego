@@ -227,6 +227,7 @@ ENTITY_DEFINITIONS = {
     },
     ENTITY_CAMERA: {
         CONF_TYPE: CAMERA_TYPE,
+        CONF_NAME: "map",
     },
     ENTITY_MOWER_SVG_X: {
         CONF_TYPE: SENSOR_TYPE,
@@ -266,6 +267,7 @@ ENTITY_DEFINITIONS = {
         CONF_DEVICE_CLASS: None,
         CONF_UNIT_OF_MEASUREMENT: None,
         CONF_ATTR: [],
+        CONF_ENTITY_CATEGORY: EntityCategory.DIAGNOSTIC,
     },
     ENTITY_MAINTENANCE_HOURS: {
         CONF_TYPE: SENSOR_TYPE,
