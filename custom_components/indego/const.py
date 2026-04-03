@@ -26,6 +26,7 @@ CONF_SEND_COMMAND: Final = "command"
 CONF_SMARTMOWING: Final = "enable"
 CONF_POLLING: Final = "polling"
 CONF_ENABLED_BY_DEFAULT: Final = "enabled_by_default"
+CONF_ENTITY_CATEGORY: Final = "entity_category"
 
 DEFAULT_NAME: Final = "Indego"
 DEFAULT_NAME_COMMANDS: Final = None

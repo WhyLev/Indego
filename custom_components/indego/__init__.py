@@ -32,7 +32,7 @@ from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.event import async_call_later
 from homeassistant.util.dt import utcnow
-from homeassistant.helpers.entity import DeviceInfo
+from homeassistant.helpers.entity import DeviceInfo, EntityCategory
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.config_entry_oauth2_flow import async_get_config_entry_implementation
 from homeassistant.helpers.event import async_track_point_in_time
@@ -104,6 +104,7 @@ ENTITY_DEFINITIONS = {
         CONF_ICON: "mdi:download-outline",
         CONF_DEVICE_CLASS: BinarySensorDeviceClass.UPDATE,
         CONF_ATTR: [],
+        CONF_ENTITY_CATEGORY: EntityCategory.DIAGNOSTIC,
     },
     ENTITY_ALERT: {
         CONF_TYPE: BINARY_SENSOR_TYPE,
@@ -236,6 +237,7 @@ ENTITY_DEFINITIONS = {
         CONF_DEVICE_CLASS: None,
         CONF_UNIT_OF_MEASUREMENT: "px",
         CONF_ATTR: [],
+        CONF_ENTITY_CATEGORY: EntityCategory.DIAGNOSTIC,
     },
     ENTITY_MOWER_SVG_Y: {
         CONF_TYPE: SENSOR_TYPE,
@@ -244,6 +246,7 @@ ENTITY_DEFINITIONS = {
         CONF_DEVICE_CLASS: None,
         CONF_UNIT_OF_MEASUREMENT: "px",
         CONF_ATTR: [],
+        CONF_ENTITY_CATEGORY: EntityCategory.DIAGNOSTIC,
     },
     ENTITY_MOWER_STUCK: {
         CONF_TYPE: BINARY_SENSOR_TYPE,
@@ -301,6 +304,7 @@ ENTITY_DEFINITIONS = {
         CONF_UNIT_OF_MEASUREMENT: "V",
         CONF_ATTR: [],
         CONF_ENABLED_BY_DEFAULT: False,
+        CONF_ENTITY_CATEGORY: EntityCategory.DIAGNOSTIC,
     },
     ENTITY_BATTERY_TEMPERATURE: {
         CONF_TYPE: SENSOR_TYPE,
@@ -310,6 +314,7 @@ ENTITY_DEFINITIONS = {
         CONF_UNIT_OF_MEASUREMENT: UnitOfTemperature.CELSIUS,
         CONF_ATTR: [],
         CONF_ENABLED_BY_DEFAULT: False,
+        CONF_ENTITY_CATEGORY: EntityCategory.DIAGNOSTIC,
     },
     ENTITY_AMBIENT_TEMPERATURE: {
         CONF_TYPE: SENSOR_TYPE,
@@ -328,6 +333,7 @@ ENTITY_DEFINITIONS = {
         CONF_UNIT_OF_MEASUREMENT: None,
         CONF_ATTR: [],
         CONF_ENABLED_BY_DEFAULT: False,
+        CONF_ENTITY_CATEGORY: EntityCategory.DIAGNOSTIC,
     },
     ENTITY_BATTERY_DISCHARGE: {
         CONF_TYPE: SENSOR_TYPE,
@@ -337,6 +343,7 @@ ENTITY_DEFINITIONS = {
         CONF_UNIT_OF_MEASUREMENT: "Ah",
         CONF_ATTR: [],
         CONF_ENABLED_BY_DEFAULT: False,
+        CONF_ENTITY_CATEGORY: EntityCategory.DIAGNOSTIC,
     },
 }
 
@@ -620,7 +627,8 @@ class IndegoHub:
                     entity[CONF_ATTR],
                     device_info,
                     translation_key=entity[CONF_TRANSLATION_KEY] if CONF_TRANSLATION_KEY in entity else None,
-                    enabled_by_default=entity.get(CONF_ENABLED_BY_DEFAULT, True),
+                    enabled_by_default=entity[CONF_ENABLED_BY_DEFAULT] if CONF_ENABLED_BY_DEFAULT in entity else True,
+                    entity_category=entity[CONF_ENTITY_CATEGORY] if CONF_ENTITY_CATEGORY in entity else None,
                 )
 
             elif entity[CONF_TYPE] == BINARY_SENSOR_TYPE:
@@ -632,6 +640,7 @@ class IndegoHub:
                     entity[CONF_ATTR],
                     device_info,
                     translation_key=entity[CONF_TRANSLATION_KEY] if CONF_TRANSLATION_KEY in entity else None,
+                    entity_category=entity[CONF_ENTITY_CATEGORY] if CONF_ENTITY_CATEGORY in entity else None,
                 )
 
             elif entity[CONF_TYPE] == LAWN_MOWER_TYPE:
@@ -657,7 +666,8 @@ class IndegoHub:
                     f"indego_{self._serial}",
                     self._mower_name,
                     device_info,
-                    self
+                    self,
+                    entity_category=entity[CONF_ENTITY_CATEGORY] if CONF_ENTITY_CATEGORY in entity else None,
                 )
 
     async def update_generic_data_and_load_platforms(self, load_platforms):

@@ -33,7 +33,7 @@ async def async_setup_entry(
 class IndegoSensor(IndegoEntity, SensorEntity):
     """Class for Indego Sensors."""
 
-    def __init__(self, entity_id, name, icon, device_class, unit_of_measurement, attributes, device_info: DeviceInfo, translation_key: str = None, enabled_by_default: bool = True):
+    def __init__(self, entity_id, name, icon, device_class, unit_of_measurement, attributes, device_info: DeviceInfo, translation_key: str = None, enabled_by_default: bool = True, entity_category = None):
         """Initialize a sensor.
 
         Args:
@@ -45,6 +45,7 @@ class IndegoSensor(IndegoEntity, SensorEntity):
             device_info (DeviceInfo): Initial device info
             translation_key: Optional translation key for (custom state) translations
             enabled_by_default: Whether the entity should be enabled by default
+            entity_category: Optional entity category for the sensor
         """
         super().__init__(SENSOR_FORMAT.format(entity_id), name, icon, attributes, device_info)
 
@@ -53,6 +54,7 @@ class IndegoSensor(IndegoEntity, SensorEntity):
         self.charging = False
         self._attr_translation_key = translation_key
         self._attr_entity_registry_enabled_default = enabled_by_default
+        self._attr_entity_category = entity_category
 
     async def async_added_to_hass(self):
         """Once the sensor is added, see if it was there before and pull in that state."""

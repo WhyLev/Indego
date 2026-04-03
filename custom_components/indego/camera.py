@@ -33,13 +33,14 @@ async def async_setup_entry(
     )
 
 class IndegoCamera(IndegoEntity, Camera):
-    def __init__(self, entity_id, name, device_info: DeviceInfo, indego_hub):
+    def __init__(self, entity_id, name, device_info: DeviceInfo, indego_hub, entity_category=None):
         IndegoEntity.__init__(self, CAMERA_SENSOR_FORMAT.format(entity_id), name, "mdi:image", None, device_info)
         Camera.__init__(self)
         self._indego_hub = indego_hub
         self._last_update_time = 0
         self._svg_map = None
         self._attr_is_streaming = False
+        self._attr_entity_category = entity_category
         self.content_type = "image/svg+xml"
 
     async def async_added_to_hass(self) -> None:
