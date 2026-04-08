@@ -82,6 +82,7 @@ ERROR_CODE_MAP = {
     "ntfy_blade_life": "Reminder blade life",
     "smartMow.mowerUnreachable": "SmartMowing disabled",
     "firmware.updateComplete": "Software update complete",
+    "smartMow.mowerReachable" : "Mower unreachable. SmartMow is currently disabled.",
 }
 
 def get_error_description(error_code: str) -> str:
