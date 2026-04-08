@@ -181,6 +181,14 @@
                     "description": "Seriennummer des Mähroboters. Wird nur benötigt, wenn mehrere Mähroboter eingerichtet sind."
                 }
             }
+        },
+        "download_map": {
+            "description": "Lädt die aktuelle Mähkarte von der Bosch Cloud API herunter und speichert diese lokal unter \"www/indego_map_base.svg\". Die Karte zeigt die zuletzt aufgezeichnete Mähroute.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Seriennummer des Mähroboters. Wird nur benötigt, wenn mehrere Mähroboter eingerichtet sind."
+                }
+            }
         }
     }
 }

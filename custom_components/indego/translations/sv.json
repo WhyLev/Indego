@@ -181,6 +181,14 @@
                     "description": "Gräsklippare serienummer. Krävs endast när du har flera gräsklippare konfigurerade."
                 }
             }
+        },
+        "download_map": {
+            "description": "Hämtar den aktuella klippkartan från Bosch Cloud API och sparar den lokalt som \"www/indego_map_base.svg\". Kartan återspeglar den senast registrerade klippvägen.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Gräsklippare serienummer. Krävs endast när du har flera gräsklippare konfigurerade."
+                }
+            }
         }
     }
 }

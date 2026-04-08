@@ -181,6 +181,14 @@
                     "description": "Numéro de série de la tondeuse. Uniquement nécessaire si vous avez configuré plusieurs tondeuses."
                 }
             }
+        },
+        "download_map": {
+            "description": "Télécharge la carte de tonte actuelle depuis l'API Bosch Cloud et l'enregistre localement sous \"www/indego_map_base.svg\". La carte reflète l'itinéraire de tonte le plus récemment enregistré.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Numéro de série de la tondeuse. Uniquement nécessaire si vous avez configuré plusieurs tondeuses."
+                }
+            }
         }
     }
 }

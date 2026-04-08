@@ -181,6 +181,14 @@
                     "description": "Græsslåmaskine serienummer. Kun nødvendigt, når du har konfigureret flere græsslåmaskiner."
                 }
             }
+        },
+        "download_map": {
+            "description": "Henter det aktuelle slåningskort fra Bosch Cloud API'en og gemmer det lokalt som \"www/indego_map_base.svg\". Kortet afspejler den senest optegnede slåningsrute.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Græsslåmaskine serienummer. Kun nødvendigt, når du har konfigureret flere græsslåmaskiner."
+                }
+            }
         }
     }
 }

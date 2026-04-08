@@ -181,6 +181,14 @@
                     "description": "Número de serie del robot. Solo es necesario cuando tiene configurados varios robots cortacéspedes."
                 }
             }
+        },
+        "download_map": {
+            "description": "Descarga el mapa de corte actual desde la API de Bosch Cloud y lo guarda localmente como \"www/indego_map_base.svg\". El mapa refleja la ruta de corte más recientemente registrada.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Número de serie del robot. Solo es necesario cuando tiene configurados varios robots cortacéspedes."
+                }
+            }
         }
     }
 }

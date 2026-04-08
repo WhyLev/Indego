@@ -181,6 +181,14 @@
                     "description": "Grasmaaier serienummer. Alleen nodig wanneer je meerdere grasmaaiers hebt geconfigureerd."
                 }
             }
+        },
+        "download_map": {
+            "description": "Downloaded de huidge maaikaart van de Bosch Cloud API en slaat deze lokaal op als \"www/indego_map_base.svg\". De kaart weerspiegelt de laatst opgenomen maairoute.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Grasmaaier serienummer. Alleen nodig wanneer je meerdere grasmaaiers hebt geconfigureerd."
+                }
+            }
         }
     }
 }

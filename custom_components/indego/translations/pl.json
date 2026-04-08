@@ -181,6 +181,14 @@
                     "description": "Numer seryjny kosiarki. Wymagany tylko gdy konfigurujesz wiele kosiarek."
                 }
             }
+        },
+        "download_map": {
+            "description": "Pobiera aktualną mapę koszenia z API Bosch Cloud i zapisuje ją lokalnie jako \"www/indego_map_base.svg\". Mapa odzwierciedla ostatnio zapisaną trasę koszenia.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Numer seryjny kosiarki. Wymagany tylko gdy konfigurujesz wiele kosiarek."
+                }
+            }
         }
     }
 }

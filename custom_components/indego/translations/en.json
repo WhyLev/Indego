@@ -135,6 +135,14 @@
                     "description": "Mower serial. Only needed when you have configured multiple mowers."
                 }
             }
+        },
+        "download_map": {
+            "description": "Downloads the current mowing map from the Bosch Cloud API and saves it locally as \"www/indego_map_base.svg\". The map reflects the most recently recorded mowing route.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Mower serial. Only needed when you have configured multiple mowers."
+                }
+            }
         }
     }
 }

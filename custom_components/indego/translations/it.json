@@ -181,6 +181,14 @@
                     "description": "Numero di serie del rasaerba. Necessario solo quando hai configurato più rasaerba."
                 }
             }
+        },
+        "download_map": {
+            "description": "Scarica la mappa di taglio attuale dall'API Bosch Cloud e la salva localmente come \"www/indego_map_base.svg\". La mappa riflette il percorso di taglio registrato più di recente.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Numero di serie del rasaerba. Necessario solo quando hai configurato più rasaerba."
+                }
+            }
         }
     }
 }
