@@ -93,7 +93,6 @@ All sensors are automatically discovered after setup and will appear as "Unused 
 | **Lawn Mowed** | Percentage of lawn mowed (%) |
 | **Total Mowing Time** | Total cumulative mowing time (hours) |
 | **Session Count** | Total number of completed mowing sessions |
-| **Estimated Session Duration** | Estimated duration of current session (minutes) |
 
 ### Battery & Charging
 

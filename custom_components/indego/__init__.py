@@ -280,14 +280,6 @@ ENTITY_DEFINITIONS = {
         CONF_UNIT_OF_MEASUREMENT: "h",
         CONF_ATTR: ["maintenance_status"],
     },
-    ENTITY_ESTIMATED_DURATION: {
-        CONF_TYPE: SENSOR_TYPE,
-        CONF_NAME: "estimated session duration",
-        CONF_ICON: "mdi:clock-outline",
-        CONF_DEVICE_CLASS: None,
-        CONF_UNIT_OF_MEASUREMENT: "min",
-        CONF_ATTR: ["based_on_battery", "based_on_garden_size"],
-    },
     ENTITY_SESSION_COUNT: {
         CONF_TYPE: SENSOR_TYPE,
         CONF_NAME: "session count",
@@ -1395,48 +1387,8 @@ class IndegoHub:
 
             if ENTITY_SESSION_COUNT in self.entities:
                 self.entities[ENTITY_SESSION_COUNT].state = self._session_count
-
-            # Calculate estimated session duration
-            if ENTITY_ESTIMATED_DURATION in self.entities:
-                estimated_mins = self._calculate_estimated_duration()
-                self.entities[ENTITY_ESTIMATED_DURATION].state = estimated_mins
-
-                self.entities[ENTITY_ESTIMATED_DURATION].add_attributes({
-                    "based_on_battery": f"{estimated_mins} min (battery capacity)",
-                    "based_on_garden_size": f"{estimated_mins} min (garden size)",
-                })
         except Exception as exc:
             _LOGGER.error("Error updating session tracking: %s", str(exc))
-
-    def _calculate_estimated_duration(self) -> int:
-        """Calculate estimated session duration based on battery and garden size."""
-        try:
-            # Safely get battery percent - some mowers don't have this attribute
-            if hasattr(self._indego_client.state, 'battery') and self._indego_client.state.battery:
-                battery_percent = getattr(self._indego_client.state.battery, 'percent', None)
-                if battery_percent is None:
-                    _LOGGER.debug("Battery percent not available - using default estimate")
-                    battery_percent = 50  # Use default estimate
-            else:
-                _LOGGER.debug("Battery data not available - using default estimate")
-                battery_percent = 50  # Use default estimate
-
-            garden_size = getattr(self._indego_client.generic_data, "garden_size", 0) or 100
-
-            # Estimation based on battery capacity
-            # Assume: 100% = 120 minutes max
-            battery_based = int((battery_percent / 100) * 120)
-
-            # Estimation based on garden size
-            # Assume: 500m² = 60min, scales linearly
-            garden_based = max(10, int((garden_size / 500) * 60))
-
-            # Return conservative estimate (minimum of both)
-            estimated = min(battery_based, garden_based)
-            return max(5, estimated)  # At least 5 minutes
-        except Exception as exc:
-            _LOGGER.debug("Error calculating estimated duration: %s", str(exc))
-            return 30  # Return safe default
 
     def _update_error_tracking(self):
         """Track error codes and descriptions from last alert."""
