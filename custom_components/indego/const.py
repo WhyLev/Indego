@@ -74,6 +74,7 @@ ENTITY_BATTERY_TEMPERATURE: Final = "battery_temperature"
 ENTITY_AMBIENT_TEMPERATURE: Final = "ambient_temperature"
 ENTITY_BATTERY_CYCLES: Final = "battery_cycles"
 ENTITY_BATTERY_DISCHARGE: Final = "battery_discharge"
+ENTITY_SERVICE_STATUS: Final = "service_status"
 
 HTTP_HEADER_USER_AGENT: Final = "User-Agent"
 HTTP_HEADER_USER_AGENT_DEFAULT: Final = "HA/Indego"

@@ -337,6 +337,14 @@ ENTITY_DEFINITIONS = {
         CONF_ENABLED_BY_DEFAULT: False,
         CONF_ENTITY_CATEGORY: EntityCategory.DIAGNOSTIC,
     },
+    ENTITY_SERVICE_STATUS: {
+        CONF_TYPE: BINARY_SENSOR_TYPE,
+        CONF_NAME: "service status",
+        CONF_ICON: "mdi:cloud-check",
+        CONF_DEVICE_CLASS: BinarySensorDeviceClass.CONNECTIVITY,
+        CONF_ATTR: ["last_service_error"],
+        CONF_ENTITY_CATEGORY: EntityCategory.DIAGNOSTIC,
+    },
 }
 
 
@@ -584,6 +592,7 @@ class IndegoHub:
         self._session_count = 0
         self._last_session_state = None
         self._last_successful_update = None  # Track last successful API response
+        self._last_service_error = None  # Track last Bosch service error (5xx)
 
         async def async_token_refresh() -> str:
             await session.async_ensure_token_valid()
@@ -696,6 +705,7 @@ class IndegoHub:
         _LOGGER.info("Starting initial state synchronization for: %s", self._serial)
 
         self.set_online_state(False)
+        self.set_service_status(True)  # Service is up by default until we detect an error
         await self._create_refresh_state_task()
         await asyncio.gather(*[self.refresh_10m(), self.refresh_24h()])
 
@@ -746,6 +756,17 @@ class IndegoHub:
         try:
             await self._update_state(longpoll=(self._update_fail_count is None or self._update_fail_count == 0))
             self._update_fail_count = 0
+
+        except ClientResponseError as exc:
+            update_failed = True
+            # Check for service errors (5xx)
+            if 500 <= exc.status < 600:
+                _LOGGER.warning("Bosch service error detected (HTTP %d): %s", exc.status, str(exc))
+                self._last_service_error = f"HTTP {exc.status}"
+                self.set_service_status(False)
+            else:
+                _LOGGER.warning("Failed to update mower state (HTTP %d): %s", exc.status, str(exc))
+            self.set_online_state(False)
 
         except Exception as exc:
             update_failed = True
@@ -1005,6 +1026,25 @@ class IndegoHub:
         if ENTITY_LAWN_MOWER in self.entities:
             self.entities[ENTITY_LAWN_MOWER].set_cloud_connection_state(online)
 
+    def set_service_status(self, service_up: bool):
+        """Set the Bosch service status."""
+        if ENTITY_SERVICE_STATUS not in self.entities:
+            return
+
+        current_status = self.entities[ENTITY_SERVICE_STATUS].state
+        if current_status != service_up:
+            if service_up:
+                _LOGGER.info("Bosch service is now UP")
+                self._last_service_error = None
+            else:
+                _LOGGER.warning("Bosch service is DOWN")
+
+        self.entities[ENTITY_SERVICE_STATUS].state = service_up
+        if self._last_service_error:
+            self.entities[ENTITY_SERVICE_STATUS].add_attributes({
+                "last_service_error": self._last_service_error
+            })
+
     async def _update_state(self, longpoll: bool = True):
         try:
             _LOGGER.debug("Fetching mower state from Bosch API (longpoll: %s)", longpoll)
@@ -1029,6 +1069,8 @@ class IndegoHub:
         try:
             # Record successful API response
             self._last_successful_update = time.time()
+            # Mark service as UP on successful response
+            self.set_service_status(True)
 
             # Check for offline error codes (WiFi lost, API error, No connection to server)
             state_code = getattr(self._indego_client.state, 'state', None)
