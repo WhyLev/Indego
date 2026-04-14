@@ -14,10 +14,16 @@ A comprehensive Home Assistant integration that provides full control and monito
 - 📊 **Real-time Monitoring** - Battery, location, alerts, and more
 - 📍 **Lawn Mapping** - Visual SVG map with mower position overlay
 - 🤖 **SmartMowing** - Automatic schedule optimization based on weather
-- ⚠️ **Alert Management** - Monitor and manage mower alerts
+- ⚠️ **Alert Management** - Monitor and manage mower alerts with complete error list extraction
 - 🌍 **Multi-language** - German, English, Dutch, French, Spanish, Italian, and more
 - 🏠 **Native Entities** - Lawn Mower and Vacuum entities for seamless Home Assistant integration
 - 📱 **Multiple Mowers** - Support for multiple mowers in one Home Assistant instance
+- 🔌 **Service Monitoring** - Bosch Cloud API availability detection with HTTP 5xx error tracking
+- 🔋 **Advanced Battery Info** - Detailed battery metrics (voltage, temperature, cycles, discharge)
+- 🛡️ **Intelligent Offline Detection** - 3-layer system (error codes, timeout, successful updates)
+- 📍 **Stuck Detection** - Automatic detection when mower is immobilized (> 60 seconds without movement)
+- 👤 **Custom User Agent** - Configurable User-Agent for API requests to work around Bosch restrictions
+- 📈 **Session Tracking** - Counter for completed mowing sessions
 
 ## 📖 Table of Contents
 
@@ -82,6 +88,15 @@ Bosch Indego uses OAuth authentication (Bosch SingleKey ID). To complete authent
 
 **You can add this integration multiple times if you own multiple mowers.**
 
+### 3. Configuration Options (Optional)
+
+After adding the integration, you can enable additional features in **Settings → Devices & Services → Bosch Indego → Configure**:
+
+- **Custom User Agent** - Useful if Bosch Cloud is blocking requests. Try alternatives like `HomeAssistant/Indego` or `HA/Indego`
+- **Expose as Lawn Mower** - Enable native Home Assistant Lawn Mower entity (recommended for automation compatibility)
+- **Expose as Vacuum** - Enable legacy Vacuum entity for backward compatibility
+- **Show All Alerts** - Store all historical alerts (use sparingly due to Entity Registry limits)
+
 ## 📊 Monitored Entities
 
 All sensors are automatically discovered after setup and will appear as "Unused Entities" in Home Assistant.
@@ -101,7 +116,11 @@ All sensors are automatically discovered after setup and will appear as "Unused 
 | Sensor | Description |
 |--------|-------------|
 | **Battery Level** | Current battery charge (%) |
-| **Battery Health** | Battery health status |
+| **Battery Voltage** | Battery voltage (V) - diagnostic |
+| **Battery Temperature** | Battery cell temperature (°C) - diagnostic |
+| **Ambient Temperature** | Ambient air temperature (°C) - diagnostic |
+| **Battery Cycles** | Battery charge cycles count - diagnostic |
+| **Battery Discharge** | Battery discharge capacity (Ah) - diagnostic |
 
 ### Location & Movement
 
@@ -116,27 +135,65 @@ All sensors are automatically discovered after setup and will appear as "Unused 
 
 | Sensor | Description |
 |--------|-------------|
-| **Alerts** | Active alert status with count and last message |
-| **Last Error** | Last error code and timestamp |
+| **Alerts** | Active alert status with count, last message, and **complete error list** with codes and timestamps |
+| **Last Error** | Last error code and timestamp with error description |
 | **Firmware Version** | Current firmware version |
-| **Maintenance Hours** | Maintenance counter (hours) |
+| **Maintenance Hours** | Maintenance counter (hours) with status (good/service_due_soon/service_required) |
+| **Service Status** | Bosch Cloud API availability - detects HTTP 5xx errors with last error timestamp |
 
 ### Other Information
 
 | Sensor | Description |
 |--------|-------------|
 | **Mowing Mode** | Current mowing mode setting |
-| **Online Status** | Whether mower is connected (True/False) |
+| **Online Status** | Whether mower is connected (True/False) - with intelligent 3-layer offline detection |
 | **Update Available** | Firmware update availability (On/Off) |
 | **Last Completed Mow** | Last full lawn mowing completion time |
 | **Next Mow Time** | Scheduled next mowing time |
+| **Lawn Mowed Size** | Absolute lawn area mowed in current session (m²) |
+| **Session Count** | Total number of completed mowing sessions |
 | **Lawn Mower Entity** | Native Home Assistant Lawn Mower entity (Start, Pause, Dock) |
 | **Vacuum Entity** | Legacy Home Assistant Vacuum entity (Start, Pause, Return, Battery) |
 | **Lawn Map** | SVG lawn map with mower position overlay |
 
 
+## 🔍 Advanced Features
 
-## 🎮 Services & Control
+### Complete Error List in Alert Sensor Attributes
+
+The `binary_sensor.indego_<SERIAL>_alert` sensor stores all active mower alerts as individual attributes, making it easy to extract and display errors in Home Assistant automations:
+
+**Available Attributes (for each alert):**
+- `error_0` - Complete error format: `"802: WiFi connection lost - 2024-01-01 12:34:56"`
+- `error_0_code` - Error code only: `"802"`
+- `error_0_description` - Error description: `"WiFi connection lost"`
+- `error_0_timestamp` - Time of error: `"2024-01-01 12:34:56"`
+- `error_0_message` - Original message from API
+- `error_0_read` - Read status (True/False)
+
+
+### Bosch Cloud Service Monitoring
+
+The `binary_sensor.indego_<SERIAL>_service_status` sensor monitors the availability of Bosch Cloud API:
+
+- **UP** (True) - Bosch API is responding normally
+- **DOWN** (False) - Bosch Cloud is experiencing 5xx errors (usually temporary)
+- **Attribute** `last_service_error` - Shows the HTTP error code (e.g., "HTTP 503")
+
+**Note:** 5xx errors are typically temporary Bosch Cloud issues and resolve automatically.
+
+### Stuck Detection
+
+The integration automatically detects when your mower is stuck:
+
+- **Binary Sensor**: `binary_sensor.indego_<SERIAL>_mower_stuck`
+- **Detection**: Mower is marked as stuck if it doesn't move > 5 pixels for 60+ seconds while actively mowing
+- **Attributes**:
+  - `stuck_since` - Time when mower became stuck
+  - `stuck_x` - X position (pixels)
+  - `stuck_y` - Y position (pixels)
+
+
 
 Control your mower through Home Assistant services. All services support multiple mowers via the `mower_serial` parameter.
 
@@ -199,7 +256,7 @@ Enable or disable SmartMowing feature (automatic schedule adjustment based on we
 
 **Service:** `indego.download_map`
 
-Downloads the current lawn map from Bosch Cloud API and saves as `www/indego_map_base.svg` in your Home Assistant configuration directory. Used by the camera entity.
+Downloads the current lawn map from Bosch Cloud API and saves as `www/indego_map_<SERIAL>.svg` in your Home Assistant configuration directory. Used by the camera entity.
 
 **Parameters:**
 - `mower_serial` (optional): Serial number (only needed for multiple mowers)

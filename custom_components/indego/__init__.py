@@ -111,7 +111,19 @@ ENTITY_DEFINITIONS = {
         CONF_NAME: "alert",
         CONF_ICON: FUNC_ICON_MOWER_ALERT,
         CONF_DEVICE_CLASS: BinarySensorDeviceClass.PROBLEM,
-        CONF_ATTR: ["alerts_count", "last_alert_message"],
+        CONF_ATTR: [
+            "alerts_count",
+            "last_alert_message",
+            "last_alert_error_code",
+            "last_alert_date",
+            "last_alert_read",
+            "error_0",
+            "error_0_code",
+            "error_0_description",
+            "error_0_timestamp",
+            "error_0_message",
+            "error_0_read",
+        ],
         CONF_TRANSLATION_KEY: "indego_alert",
     },
     ENTITY_MOWER_STATE: {
@@ -759,18 +771,20 @@ class IndegoHub:
 
         except ClientResponseError as exc:
             update_failed = True
-            # Check for service errors (5xx)
+            # Check for service errors (5xx) - only log if status actually changed
             if 500 <= exc.status < 600:
-                _LOGGER.warning("Bosch service error detected (HTTP %d): %s", exc.status, str(exc))
-                self._last_service_error = f"HTTP {exc.status}"
+                new_error = f"HTTP {exc.status}"
+                if self._last_service_error != new_error:
+                    _LOGGER.warning("Bosch service error detected (HTTP %d)", exc.status)
+                    self._last_service_error = new_error
                 self.set_service_status(False)
             else:
-                _LOGGER.warning("Failed to update mower state (HTTP %d): %s", exc.status, str(exc))
+                _LOGGER.debug("Failed to update mower state (HTTP %d)", exc.status)
             self.set_online_state(False)
 
         except Exception as exc:
             update_failed = True
-            _LOGGER.warning("Failed to update mower state: %s", str(exc))
+            _LOGGER.debug("Failed to update mower state: %s", str(exc))
             self.set_online_state(False)
 
         if self._shutdown:
@@ -1037,7 +1051,7 @@ class IndegoHub:
                 _LOGGER.info("Bosch service is now UP")
                 self._last_service_error = None
             else:
-                _LOGGER.warning("Bosch service is DOWN")
+                _LOGGER.info("Bosch service is now DOWN")
 
         self.entities[ENTITY_SERVICE_STATUS].state = service_up
         if self._last_service_error:
@@ -1318,30 +1332,42 @@ class IndegoHub:
         self.entities[ENTITY_ALERT].state = self._indego_client.alerts_count > 0
 
         if self._indego_client.alerts:
-            self.entities[ENTITY_ALERT].add_attributes(
-                {
-                    "alerts_count": self._indego_client.alerts_count,
-                    "last_alert_error_code": self._indego_client.alerts[0].error_code,
-                    "last_alert_message": self._indego_client.alerts[0].message,
-                    "last_alert_date": format_indego_date(self._indego_client.alerts[0].date),
-                    "last_alert_read": self._indego_client.alerts[0].read_status,
-                }, False
-            )
+            # Build complete alert attributes
+            alert_attributes = {
+                "alerts_count": self._indego_client.alerts_count,
+                "last_alert_error_code": self._indego_client.alerts[0].error_code,
+                "last_alert_message": self._indego_client.alerts[0].message,
+                "last_alert_date": format_indego_date(self._indego_client.alerts[0].date),
+                "last_alert_read": self._indego_client.alerts[0].read_status,
+            }
 
-            # It's not recommended to track full alerts, disabled by default.
-            # See the developer docs: https://developers.home-assistant.io/docs/core/entity/
-            if self._features[CONF_SHOW_ALL_ALERTS]:
-                alert_index = 0
-                for index, alert in enumerate(self._indego_client.alerts):
-                    self.entities[ENTITY_ALERT].add_attributes({
-                        ("alert_%i" % index): "%s: %s" % (format_indego_date(alert.date), alert.message)
-                    }, False)
-                    alert_index = index
+            # Always store all alerts as individual attributes for easy extraction in automations
+            for index, alert in enumerate(self._indego_client.alerts):
+                error_code = str(alert.error_code)
+                error_desc = get_error_description(error_code)
+                alert_time = format_indego_date(alert.date)
 
-                # Clear any other alerts that no longer exist.
+                # Format: "ERROR_CODE: Error Description - 2024-01-01 12:34:56"
+                alert_attributes[f"error_{index}"] = f"{error_code}: {error_desc} - {alert_time}"
+
+                # Also store individual components for advanced use cases
+                alert_attributes[f"error_{index}_code"] = error_code
+                alert_attributes[f"error_{index}_description"] = error_desc
+                alert_attributes[f"error_{index}_timestamp"] = alert_time
+                alert_attributes[f"error_{index}_message"] = alert.message
+                alert_attributes[f"error_{index}_read"] = alert.read_status
+
+            self.entities[ENTITY_ALERT].add_attributes(alert_attributes, False)
+
+            # Clear any other alerts that no longer exist
+            alert_index = len(self._indego_client.alerts)
+            while self.entities[ENTITY_ALERT].clear_attribute(f"error_{alert_index}", False):
                 alert_index += 1
-                while self.entities[ENTITY_ALERT].clear_attribute("alert_%i" % alert_index, False):
-                    alert_index += 1
+
+            # Also clear individual components if alerts were removed
+            error_index = len(self._indego_client.alerts)
+            while self.entities[ENTITY_ALERT].clear_attribute(f"error_{error_index}_code", False):
+                error_index += 1
 
             self.entities[ENTITY_ALERT].async_schedule_update_ha_state()
 
@@ -1351,6 +1377,15 @@ class IndegoHub:
                     "alerts_count": self._indego_client.alerts_count
                 }
             )
+
+            # Clear all error attributes when no alerts
+            error_index = 0
+            while self.entities[ENTITY_ALERT].clear_attribute(f"error_{error_index}", False):
+                error_index += 1
+
+            error_index = 0
+            while self.entities[ENTITY_ALERT].clear_attribute(f"error_{error_index}_code", False):
+                error_index += 1
 
     async def _update_updates_available(self):
         await self._indego_client.update_updates_available()
