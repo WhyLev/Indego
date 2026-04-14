@@ -605,6 +605,8 @@ class IndegoHub:
         self._last_session_state = None
         self._last_successful_update = None  # Track last successful API response
         self._last_service_error = None  # Track last Bosch service error (5xx)
+        self._consecutive_timeouts = 0  # Track consecutive position update timeouts
+        self._last_timeout_warning_time = None  # Prevent timeout spam
 
         async def async_token_refresh() -> str:
             await session.async_ensure_token_valid()
@@ -754,7 +756,6 @@ class IndegoHub:
             self._unsub_map_timer = None
 
         await self._indego_client.close()
-        _LOGGER.debug("Shutdown completed for: %s", self._serial)
 
     async def refresh_state(self):
         """Update the state, if necessary update operating data and recall itself."""
@@ -898,11 +899,29 @@ class IndegoHub:
             _LOGGER.debug("Fetching latest mower position and state")
             await self._indego_client.update_state(force=True)
         except asyncio.TimeoutError:
-            _LOGGER.warning("Timeout while fetching position - mower may be offline or API is slow")
+            # Track consecutive timeouts to implement backoff
+            self._consecutive_timeouts += 1
+
+            # Only log on first timeout or after a minute of silence
+            should_log = (
+                self._consecutive_timeouts == 1 or
+                (self._last_timeout_warning_time and
+                 (time.time() - self._last_timeout_warning_time) > 60)
+            )
+
+            if should_log:
+                _LOGGER.debug("Timeout while fetching position - mower may be offline or API is slow (attempt: %d)",
+                            self._consecutive_timeouts)
+                self._last_timeout_warning_time = time.time()
             return
         except Exception as e:
+            self._consecutive_timeouts = 0  # Reset on other errors
             _LOGGER.debug("Error fetching position (current state: %s): %s", self._last_state, str(e))
             return
+
+        # Successful update - reset timeout counter
+        self._consecutive_timeouts = 0
+        self._last_timeout_warning_time = None
 
         try:
             state = self._indego_client.state
