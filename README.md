@@ -6,7 +6,8 @@
 
 A comprehensive Home Assistant integration that provides full control and monitoring of your Bosch Indego lawn mower. Get real-time status, battery information, mowing schedules, and more.
 
-![Entities in Home Assistant](/doc/sensors.png)
+![Sensors in Home Assistant](/doc/01_sensors.png)
+![Diagnostics in Home Assistant](/doc/02_diagnostics.png)
 
 ## ✨ Features
 
