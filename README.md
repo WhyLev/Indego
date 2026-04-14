@@ -32,7 +32,7 @@ A comprehensive Home Assistant integration that provides full control and monito
 - [Installation](#installation)
 - [Getting Started](#getting-started)
 - [Monitored Entities](#-monitored-entities)
-- [Services & Control](#-services--control)
+- [Advanced Features](#-advanced-features)
 - [Debugging](#-debugging)
 - [Supported Models](#-supported-models)
 - [Known Issues](#️-known-issues)
