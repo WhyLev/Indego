@@ -27,7 +27,6 @@ A comprehensive Home Assistant integration that provides full control and monito
 - [Getting Started](#getting-started)
 - [Monitored Entities](#-monitored-entities)
 - [Services & Control](#-services--control)
-- [Examples](#-examples)
 - [Debugging](#-debugging)
 - [Supported Models](#-supported-models)
 - [Known Issues](#️-known-issues)
@@ -41,6 +40,8 @@ Join our Discord community to discuss features, vote on improvements, and get su
 
 ## Installation
 
+**HACS NOT AVAILABLE YET**
+<s>
 ### Option 1: Via HACS (Recommended)
 
 1. Add this repository to HACS (Community Store)
@@ -49,6 +50,7 @@ Join our Discord community to discuss features, vote on improvements, and get su
 4. Restart Home Assistant
 
 [HACS Repository](https://hacs.xyz/)
+</s>
 
 ### Option 2: Manual Installation
 
