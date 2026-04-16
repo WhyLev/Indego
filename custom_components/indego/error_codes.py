@@ -67,6 +67,7 @@ ERROR_CODE_MAP = {
     "904": "Memory error",
 
     # Battery/System errors (1100+)
+    "1108": "Inclination angle too large",
     "1138": "Last run error",
     "1146": "Orientation filter error",
     "1148": "On-/Off error. Need PIN code to unlock",

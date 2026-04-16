@@ -47,6 +47,7 @@ from .const import *
 from .sensor import IndegoSensor
 from .camera import IndegoCamera
 from .error_codes import ERROR_CODE_MAP, get_error_description
+from .button import IndegoAlertButton
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -356,6 +357,36 @@ ENTITY_DEFINITIONS = {
         CONF_DEVICE_CLASS: BinarySensorDeviceClass.CONNECTIVITY,
         CONF_ATTR: ["last_service_error"],
         CONF_ENTITY_CATEGORY: EntityCategory.DIAGNOSTIC,
+    },
+    ENTITY_DELETE_ALL_ALERTS_BUTTON: {
+        CONF_TYPE: BUTTON_TYPE,
+        CONF_NAME: "Delete all alerts",
+        CONF_ICON: "mdi:alert-remove",
+        CONF_SERVICE: SERVICE_NAME_DELETE_ALERT_ALL,
+    },
+    ENTITY_DELETE_LAST_ALERT_BUTTON: {
+        CONF_TYPE: BUTTON_TYPE,
+        CONF_NAME: "Delete last alert",
+        CONF_ICON: "mdi:alert-minus",
+        CONF_SERVICE: SERVICE_NAME_DELETE_ALERT,
+        CONF_SERVICE_DATA: {
+            SERVER_DATA_ALERT_INDEX: 0,
+        },
+    },
+    ENTITY_READ_ALL_ALERTS_BUTTON: {
+        CONF_TYPE: BUTTON_TYPE,
+        CONF_NAME: "Mark all alerts as read",
+        CONF_ICON: "mdi:message-alert",
+        CONF_SERVICE: SERVICE_NAME_READ_ALERT_ALL,
+    },
+    ENTITY_READ_LAST_ALERT_BUTTON: {
+        CONF_TYPE: BUTTON_TYPE,
+        CONF_NAME: "Mark last alert as read",
+        CONF_ICON: "mdi:message-alert",
+        CONF_SERVICE: SERVICE_NAME_READ_ALERT,
+        CONF_SERVICE_DATA: {
+            SERVER_DATA_ALERT_INDEX: 0,
+        },
     },
 }
 
@@ -683,6 +714,17 @@ class IndegoHub:
                     device_info,
                     self,
                     entity_category=entity[CONF_ENTITY_CATEGORY] if CONF_ENTITY_CATEGORY in entity else None,
+                )
+
+            elif entity[CONF_TYPE] == BUTTON_TYPE:
+                self.entities[entity_key] = IndegoAlertButton(
+                    f"indego_{self._serial}_{entity_key}",
+                    f"{self._mower_name} {entity[CONF_NAME]}",
+                    entity[CONF_ICON],
+                    entity[CONF_SERVICE],
+                    entity[CONF_SERVICE_DATA] if CONF_SERVICE_DATA in entity else None,
+                    device_info,
+                    self,
                 )
 
     async def update_generic_data_and_load_platforms(self, load_platforms):

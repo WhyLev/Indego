@@ -28,6 +28,9 @@ CONF_POLLING: Final = "polling"
 CONF_ENABLED_BY_DEFAULT: Final = "enabled_by_default"
 CONF_ENTITY_CATEGORY: Final = "entity_category"
 
+CONF_SERVICE: Final = "service"
+CONF_SERVICE_DATA: Final = "service_data"
+
 DEFAULT_NAME: Final = "Indego"
 DEFAULT_NAME_COMMANDS: Final = None
 
@@ -45,7 +48,8 @@ SENSOR_TYPE: Final = "sensor"
 BINARY_SENSOR_TYPE: Final = "binary_sensor"
 VACUUM_TYPE: Final = "vacuum"
 LAWN_MOWER_TYPE: Final = "lawn_mower"
-INDEGO_PLATFORMS: Final = [SENSOR_TYPE, BINARY_SENSOR_TYPE, VACUUM_TYPE, LAWN_MOWER_TYPE, CAMERA_TYPE]
+BUTTON_TYPE: Final = "button"
+INDEGO_PLATFORMS: Final = [SENSOR_TYPE, BINARY_SENSOR_TYPE, VACUUM_TYPE, LAWN_MOWER_TYPE, CAMERA_TYPE, BUTTON_TYPE]
 ENTITY_ONLINE: Final = "online"
 ENTITY_UPDATE_AVAILABLE: Final = "update_available"
 ENTITY_ALERT: Final = "alert"
@@ -75,6 +79,15 @@ ENTITY_AMBIENT_TEMPERATURE: Final = "ambient_temperature"
 ENTITY_BATTERY_CYCLES: Final = "battery_cycles"
 ENTITY_BATTERY_DISCHARGE: Final = "battery_discharge"
 ENTITY_SERVICE_STATUS: Final = "service_status"
+ENTITY_DELETE_ALL_ALERTS_BUTTON: Final = "delete_all_alerts"
+ENTITY_DELETE_LAST_ALERT_BUTTON: Final = "delete_last_alert"
+ENTITY_READ_ALL_ALERTS_BUTTON: Final = "read_all_alerts"
+ENTITY_READ_LAST_ALERT_BUTTON: Final = "read_last_alert"
+
+DELETE_ALERTS_BATCH_DELAY_SECONDS: Final = 10
+DELETE_ALERTS_BATCH_MAX_ROUNDS: Final = 20
+READ_ALERTS_BATCH_DELAY_SECONDS: Final = 10
+READ_ALERTS_BATCH_MAX_ROUNDS: Final = 20
 
 HTTP_HEADER_USER_AGENT: Final = "User-Agent"
 HTTP_HEADER_USER_AGENT_DEFAULT: Final = "HA/Indego"
