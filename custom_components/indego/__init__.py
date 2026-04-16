@@ -1023,14 +1023,14 @@ class IndegoHub:
                 _LOGGER.warning("Received empty state object from API")
                 return
 
-            mower_state = getattr(state, "mower_state", "unknown")
+            mower_state = self._indego_client.state_description
             xpos = getattr(state, "svg_xPos", None)
             ypos = getattr(state, "svg_yPos", None)
             self._last_state = mower_state
 
             _LOGGER.debug("Position: x=%s, y=%s | State: %s", xpos, ypos, mower_state)
 
-            if mower_state == "docked":
+            if mower_state and mower_state.lower() == "docked":
                 _LOGGER.debug("Mower is docked - skipping position update")
                 return
 
@@ -1340,7 +1340,7 @@ class IndegoHub:
             if ENTITY_LAWN_MOWER in self.entities:
                 try:
                     self.entities[ENTITY_LAWN_MOWER].indego_state = getattr(self._indego_client.state, 'state', None)
-                    self.entities[ENTITY_LAWN_MOWER].indego_state_detail = self.state_description_detail
+                    self.entities[ENTITY_LAWN_MOWER].indego_state_detail = self._indego_client.state_description_detail
                 except Exception as exc:
                     _LOGGER.error("Failed to update lawn mower state: %s", str(exc))
 
