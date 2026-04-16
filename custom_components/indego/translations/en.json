@@ -32,21 +32,21 @@
         }
     },
     "options": {
-      "step": {
-          "init": {
-              "title": "Advanced settings",
-              "description": "Advanced settings of the Bosch Indego component. You might have to reload the component after changing these settings.",
-              "data": {
-                  "user_agent": "User-Agent",
-                  "expose_mower": "Expose Indego mower as mower entity in Home Assistant",
-                  "expose_vacuum": "Expose Indego mower as vacuum entity in Home Assistant",
-                  "show_all_alerts": "Show the full alert history in Home Assistant. This is not recommended for most users, as it might have a significant impact on the Home Assistant database size!"
-              },
-              "data_description": {
-                  "user_agent": "Custom User-Agent header for API requests to Bosch Indego Cloud. Leave empty to use default. Some users may need to set a custom value if their account has API access restrictions."
-              }
-          }
-      }
+        "step": {
+            "init": {
+                "title": "Advanced settings",
+                "description": "Advanced settings of the Bosch Indego component. You might have to reload the component after changing these settings.",
+                "data": {
+                    "user_agent": "User-Agent",
+                    "expose_mower": "Expose Indego mower as mower entity in Home Assistant",
+                    "expose_vacuum": "Expose Indego mower as vacuum entity in Home Assistant",
+                    "show_all_alerts": "Show the full alert history in Home Assistant. This is not recommended for most users, as it might have a significant impact on the Home Assistant database size!"
+                },
+                "data_description": {
+                    "user_agent": "Custom User-Agent header for API requests to Bosch Indego Cloud. Leave empty to use default. Some users may need to set a custom value if their account has API access restrictions."
+                }
+            }
+        }
     },
     "entity": {
         "binary_sensor": {
@@ -72,6 +72,140 @@
                         }
                     }
                 }
+            },
+            "online": {
+                "name": "Online"
+            },
+            "update_available": {
+                "name": "Update Available"
+            },
+            "mower_stuck": {
+                "name": "Mower Stuck"
+            },
+            "service_status": {
+                "name": "Service Status"
+            }
+        },
+        "sensor": {
+            "mower_state": {
+                "state": {
+                    "Mowing": "Mowing",
+                    "Docked": "Docked",
+                    "Sleeping": "Sleeping",
+                    "Paused": "Paused"
+                }
+            },
+            "mower_state_detail": {
+                "state": {
+                    "Reading status": "Reading status",
+                    "Charging": "Charging",
+                    "Docked": "Docked",
+                    "Sleeping": "Sleeping",
+                    "Docked - Software update": "Docked - Software update",
+                    "Docked - Loading map": "Docked - Loading map",
+                    "Docked - Saving map": "Docked - Saving map",
+                    "Docked - Leaving Dock": "Docked - Leaving Dock",
+                    "Mowing": "Mowing",
+                    "Mowing - Relocalising": "Mowing - Relocating",
+                    "Mowing - Learning Lawn": "Mowing - Learning Lawn",
+                    "Mowing - Learning Lawn paused": "Mowing - Learning Lawn paused",
+                    "SpotMow": "SpotMow",
+                    "Mowing randomly": "Mowing randomly",
+                    "Diagnostic mode": "Diagnostic mode",
+                    "End of life": "End of life",
+                    "Software update": "Software update",
+                    "Energy save mode": "Energy save mode",
+                    "Relocalising": "Relocating",
+                    "Loading map": "Loading map",
+                    "Learning lawn": "Learning lawn",
+                    "Paused": "Paused",
+                    "Border cut": "Border cut",
+                    "Idle in lawn": "Idle in lawn",
+                    "Stuck on lawn, help needed": "Stuck on lawn, help needed",
+                    "Returning to Dock": "Returning to Dock",
+                    "Returning to Dock - Battery low": "Returning to Dock - Battery low",
+                    "Returning to dock - Calendar timeslot ended": "Returning to Dock - Calendar timeslot ended",
+                    "Returning to dock - Battery temp range": "Returning to Dock - Battery temp range",
+                    "Returning to dock - Lawn complete": "Returning to Dock - Lawn complete",
+                    "Returning to dock - Relocalising": "Returning to Dock - Relocating",
+                    "Returning to dock - requested by user/app": "Returning to Dock - requested by user/app"
+                }
+            },
+            "battery_percentage": {
+                "name": "Battery"
+            },
+            "lawn_mowed": {
+                "name": "Lawn Mowed"
+            },
+            "lawn_mowed_size": {
+                "name": "Lawn Mowed Size"
+            },
+            "last_completed": {
+                "name": "Last Completed"
+            },
+            "next_mow": {
+                "name": "Next Mow"
+            },
+            "mowing_mode": {
+                "name": "Mowing Mode"
+            },
+            "runtime_total": {
+                "name": "Mow Time Total"
+            },
+            "garden_size": {
+                "name": "Garden Size"
+            },
+            "mower_position_x": {
+                "name": "Mower Position X"
+            },
+            "mower_position_y": {
+                "name": "Mower Position Y"
+            },
+            "last_error_code": {
+                "name": "Last Error"
+            },
+            "firmware_version": {
+                "name": "Firmware Version"
+            },
+            "maintenance_hours": {
+                "name": "Maintenance Hours"
+            },
+            "session_count": {
+                "name": "Session Count"
+            },
+            "battery_voltage": {
+                "name": "Battery Voltage"
+            },
+            "battery_temperature": {
+                "name": "Battery Temperature"
+            },
+            "ambient_temperature": {
+                "name": "Ambient Temperature"
+            },
+            "battery_cycles": {
+                "name": "Battery Cycles"
+            },
+            "battery_discharge": {
+                "name": "Battery Discharge"
+            }
+        },
+        "camera": {
+            "mowing_map": {
+                "name": "Mowing Map"
+            }
+        },
+        "button": {
+            "delete_all_alerts": {
+                "name": "Delete All Alerts"
+            },
+            "delete_last_alert": {
+                "name": "Delete Last Alert"
+            },
+            "read_all_alerts": {
+                "name": "Mark All Alerts as Read"
+            },
+            "read_last_alert": {
+                "name": "Mark Last Alert as Read"
             }
         }
     },

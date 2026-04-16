@@ -32,21 +32,21 @@
         }
     },
     "options": {
-      "step": {
-          "init": {
-              "title": "Geavanceerde instellingen",
-              "description": "Geavanceerde instellingen van het Bosch Indego component. Mogelijk moet het component opnieuw geladen worden na het wijzigen van deze instellingen.",
-              "data": {
-                  "user_agent": "User-Agent",
-                  "expose_mower": "Voeg de Indego robotmaaier toe als grasmaaier entiteit aan Home Assistant",
-                  "expose_vacuum": "Voeg de Indego robotmaaier toe als stofzuiger entiteit aan Home Assistant",
-                  "show_all_alerts": "Toon de volledige melding/waarschuwing geschiedenis in Home Assistant. Dit wordt niet aangeraden voor de meeste gebruikers, het heeft mogelijk een significante impact op de Home Assistant database!"
-              },
-              "data_description": {
-                  "user_agent": "Custom User-Agent header voor API-verzoeken naar Bosch Indego Cloud. Leeg laten om de standaardwaarde te gebruiken. Sommige gebruikers moeten mogelijk een aangepaste waarde instellen als hun account API-toegangsbeperkingen heeft."
-              }
-          }
-      }
+        "step": {
+            "init": {
+                "title": "Geavanceerde instellingen",
+                "description": "Geavanceerde instellingen van het Bosch Indego component. Mogelijk moet het component opnieuw geladen worden na het wijzigen van deze instellingen.",
+                "data": {
+                    "user_agent": "User-Agent",
+                    "expose_mower": "Voeg de Indego robotmaaier toe als grasmaaier entiteit aan Home Assistant",
+                    "expose_vacuum": "Voeg de Indego robotmaaier toe als stofzuiger entiteit aan Home Assistant",
+                    "show_all_alerts": "Toon de volledige melding/waarschuwing geschiedenis in Home Assistant. Dit wordt niet aangeraden voor de meeste gebruikers, het heeft mogelijk een significante impact op de Home Assistant database!"
+                },
+                "data_description": {
+                    "user_agent": "Custom User-Agent header voor API-verzoeken naar Bosch Indego Cloud. Leeg laten om de standaardwaarde te gebruiken. Sommige gebruikers moeten mogelijk een aangepaste waarde instellen als hun account API-toegangsbeperkingen heeft."
+                }
+            }
+        }
     },
     "entity": {
         "binary_sensor": {
@@ -72,6 +72,18 @@
                         }
                     }
                 }
+            },
+            "online": {
+                "name": "Online"
+            },
+            "update_available": {
+                "name": "Update beschikbaar"
+            },
+            "mower_stuck": {
+                "name": "Robot vast"
+            },
+            "service_status": {
+                "name": "Servicestatus"
             }
         },
         "sensor": {
@@ -118,6 +130,82 @@
                     "Returning to dock - Relocalising": "Terugkeren naar basisstation - Herlokaliseren",
                     "Returning to dock - requested by user/app": "Terugkeren naar basisstation - verzocht door gebruiker"
                 }
+            },
+            "battery_percentage": {
+                "name": "Batterij"
+            },
+            "lawn_mowed": {
+                "name": "Gazon gemaaid"
+            },
+            "lawn_mowed_size": {
+                "name": "Gazonoppervlak gemaaid"
+            },
+            "last_completed": {
+                "name": "Laatst voltooid"
+            },
+            "next_mow": {
+                "name": "Volgende maaien"
+            },
+            "mowing_mode": {
+                "name": "Maaimode"
+            },
+            "runtime_total": {
+                "name": "Totale maaibedrijf"
+            },
+            "garden_size": {
+                "name": "Tuingrootte"
+            },
+            "mower_position_x": {
+                "name": "Robot positie X"
+            },
+            "mower_position_y": {
+                "name": "Robot positie Y"
+            },
+            "last_error_code": {
+                "name": "Laatste fout"
+            },
+            "firmware_version": {
+                "name": "Firmwareversie"
+            },
+            "maintenance_hours": {
+                "name": "Onderhoudsuren"
+            },
+            "session_count": {
+                "name": "Sessieaantal"
+            },
+            "battery_voltage": {
+                "name": "Batterijspanning"
+            },
+            "battery_temperature": {
+                "name": "Batterijtemperatuur"
+            },
+            "ambient_temperature": {
+                "name": "Omgevingstemperatuur"
+            },
+            "battery_cycles": {
+                "name": "Batterijcycli"
+            },
+            "battery_discharge": {
+                "name": "Batterijontlading"
+            }
+        },
+        "camera": {
+            "mowing_map": {
+                "name": "Maaikaart"
+            }
+        },
+        "button": {
+            "delete_all_alerts": {
+                "name": "Alle waarschuwingen verwijderen"
+            },
+            "delete_last_alert": {
+                "name": "Laatste waarschuwing verwijderen"
+            },
+            "read_all_alerts": {
+                "name": "Alle waarschuwingen als gelezen markeren"
+            },
+            "read_last_alert": {
+                "name": "Laatste waarschuwing als gelezen markeren"
             }
         }
     },

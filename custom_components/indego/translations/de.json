@@ -72,6 +72,18 @@
                         }
                     }
                 }
+            },
+            "online": {
+                "name": "Online"
+            },
+            "update_available": {
+                "name": "Update verfügbar"
+            },
+            "mower_stuck": {
+                "name": "Mähroboter festgefahren"
+            },
+            "service_status": {
+                "name": "Servicestatus"
             }
         },
         "sensor": {
@@ -118,6 +130,82 @@
                     "Returning to dock - Relocalising": "Zurück zur Ladestation - Position bestimmen",
                     "Returning to dock - requested by user/app": "Zurück zur Ladestation - Vom Benutzer angefordert"
                 }
+            },
+            "battery_percentage": {
+                "name": "Batterie"
+            },
+            "lawn_mowed": {
+                "name": "Rasen gemäht"
+            },
+            "lawn_mowed_size": {
+                "name": "Rasenfläche gemäht"
+            },
+            "last_completed": {
+                "name": "Zuletzt abgeschlossen"
+            },
+            "next_mow": {
+                "name": "Nächster Mähtermin"
+            },
+            "mowing_mode": {
+                "name": "Mähmodus"
+            },
+            "runtime_total": {
+                "name": "Gesamtmähzeit"
+            },
+            "garden_size": {
+                "name": "Gartengröße"
+            },
+            "mower_position_x": {
+                "name": "Mähroboter Position X"
+            },
+            "mower_position_y": {
+                "name": "Mähroboter Position Y"
+            },
+            "last_error_code": {
+                "name": "Letzter Fehler"
+            },
+            "firmware_version": {
+                "name": "Firmware-Version"
+            },
+            "maintenance_hours": {
+                "name": "Wartungsstunden"
+            },
+            "session_count": {
+                "name": "Sitzungsanzahl"
+            },
+            "battery_voltage": {
+                "name": "Batteriespannung"
+            },
+            "battery_temperature": {
+                "name": "Batterietemperatur"
+            },
+            "ambient_temperature": {
+                "name": "Umgebungstemperatur"
+            },
+            "battery_cycles": {
+                "name": "Batteriezyklen"
+            },
+            "battery_discharge": {
+                "name": "Batterieentladung"
+            }
+        },
+        "camera": {
+            "mowing_map": {
+                "name": "Mähkarte"
+            }
+        },
+        "button": {
+            "delete_all_alerts": {
+                "name": "Alle Fehler löschen"
+            },
+            "delete_last_alert": {
+                "name": "Letzten Fehler löschen"
+            },
+            "read_all_alerts": {
+                "name": "Alle Fehler als gelesen markieren"
+            },
+            "read_last_alert": {
+                "name": "Letzten Fehler als gelesen markieren"
             }
         }
     },

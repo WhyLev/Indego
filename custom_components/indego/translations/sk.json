@@ -32,21 +32,21 @@
         }
     },
     "options": {
-      "step": {
-          "init": {
-              "title": "Pokročilé nastavenia",
-              "description": "Rozšírené nastavenia komponentu Bosch Indego. Po zmene týchto nastavení možno budete musieť znova načítať komponent.",
-              "data": {
-                  "user_agent": "User-Agent",
-                  "expose_mower": "Zobraziť kosačku Indego ako entitu kosačky v Home Assistant",
-                  "expose_vacuum": "Zobraziť kosačku Indego ako entitu vysávača v Home Assistant",
-                  "show_all_alerts": "Zobraziť celú históriu upozornení v Home Assistant. Toto sa neodporúča väčšine používateľov, môže to mať významný vplyv na veľkosť databázy Home Assistant!"
-              },
-              "data_description": {
-                  "user_agent": "Vlastný nástroj User-Agent v hlavičke pre požiadavky API na Bosch Indego Cloud. Nechajte prázdne na použitie štandardnej hodnoty. Niektorí používatelia budú musieť nastaviť vlastnú hodnotu, ak má ich účet obmedzenia prístupu k API."
-              }
-          }
-      }
+        "step": {
+            "init": {
+                "title": "Pokročilé nastavenia",
+                "description": "Rozšírené nastavenia komponentu Bosch Indego. Po zmene týchto nastavení možno budete musieť znova načítať komponent.",
+                "data": {
+                    "user_agent": "User-Agent",
+                    "expose_mower": "Zobraziť kosačku Indego ako entitu kosačky v Home Assistant",
+                    "expose_vacuum": "Zobraziť kosačku Indego ako entitu vysávača v Home Assistant",
+                    "show_all_alerts": "Zobraziť celú históriu upozornení v Home Assistant. Toto sa neodporúča väčšine používateľov, môže to mať významný vplyv na veľkosť databázy Home Assistant!"
+                },
+                "data_description": {
+                    "user_agent": "Vlastný nástroj User-Agent v hlavičke pre požiadavky API na Bosch Indego Cloud. Nechajte prázdne na použitie štandardnej hodnoty. Niektorí používatelia budú musieť nastaviť vlastnú hodnotu, ak má ich účet obmedzenia prístupu k API."
+                }
+            }
+        }
     },
     "entity": {
         "binary_sensor": {
@@ -72,6 +72,140 @@
                         }
                     }
                 }
+            },
+            "online": {
+                "name": "Online"
+            },
+            "update_available": {
+                "name": "Dostupná aktualizácia"
+            },
+            "mower_stuck": {
+                "name": "Robot uviaznutý"
+            },
+            "service_status": {
+                "name": "Stav služby"
+            }
+        },
+        "sensor": {
+            "mower_state": {
+                "state": {
+                    "Mowing": "Kosenie",
+                    "Docked": "Zaparkované",
+                    "Sleeping": "Spí",
+                    "Paused": "Pozastavené"
+                }
+            },
+            "mower_state_detail": {
+                "state": {
+                    "Reading status": "Čítanie stavu",
+                    "Charging": "Nabíjanie",
+                    "Docked": "Zaparkované",
+                    "Sleeping": "Spí",
+                    "Docked - Software update": "Zaparkované - Softvérová aktualizácia",
+                    "Docked - Loading map": "Zaparkované - Načítavanie mapy",
+                    "Docked - Saving map": "Zaparkované - Ukladanie mapy",
+                    "Docked - Leaving Dock": "Zaparkované - Opúšťa stanicu",
+                    "Mowing": "Kosenie",
+                    "Mowing - Relocalising": "Kosenie - Presunutie",
+                    "Mowing - Learning Lawn": "Kosenie - Učenie sa záhrady",
+                    "Mowing - Learning Lawn paused": "Kosenie - Učenie sa záhrady pozastavené",
+                    "SpotMow": "Bodové kosenie",
+                    "Mowing randomly": "Náhodné kosenie",
+                    "Diagnostic mode": "Diagnostický režim",
+                    "End of life": "Koniec životnosti",
+                    "Software update": "Softvérová aktualizácia",
+                    "Energy save mode": "Režim šetriace energie",
+                    "Relocalising": "Presunutie",
+                    "Loading map": "Načítavanie mapy",
+                    "Learning lawn": "Učenie sa záhrady",
+                    "Paused": "Pozastavené",
+                    "Border cut": "Косenie okrajov",
+                    "Idle in lawn": "Nečinnosť na trávniku",
+                    "Stuck on lawn, help needed": "Uviaznuté na trávniku, potrebná pomoc",
+                    "Returning to Dock": "Návrat do stanice",
+                    "Returning to Dock - Battery low": "Návrat do stanice - Nízka batéria",
+                    "Returning to dock - Calendar timeslot ended": "Návrat do stanice - Kalendárny časový úsek skončil",
+                    "Returning to dock - Battery temp range": "Návrat do stanice - Teplota batérie",
+                    "Returning to dock - Lawn complete": "Návrat do stanice - Trávnik dokončený",
+                    "Returning to dock - Relocalising": "Návrat do stanice - Presunutie",
+                    "Returning to dock - requested by user/app": "Návrat do stanice - Požiadavka užívateľa"
+                }
+            },
+            "battery_percentage": {
+                "name": "Batéria"
+            },
+            "lawn_mowed": {
+                "name": "Trávnik pokosený"
+            },
+            "lawn_mowed_size": {
+                "name": "Plocha trávnika pokosená"
+            },
+            "last_completed": {
+                "name": "Naposledy dokončené"
+            },
+            "next_mow": {
+                "name": "Budúce kosenie"
+            },
+            "mowing_mode": {
+                "name": "Režim kosenia"
+            },
+            "runtime_total": {
+                "name": "Celkový čas kosenia"
+            },
+            "garden_size": {
+                "name": "Veľkosť záhrady"
+            },
+            "mower_position_x": {
+                "name": "Pozícia robota X"
+            },
+            "mower_position_y": {
+                "name": "Pozícia robota Y"
+            },
+            "last_error_code": {
+                "name": "Posledná chyba"
+            },
+            "firmware_version": {
+                "name": "Verzia firmvéru"
+            },
+            "maintenance_hours": {
+                "name": "Hodiny údržby"
+            },
+            "session_count": {
+                "name": "Počet sedení"
+            },
+            "battery_voltage": {
+                "name": "Napätie batérie"
+            },
+            "battery_temperature": {
+                "name": "Teplota batérie"
+            },
+            "ambient_temperature": {
+                "name": "Teplota okolia"
+            },
+            "battery_cycles": {
+                "name": "Cykly batérie"
+            },
+            "battery_discharge": {
+                "name": "Vybíjanie batérie"
+            }
+        },
+        "camera": {
+            "mowing_map": {
+                "name": "Mapa kosenia"
+            }
+        },
+        "button": {
+            "delete_all_alerts": {
+                "name": "Odstrániť všetky upozornenia"
+            },
+            "delete_last_alert": {
+                "name": "Odstrániť poslednú výstrahu"
+            },
+            "read_all_alerts": {
+                "name": "Označiť všetky výstrahy ako prečítané"
+            },
+            "read_last_alert": {
+                "name": "Označiť poslednú výstrahu ako prečítanú"
             }
         }
     },

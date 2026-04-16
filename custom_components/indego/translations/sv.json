@@ -32,21 +32,21 @@
         }
     },
     "options": {
-      "step": {
-          "init": {
-              "title": "Avancerade inställningar",
-              "description": "Avancerade inställningar för Bosch Indego-komponenten. Du kan behöva ladda om komponenten efter att ha ändrat dessa inställningar.",
-              "data": {
-                  "user_agent": "User-Agent",
-                  "expose_mower": "Exponera Indego-gräsklippare som mower-enhet i Home Assistant",
-                  "expose_vacuum": "Exponera Indego-gräsklippare som dammsugare-enhet i Home Assistant",
-                  "show_all_alerts": "Visa hela aviseringshistoriken i Home Assistant. Detta rekommenderas inte för de flesta användare, eftersom det kan ha en betydande inverkan på Home Assistant-databasens storlek!"
-              },
-              "data_description": {
-                  "user_agent": "Anpassad User-Agent header för API-förfrågningar till Bosch Indego Cloud. Lämna tom för att använda standard. Vissa användare kan behöva ange ett anpassat värde om deras konto har API-åtkomstbegränsningar."
-              }
-          }
-      }
+        "step": {
+            "init": {
+                "title": "Avancerade inställningar",
+                "description": "Avancerade inställningar för Bosch Indego-komponenten. Du kan behöva ladda om komponenten efter att ha ändrat dessa inställningar.",
+                "data": {
+                    "user_agent": "User-Agent",
+                    "expose_mower": "Exponera Indego-gräsklippare som mower-enhet i Home Assistant",
+                    "expose_vacuum": "Exponera Indego-gräsklippare som dammsugare-enhet i Home Assistant",
+                    "show_all_alerts": "Visa hela aviseringshistoriken i Home Assistant. Detta rekommenderas inte för de flesta användare, eftersom det kan ha en betydande inverkan på Home Assistant-databasens storlek!"
+                },
+                "data_description": {
+                    "user_agent": "Anpassad User-Agent header för API-förfrågningar till Bosch Indego Cloud. Lämna tom för att använda standard. Vissa användare kan behöva ange ett anpassat värde om deras konto har API-åtkomstbegränsningar."
+                }
+            }
+        }
     },
     "entity": {
         "binary_sensor": {
@@ -72,6 +72,18 @@
                         }
                     }
                 }
+            },
+            "online": {
+                "name": "Online"
+            },
+            "update_available": {
+                "name": "Uppdatering tillgänglig"
+            },
+            "mower_stuck": {
+                "name": "Robot fastnar"
+            },
+            "service_status": {
+                "name": "Servicestatus"
             }
         },
         "sensor": {
@@ -118,6 +130,82 @@
                     "Returning to dock - Relocalising": "Återvänder till dockan - Ompositionering",
                     "Returning to dock - requested by user/app": "Återvänder till dockan - Begärd av användare/app"
                 }
+            },
+            "battery_percentage": {
+                "name": "Batteri"
+            },
+            "lawn_mowed": {
+                "name": "Gräs klippt"
+            },
+            "lawn_mowed_size": {
+                "name": "Gräsyta klippt"
+            },
+            "last_completed": {
+                "name": "Senast slutfört"
+            },
+            "next_mow": {
+                "name": "Nästa klippning"
+            },
+            "mowing_mode": {
+                "name": "Klippläge"
+            },
+            "runtime_total": {
+                "name": "Total klippetid"
+            },
+            "garden_size": {
+                "name": "Trädgårdsstorlek"
+            },
+            "mower_position_x": {
+                "name": "Robotposition X"
+            },
+            "mower_position_y": {
+                "name": "Robotposition Y"
+            },
+            "last_error_code": {
+                "name": "Senaste fel"
+            },
+            "firmware_version": {
+                "name": "Fastvarversion"
+            },
+            "maintenance_hours": {
+                "name": "Underhållstimmar"
+            },
+            "session_count": {
+                "name": "Sessionsantal"
+            },
+            "battery_voltage": {
+                "name": "Batterispänning"
+            },
+            "battery_temperature": {
+                "name": "Batteritemperatur"
+            },
+            "ambient_temperature": {
+                "name": "Omgivningstemperatur"
+            },
+            "battery_cycles": {
+                "name": "Batterisedlar"
+            },
+            "battery_discharge": {
+                "name": "Batteriavlastning"
+            }
+        },
+        "camera": {
+            "mowing_map": {
+                "name": "Klippekarta"
+            }
+        },
+        "button": {
+            "delete_all_alerts": {
+                "name": "Ta bort alla varningar"
+            },
+            "delete_last_alert": {
+                "name": "Ta bort senaste varningen"
+            },
+            "read_all_alerts": {
+                "name": "Markera alla varningar som lästa"
+            },
+            "read_last_alert": {
+                "name": "Markera senaste varningen som läst"
             }
         }
     },

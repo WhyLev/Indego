@@ -32,21 +32,21 @@
         }
     },
     "options": {
-      "step": {
-          "init": {
-              "title": "Réglages avancés",
-              "description": "Réglages avancés du composant Bosch Indego. Vous devrez recharger le composant après avoir changé ces paramètres.",
-              "data": {
-                  "user_agent": "User-Agent",
-                  "expose_mower": "Exposer la tondeuse Indego comme une entité tondeuse dans Home Assistant",
-                  "expose_vacuum": "Exposer la tondeuse Indego comme une entité aspirateur dans Home Assistant",
-                  "show_all_alerts": "Montrer l'historique complet des alertes dans Home Assistant. Non recommandé pour la plupart des utilisateurs, l'impact sur la taille de la base de données Home Assistant peut être assez important !"
-              },
-              "data_description": {
-                  "user_agent": "En-tête User-Agent personnalisé pour les requêtes API vers Bosch Indego Cloud. Laisser vide pour utiliser la valeur par défaut. Certains utilisateurs devront peut-être définir une valeur personnalisée si leur compte a des restrictions d'accès à l'API."
-              }
-          }
-      }
+        "step": {
+            "init": {
+                "title": "Réglages avancés",
+                "description": "Réglages avancés du composant Bosch Indego. Vous devrez recharger le composant après avoir changé ces paramètres.",
+                "data": {
+                    "user_agent": "User-Agent",
+                    "expose_mower": "Exposer la tondeuse Indego comme une entité tondeuse dans Home Assistant",
+                    "expose_vacuum": "Exposer la tondeuse Indego comme une entité aspirateur dans Home Assistant",
+                    "show_all_alerts": "Montrer l'historique complet des alertes dans Home Assistant. Non recommandé pour la plupart des utilisateurs, l'impact sur la taille de la base de données Home Assistant peut être assez important !"
+                },
+                "data_description": {
+                    "user_agent": "En-tête User-Agent personnalisé pour les requêtes API vers Bosch Indego Cloud. Laisser vide pour utiliser la valeur par défaut. Certains utilisateurs devront peut-être définir une valeur personnalisée si leur compte a des restrictions d'accès à l'API."
+                }
+            }
+        }
     },
     "entity": {
         "binary_sensor": {
@@ -72,6 +72,18 @@
                         }
                     }
                 }
+            },
+            "online": {
+                "name": "En ligne"
+            },
+            "update_available": {
+                "name": "Mise à jour disponible"
+            },
+            "mower_stuck": {
+                "name": "Robot bloqué"
+            },
+            "service_status": {
+                "name": "État du service"
             }
         },
         "sensor": {
@@ -118,6 +130,82 @@
                     "Returning to dock - Relocalising": "Retour à la station - Cherche position",
                     "Returning to dock - requested by user/app": "Retour à la station - Demandé par l'utilisateur"
                 }
+            },
+            "battery_percentage": {
+                "name": "Batterie"
+            },
+            "lawn_mowed": {
+                "name": "Pelouse tondue"
+            },
+            "lawn_mowed_size": {
+                "name": "Superficie pelouse tondue"
+            },
+            "last_completed": {
+                "name": "Dernier réalisé"
+            },
+            "next_mow": {
+                "name": "Prochain tontes"
+            },
+            "mowing_mode": {
+                "name": "Mode de tonte"
+            },
+            "runtime_total": {
+                "name": "Temps de tontes total"
+            },
+            "garden_size": {
+                "name": "Taille du jardin"
+            },
+            "mower_position_x": {
+                "name": "Position du robot X"
+            },
+            "mower_position_y": {
+                "name": "Position du robot Y"
+            },
+            "last_error_code": {
+                "name": "Dernière erreur"
+            },
+            "firmware_version": {
+                "name": "Version du firmware"
+            },
+            "maintenance_hours": {
+                "name": "Heures de maintenance"
+            },
+            "session_count": {
+                "name": "Nombre de séances"
+            },
+            "battery_voltage": {
+                "name": "Tension batterie"
+            },
+            "battery_temperature": {
+                "name": "Température batterie"
+            },
+            "ambient_temperature": {
+                "name": "Température ambiante"
+            },
+            "battery_cycles": {
+                "name": "Cycles batterie"
+            },
+            "battery_discharge": {
+                "name": "Décharge batterie"
+            }
+        },
+        "camera": {
+            "mowing_map": {
+                "name": "Carte de tonte"
+            }
+        },
+        "button": {
+            "delete_all_alerts": {
+                "name": "Supprimer toutes les alertes"
+            },
+            "delete_last_alert": {
+                "name": "Supprimer la dernière alerte"
+            },
+            "read_all_alerts": {
+                "name": "Marquer toutes les alertes comme lues"
+            },
+            "read_last_alert": {
+                "name": "Marquer la dernière alerte comme lue"
             }
         }
     },

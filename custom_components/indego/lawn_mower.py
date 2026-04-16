@@ -113,12 +113,39 @@ class IndegoLawnMower(IndegoEntity, LawnMowerEntity):
     @indego_state.setter
     def indego_state(self, indego_state: int):
         self._attr_indego_state = indego_state
+        self._update_activity()
 
-        new_activity = INDEGO_STATE_TO_LAWN_MOWER_MAPPING.get(indego_state)
+    @property
+    def indego_state_detail(self) -> str:
+        return getattr(self, "_attr_indego_state_detail", "")
+
+    @indego_state_detail.setter
+    def indego_state_detail(self, state_detail: str):
+        self._attr_indego_state_detail = state_detail
+        self._update_activity()
+
+    def _update_activity(self) -> None:
+        """Update activity based on state and state detail."""
+        state_detail = self.indego_state_detail or ""
+
+        # Check if returning to dock based on state description
+        if state_detail.startswith("Returning to"):
+            new_activity = LawnMowerActivity.RETURNING
+        else:
+            new_activity = INDEGO_STATE_TO_LAWN_MOWER_MAPPING.get(self._attr_indego_state)
+
         if self._attr_activity != new_activity:
             self._attr_activity = new_activity
             self.async_schedule_update_ha_state()
-            _LOGGER.debug("Lawn mower activity: %s (mower state: %d)", self._attr_activity, indego_state)
+            _LOGGER.debug(
+                "Lawn mower activity: %s (mower state: %d, detail: %s)",
+                self._attr_activity,
+                self._attr_indego_state,
+                state_detail,
+            )
 
             if self._attr_activity is None:
-                _LOGGER.warning("Unsupported mower state received: %d - lawn mower activity cannot be determined", indego_state)
+                _LOGGER.warning(
+                    "Unsupported mower state received: %d - lawn mower activity cannot be determined",
+                    self._attr_indego_state,
+                )

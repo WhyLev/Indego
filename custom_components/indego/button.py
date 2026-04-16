@@ -43,6 +43,7 @@ class IndegoAlertButton(IndegoEntity, ButtonEntity):
         service_data: dict | None,
         device_info,
         indego_hub,
+        entity_category=None,
     ) -> None:
         super().__init__(
             BUTTON_ENTITY_ID_FORMAT.format(entity_id),
@@ -54,6 +55,7 @@ class IndegoAlertButton(IndegoEntity, ButtonEntity):
         self._indego_hub = indego_hub
         self._service_name = service_name
         self._service_data = service_data or {}
+        self._attr_entity_category = entity_category
 
     async def async_press(self) -> None:
         """Handle button press."""

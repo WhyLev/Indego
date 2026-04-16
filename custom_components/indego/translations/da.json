@@ -32,21 +32,21 @@
         }
     },
     "options": {
-      "step": {
-          "init": {
-              "title": "Avancerede indstillinger",
-              "description": "Avancerede indstillinger for Bosch Indego-komponenten. Du skal muligvis genindlæse komponenten efter at have ændret disse indstillinger.",
-              "data": {
-                  "user_agent": "User-Agent",
-                  "expose_mower": "Vis Indego-græsslåmaskinen som en mower-enhed i Home Assistant",
-                  "expose_vacuum": "Vis Indego-græsslåmaskinen som en støvsuger-enhed i Home Assistant",
-                  "show_all_alerts": "Vis hele advarselshistorikken i Home Assistant. Dette anbefales ikke for de fleste brugere, da det kan have en væsentlig indvirkning på Home Assistant-databasens størrelse!"
-              },
-              "data_description": {
-                  "user_agent": "Brugerdefineret User-Agent header for API-anmodninger til Bosch Indego Cloud. Lad være tom for at bruge standard. Nogle brugere skal muligvis angive en brugerdefineret værdi, hvis deres konto har API-adgangsbegrænsninger."
-              }
-          }
-      }
+        "step": {
+            "init": {
+                "title": "Avancerede indstillinger",
+                "description": "Avancerede indstillinger for Bosch Indego-komponenten. Du skal muligvis genindlæse komponenten efter at have ændret disse indstillinger.",
+                "data": {
+                    "user_agent": "User-Agent",
+                    "expose_mower": "Vis Indego-græsslåmaskinen som en mower-enhed i Home Assistant",
+                    "expose_vacuum": "Vis Indego-græsslåmaskinen som en støvsuger-enhed i Home Assistant",
+                    "show_all_alerts": "Vis hele advarselshistorikken i Home Assistant. Dette anbefales ikke for de fleste brugere, da det kan have en væsentlig indvirkning på Home Assistant-databasens størrelse!"
+                },
+                "data_description": {
+                    "user_agent": "Brugerdefineret User-Agent header for API-anmodninger til Bosch Indego Cloud. Lad være tom for at bruge standard. Nogle brugere skal muligvis angive en brugerdefineret værdi, hvis deres konto har API-adgangsbegrænsninger."
+                }
+            }
+        }
     },
     "entity": {
         "binary_sensor": {
@@ -72,6 +72,18 @@
                         }
                     }
                 }
+            },
+            "online": {
+                "name": "Online"
+            },
+            "update_available": {
+                "name": "Opdatering tilgængelig"
+            },
+            "mower_stuck": {
+                "name": "Robot siddende fast"
+            },
+            "service_status": {
+                "name": "Servicestatus"
             }
         },
         "sensor": {
@@ -118,6 +130,82 @@
                     "Returning to dock - Relocalising": "Vender tilbage til dockingstationen - Genpositionering",
                     "Returning to dock - requested by user/app": "Vender tilbage til dockingstationen - Anmodet af bruger/app"
                 }
+            },
+            "battery_percentage": {
+                "name": "Batteri"
+            },
+            "lawn_mowed": {
+                "name": "Plæne klippet"
+            },
+            "lawn_mowed_size": {
+                "name": "Plæneareal klippet"
+            },
+            "last_completed": {
+                "name": "Senest afsluttet"
+            },
+            "next_mow": {
+                "name": "Næste klipning"
+            },
+            "mowing_mode": {
+                "name": "Klippemode"
+            },
+            "runtime_total": {
+                "name": "Total klipningstid"
+            },
+            "garden_size": {
+                "name": "Havestørrelse"
+            },
+            "mower_position_x": {
+                "name": "Robot position X"
+            },
+            "mower_position_y": {
+                "name": "Robot position Y"
+            },
+            "last_error_code": {
+                "name": "Seneste fejl"
+            },
+            "firmware_version": {
+                "name": "Firmwareversion"
+            },
+            "maintenance_hours": {
+                "name": "Vedligeholdelsesbetjentid"
+            },
+            "session_count": {
+                "name": "Sessionsantal"
+            },
+            "battery_voltage": {
+                "name": "Batterimoduler"
+            },
+            "battery_temperature": {
+                "name": "BatteriTemperatur"
+            },
+            "ambient_temperature": {
+                "name": "Omgivelsestemperatur"
+            },
+            "battery_cycles": {
+                "name": "Batterikræv"
+            },
+            "battery_discharge": {
+                "name": "Batteriudladning"
+            }
+        },
+        "camera": {
+            "mowing_map": {
+                "name": "Klippekort"
+            }
+        },
+        "button": {
+            "delete_all_alerts": {
+                "name": "Slet alle advarsler"
+            },
+            "delete_last_alert": {
+                "name": "Slet seneste advarsel"
+            },
+            "read_all_alerts": {
+                "name": "Markér alle advarsler som læst"
+            },
+            "read_last_alert": {
+                "name": "Markér seneste advarsel som læst"
             }
         }
     },

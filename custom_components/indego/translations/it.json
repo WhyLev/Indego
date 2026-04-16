@@ -32,21 +32,21 @@
         }
     },
     "options": {
-      "step": {
-          "init": {
-              "title": "Impostazioni avanzate",
-              "description": "Impostazioni avanzate del componente Bosch Indego. Potrebbe essere necessario ricaricare il componente dopo aver modificato queste impostazioni.",
-              "data": {
-                  "user_agent": "User-Agent",
-                  "expose_mower": "Esponi il rasaerba Indego come entità mower in Home Assistant",
-                  "expose_vacuum": "Esponi il rasaerba Indego come entità aspirapolvere in Home Assistant",
-                  "show_all_alerts": "Mostra la cronologia completa degli avvisi in Home Assistant. Questo non è consigliato per la maggior parte degli utenti, in quanto potrebbe avere un impatto significativo sulla dimensione del database di Home Assistant!"
-              },
-              "data_description": {
-                  "user_agent": "Intestazione User-Agent personalizzata per le richieste API a Bosch Indego Cloud. Lasciare vuoto per utilizzare il valore predefinito. Alcuni utenti potrebbero aver bisogno di impostare un valore personalizzato se il loro account ha restrizioni di accesso all'API."
-              }
-          }
-      }
+        "step": {
+            "init": {
+                "title": "Impostazioni avanzate",
+                "description": "Impostazioni avanzate del componente Bosch Indego. Potrebbe essere necessario ricaricare il componente dopo aver modificato queste impostazioni.",
+                "data": {
+                    "user_agent": "User-Agent",
+                    "expose_mower": "Esponi il rasaerba Indego come entità mower in Home Assistant",
+                    "expose_vacuum": "Esponi il rasaerba Indego come entità aspirapolvere in Home Assistant",
+                    "show_all_alerts": "Mostra la cronologia completa degli avvisi in Home Assistant. Questo non è consigliato per la maggior parte degli utenti, in quanto potrebbe avere un impatto significativo sulla dimensione del database di Home Assistant!"
+                },
+                "data_description": {
+                    "user_agent": "Intestazione User-Agent personalizzata per le richieste API a Bosch Indego Cloud. Lasciare vuoto per utilizzare il valore predefinito. Alcuni utenti potrebbero aver bisogno di impostare un valore personalizzato se il loro account ha restrizioni di accesso all'API."
+                }
+            }
+        }
     },
     "entity": {
         "binary_sensor": {
@@ -72,6 +72,18 @@
                         }
                     }
                 }
+            },
+            "online": {
+                "name": "Online"
+            },
+            "update_available": {
+                "name": "Aggiornamento disponibile"
+            },
+            "mower_stuck": {
+                "name": "Robot bloccato"
+            },
+            "service_status": {
+                "name": "Stato del servizio"
             }
         },
         "sensor": {
@@ -118,6 +130,82 @@
                     "Returning to dock - Relocalising": "Ritorno alla base - Ricalcolando posizione",
                     "Returning to dock - requested by user/app": "Ritorno alla base - Richiesto da utente/app"
                 }
+            },
+            "battery_percentage": {
+                "name": "Batteria"
+            },
+            "lawn_mowed": {
+                "name": "Prato tagliato"
+            },
+            "lawn_mowed_size": {
+                "name": "Superficie prato tagliato"
+            },
+            "last_completed": {
+                "name": "Ultimo completato"
+            },
+            "next_mow": {
+                "name": "Prossimo taglio"
+            },
+            "mowing_mode": {
+                "name": "Modalità di taglio"
+            },
+            "runtime_total": {
+                "name": "Tempo totale di taglio"
+            },
+            "garden_size": {
+                "name": "Dimensione giardino"
+            },
+            "mower_position_x": {
+                "name": "Posizione robot X"
+            },
+            "mower_position_y": {
+                "name": "Posizione robot Y"
+            },
+            "last_error_code": {
+                "name": "Ultimo errore"
+            },
+            "firmware_version": {
+                "name": "Versione firmware"
+            },
+            "maintenance_hours": {
+                "name": "Ore di manutenzione"
+            },
+            "session_count": {
+                "name": "Conteggio sessioni"
+            },
+            "battery_voltage": {
+                "name": "Tensione batteria"
+            },
+            "battery_temperature": {
+                "name": "Temperatura batteria"
+            },
+            "ambient_temperature": {
+                "name": "Temperatura ambiente"
+            },
+            "battery_cycles": {
+                "name": "Cicli batteria"
+            },
+            "battery_discharge": {
+                "name": "Scarica batteria"
+            }
+        },
+        "camera": {
+            "mowing_map": {
+                "name": "Mappa di taglio"
+            }
+        },
+        "button": {
+            "delete_all_alerts": {
+                "name": "Elimina tutti gli avvisi"
+            },
+            "delete_last_alert": {
+                "name": "Elimina ultimo avviso"
+            },
+            "read_all_alerts": {
+                "name": "Contrassegna tutti gli avvisi come letti"
+            },
+            "read_last_alert": {
+                "name": "Contrassegna ultimo avviso come letto"
             }
         }
     },

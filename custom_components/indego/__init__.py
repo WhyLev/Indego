@@ -48,6 +48,7 @@ from .sensor import IndegoSensor
 from .camera import IndegoCamera
 from .error_codes import ERROR_CODE_MAP, get_error_description
 from .button import IndegoAlertButton
+from .switch import IndegoSwitch
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -94,18 +95,20 @@ def FUNC_ICON_MOWER_ALERT(state):
 ENTITY_DEFINITIONS = {
     ENTITY_ONLINE: {
         CONF_TYPE: BINARY_SENSOR_TYPE,
-        CONF_NAME: "online",
+        CONF_NAME: "Online",
         CONF_ICON: "mdi:cloud-check",
         CONF_DEVICE_CLASS: BinarySensorDeviceClass.CONNECTIVITY,
         CONF_ATTR: [],
+        CONF_TRANSLATION_KEY: "online",
     },
     ENTITY_UPDATE_AVAILABLE: {
         CONF_TYPE: BINARY_SENSOR_TYPE,
-        CONF_NAME: "update available",
+        CONF_NAME: "Update Available",
         CONF_ICON: "mdi:download-outline",
         CONF_DEVICE_CLASS: BinarySensorDeviceClass.UPDATE,
         CONF_ATTR: [],
         CONF_ENTITY_CATEGORY: EntityCategory.DIAGNOSTIC,
+        CONF_TRANSLATION_KEY: "update_available",
     },
     ENTITY_ALERT: {
         CONF_TYPE: BINARY_SENSOR_TYPE,
@@ -151,7 +154,7 @@ ENTITY_DEFINITIONS = {
     },
     ENTITY_BATTERY: {
         CONF_TYPE: SENSOR_TYPE,
-        CONF_NAME: "battery %",
+        CONF_NAME: "Battery",
         CONF_ICON: "battery",
         CONF_DEVICE_CLASS: SensorDeviceClass.BATTERY,
         CONF_UNIT_OF_MEASUREMENT: "%",
@@ -163,10 +166,11 @@ ENTITY_DEFINITIONS = {
             f"battery_temp_{UnitOfTemperature.CELSIUS}",
             f"ambient_temp_{UnitOfTemperature.CELSIUS}",
         ],
+        CONF_TRANSLATION_KEY: "battery_percentage",
     },
     ENTITY_LAWN_MOWED: {
         CONF_TYPE: SENSOR_TYPE,
-        CONF_NAME: "lawn mowed",
+        CONF_NAME: "Lawn Mowed",
         CONF_ICON: "mdi:grass",
         CONF_DEVICE_CLASS: None,
         CONF_UNIT_OF_MEASUREMENT: "%",
@@ -178,44 +182,49 @@ ENTITY_DEFINITIONS = {
             "last_session_cut_min",
             "last_session_charge_min",
         ],
+        CONF_TRANSLATION_KEY: "lawn_mowed",
     },
     ENTITY_LAWN_MOWED_SIZE: {
         CONF_TYPE: SENSOR_TYPE,
-        CONF_NAME: "lawn mowed size",
+        CONF_NAME: "Lawn Mowed Size",
         CONF_ICON: "mdi:grass",
         CONF_DEVICE_CLASS: None,
         CONF_UNIT_OF_MEASUREMENT: "m²",
         CONF_ATTR: [
             "last_updated",
         ],
+        CONF_TRANSLATION_KEY: "lawn_mowed_size",
     },
     ENTITY_LAST_COMPLETED: {
         CONF_TYPE: SENSOR_TYPE,
-        CONF_NAME: "last completed",
+        CONF_NAME: "Last Completed",
         CONF_ICON: "mdi:calendar-check",
         CONF_DEVICE_CLASS: SensorDeviceClass.TIMESTAMP,
         CONF_UNIT_OF_MEASUREMENT: None,
         CONF_ATTR: [],
+        CONF_TRANSLATION_KEY: "last_completed",
     },
     ENTITY_NEXT_MOW: {
         CONF_TYPE: SENSOR_TYPE,
-        CONF_NAME: "next mow",
+        CONF_NAME: "Next Mow",
         CONF_ICON: "mdi:calendar-clock",
         CONF_DEVICE_CLASS: SensorDeviceClass.TIMESTAMP,
         CONF_UNIT_OF_MEASUREMENT: None,
         CONF_ATTR: [],
+        CONF_TRANSLATION_KEY: "next_mow",
     },
     ENTITY_MOWING_MODE: {
         CONF_TYPE: SENSOR_TYPE,
-        CONF_NAME: "mowing mode",
+        CONF_NAME: "Mowing Mode",
         CONF_ICON: "mdi:alpha-m-circle-outline",
         CONF_DEVICE_CLASS: None,
         CONF_UNIT_OF_MEASUREMENT: None,
         CONF_ATTR: [],
+        CONF_TRANSLATION_KEY: "mowing_mode",
     },
     ENTITY_RUNTIME: {
         CONF_TYPE: SENSOR_TYPE,
-        CONF_NAME: "mowtime total",
+        CONF_NAME: "Mow Time Total",
         CONF_ICON: "mdi:information-outline",
         CONF_DEVICE_CLASS: None,
         CONF_UNIT_OF_MEASUREMENT: "h",
@@ -224,6 +233,7 @@ ENTITY_DEFINITIONS = {
             "total_charging_time_h",
             "total_operation_time_h",
         ],
+        CONF_TRANSLATION_KEY: "runtime_total",
     },
     ENTITY_VACUUM: {
         CONF_TYPE: VACUUM_TYPE,
@@ -233,160 +243,190 @@ ENTITY_DEFINITIONS = {
     },
     ENTITY_GARDEN_SIZE: {
         CONF_TYPE: SENSOR_TYPE,
-        CONF_NAME: "garden size",
+        CONF_NAME: "Garden Size",
         CONF_ICON: "mdi:ruler-square",
         CONF_DEVICE_CLASS: None,
         CONF_UNIT_OF_MEASUREMENT: "m²",
         CONF_ATTR: [],
+        CONF_TRANSLATION_KEY: "garden_size",
     },
     ENTITY_CAMERA: {
         CONF_TYPE: CAMERA_TYPE,
-        CONF_NAME: "map",
+        CONF_NAME: "Mowing Map",
+        CONF_TRANSLATION_KEY: "mowing_map",
     },
     ENTITY_MOWER_SVG_X: {
         CONF_TYPE: SENSOR_TYPE,
-        CONF_NAME: "mower position x",
+        CONF_NAME: "Mower Position X",
         CONF_ICON: "mdi:map-marker",
         CONF_DEVICE_CLASS: None,
         CONF_UNIT_OF_MEASUREMENT: "px",
         CONF_ATTR: [],
         CONF_ENTITY_CATEGORY: EntityCategory.DIAGNOSTIC,
+        CONF_TRANSLATION_KEY: "mower_position_x",
     },
     ENTITY_MOWER_SVG_Y: {
         CONF_TYPE: SENSOR_TYPE,
-        CONF_NAME: "mower position y",
+        CONF_NAME: "Mower Position Y",
         CONF_ICON: "mdi:map-marker",
         CONF_DEVICE_CLASS: None,
         CONF_UNIT_OF_MEASUREMENT: "px",
         CONF_ATTR: [],
         CONF_ENTITY_CATEGORY: EntityCategory.DIAGNOSTIC,
+        CONF_TRANSLATION_KEY: "mower_position_y",
     },
     ENTITY_MOWER_STUCK: {
         CONF_TYPE: BINARY_SENSOR_TYPE,
-        CONF_NAME: "mower stuck",
+        CONF_NAME: "Mower Stuck",
         CONF_ICON: "mdi:alert-circle-outline",
         CONF_DEVICE_CLASS: BinarySensorDeviceClass.PROBLEM,
         CONF_ATTR: ["stuck_since", "stuck_x", "stuck_y"],
+        CONF_TRANSLATION_KEY: "mower_stuck",
     },
     ENTITY_LAST_ERROR_CODE: {
         CONF_TYPE: SENSOR_TYPE,
-        CONF_NAME: "last error",
+        CONF_NAME: "Last Error",
         CONF_ICON: "mdi:alert",
         CONF_DEVICE_CLASS: None,
         CONF_UNIT_OF_MEASUREMENT: None,
         CONF_ATTR: ["error_code", "error_time"],
+        CONF_TRANSLATION_KEY: "last_error_code",
     },
     ENTITY_FIRMWARE_VERSION: {
         CONF_TYPE: SENSOR_TYPE,
-        CONF_NAME: "firmware version",
+        CONF_NAME: "Firmware Version",
         CONF_ICON: "mdi:chip",
         CONF_DEVICE_CLASS: None,
         CONF_UNIT_OF_MEASUREMENT: None,
         CONF_ATTR: [],
         CONF_ENTITY_CATEGORY: EntityCategory.DIAGNOSTIC,
+        CONF_TRANSLATION_KEY: "firmware_version",
     },
     ENTITY_MAINTENANCE_HOURS: {
         CONF_TYPE: SENSOR_TYPE,
-        CONF_NAME: "maintenance hours",
+        CONF_NAME: "Maintenance Hours",
         CONF_ICON: "mdi:tools",
         CONF_DEVICE_CLASS: None,
         CONF_UNIT_OF_MEASUREMENT: "h",
         CONF_ATTR: ["maintenance_status"],
+        CONF_TRANSLATION_KEY: "maintenance_hours",
     },
     ENTITY_SESSION_COUNT: {
         CONF_TYPE: SENSOR_TYPE,
-        CONF_NAME: "session count",
+        CONF_NAME: "Session Count",
         CONF_ICON: "mdi:counter",
         CONF_DEVICE_CLASS: None,
         CONF_UNIT_OF_MEASUREMENT: None,
         CONF_ATTR: [],
+        CONF_TRANSLATION_KEY: "session_count",
     },
     ENTITY_BATTERY_VOLTAGE: {
         CONF_TYPE: SENSOR_TYPE,
-        CONF_NAME: "battery voltage",
+        CONF_NAME: "Battery Voltage",
         CONF_ICON: "mdi:lightning-bolt",
         CONF_DEVICE_CLASS: SensorDeviceClass.VOLTAGE,
         CONF_UNIT_OF_MEASUREMENT: "V",
         CONF_ATTR: [],
         CONF_ENABLED_BY_DEFAULT: False,
         CONF_ENTITY_CATEGORY: EntityCategory.DIAGNOSTIC,
+        CONF_TRANSLATION_KEY: "battery_voltage",
     },
     ENTITY_BATTERY_TEMPERATURE: {
         CONF_TYPE: SENSOR_TYPE,
-        CONF_NAME: "battery temperature",
+        CONF_NAME: "Battery Temperature",
         CONF_ICON: "mdi:thermometer",
         CONF_DEVICE_CLASS: SensorDeviceClass.TEMPERATURE,
         CONF_UNIT_OF_MEASUREMENT: UnitOfTemperature.CELSIUS,
         CONF_ATTR: [],
         CONF_ENABLED_BY_DEFAULT: False,
         CONF_ENTITY_CATEGORY: EntityCategory.DIAGNOSTIC,
+        CONF_TRANSLATION_KEY: "battery_temperature",
     },
     ENTITY_AMBIENT_TEMPERATURE: {
         CONF_TYPE: SENSOR_TYPE,
-        CONF_NAME: "ambient temperature",
+        CONF_NAME: "Ambient Temperature",
         CONF_ICON: "mdi:thermometer",
         CONF_DEVICE_CLASS: SensorDeviceClass.TEMPERATURE,
         CONF_UNIT_OF_MEASUREMENT: UnitOfTemperature.CELSIUS,
         CONF_ATTR: [],
         CONF_ENABLED_BY_DEFAULT: False,
+        CONF_TRANSLATION_KEY: "ambient_temperature",
     },
     ENTITY_BATTERY_CYCLES: {
         CONF_TYPE: SENSOR_TYPE,
-        CONF_NAME: "battery cycles",
+        CONF_NAME: "Battery Cycles",
         CONF_ICON: "mdi:battery-sync",
         CONF_DEVICE_CLASS: None,
         CONF_UNIT_OF_MEASUREMENT: None,
         CONF_ATTR: [],
         CONF_ENABLED_BY_DEFAULT: False,
         CONF_ENTITY_CATEGORY: EntityCategory.DIAGNOSTIC,
+        CONF_TRANSLATION_KEY: "battery_cycles",
     },
     ENTITY_BATTERY_DISCHARGE: {
         CONF_TYPE: SENSOR_TYPE,
-        CONF_NAME: "battery discharge",
+        CONF_NAME: "Battery Discharge",
         CONF_ICON: "mdi:battery-minus",
         CONF_DEVICE_CLASS: None,
         CONF_UNIT_OF_MEASUREMENT: "Ah",
         CONF_ATTR: [],
         CONF_ENABLED_BY_DEFAULT: False,
         CONF_ENTITY_CATEGORY: EntityCategory.DIAGNOSTIC,
+        CONF_TRANSLATION_KEY: "battery_discharge",
     },
     ENTITY_SERVICE_STATUS: {
         CONF_TYPE: BINARY_SENSOR_TYPE,
-        CONF_NAME: "service status",
+        CONF_NAME: "Service Status",
         CONF_ICON: "mdi:cloud-check",
         CONF_DEVICE_CLASS: BinarySensorDeviceClass.CONNECTIVITY,
         CONF_ATTR: ["last_service_error"],
         CONF_ENTITY_CATEGORY: EntityCategory.DIAGNOSTIC,
+        CONF_TRANSLATION_KEY: "service_status",
     },
     ENTITY_DELETE_ALL_ALERTS_BUTTON: {
         CONF_TYPE: BUTTON_TYPE,
-        CONF_NAME: "Delete all alerts",
+        CONF_NAME: "Delete All Alerts",
         CONF_ICON: "mdi:alert-remove",
         CONF_SERVICE: SERVICE_NAME_DELETE_ALERT_ALL,
+        CONF_ENTITY_CATEGORY: EntityCategory.CONFIG,
+        CONF_TRANSLATION_KEY: "delete_all_alerts",
     },
     ENTITY_DELETE_LAST_ALERT_BUTTON: {
         CONF_TYPE: BUTTON_TYPE,
-        CONF_NAME: "Delete last alert",
+        CONF_NAME: "Delete Last Alert",
         CONF_ICON: "mdi:alert-minus",
         CONF_SERVICE: SERVICE_NAME_DELETE_ALERT,
         CONF_SERVICE_DATA: {
             SERVER_DATA_ALERT_INDEX: 0,
         },
+        CONF_ENTITY_CATEGORY: EntityCategory.CONFIG,
+        CONF_TRANSLATION_KEY: "delete_last_alert",
     },
     ENTITY_READ_ALL_ALERTS_BUTTON: {
         CONF_TYPE: BUTTON_TYPE,
-        CONF_NAME: "Mark all alerts as read",
+        CONF_NAME: "Mark All Alerts as Read",
         CONF_ICON: "mdi:message-alert",
         CONF_SERVICE: SERVICE_NAME_READ_ALERT_ALL,
+        CONF_ENTITY_CATEGORY: EntityCategory.CONFIG,
+        CONF_TRANSLATION_KEY: "read_all_alerts",
     },
     ENTITY_READ_LAST_ALERT_BUTTON: {
         CONF_TYPE: BUTTON_TYPE,
-        CONF_NAME: "Mark last alert as read",
+        CONF_NAME: "Mark Last Alert as Read",
         CONF_ICON: "mdi:message-alert",
         CONF_SERVICE: SERVICE_NAME_READ_ALERT,
         CONF_SERVICE_DATA: {
             SERVER_DATA_ALERT_INDEX: 0,
         },
+        CONF_ENTITY_CATEGORY: EntityCategory.CONFIG,
+        CONF_TRANSLATION_KEY: "read_last_alert",
+    },
+    ENTITY_SMARTMOWING_SWITCH: {
+        CONF_TYPE: SWITCH_TYPE,
+        CONF_NAME: "SmartMowing",
+        CONF_ICON: "mdi:auto-mode",
+        CONF_TRANSLATION_KEY: "indego_smartmowing",
+        CONF_ENTITY_CATEGORY: EntityCategory.CONFIG,
     },
 }
 
@@ -725,6 +765,18 @@ class IndegoHub:
                     entity[CONF_SERVICE_DATA] if CONF_SERVICE_DATA in entity else None,
                     device_info,
                     self,
+                    entity_category=entity[CONF_ENTITY_CATEGORY] if CONF_ENTITY_CATEGORY in entity else None,
+                )
+
+            elif entity[CONF_TYPE] == SWITCH_TYPE:
+                self.entities[entity_key] = IndegoSwitch(
+                    f"indego_{self._serial}_{entity_key}",
+                    f"{self._mower_name} {entity[CONF_NAME]}",
+                    entity[CONF_ICON],
+                    device_info,
+                    self,
+                    translation_key=entity[CONF_TRANSLATION_KEY] if CONF_TRANSLATION_KEY in entity else None,
+                    entity_category=entity[CONF_ENTITY_CATEGORY] if CONF_ENTITY_CATEGORY in entity else None,
                 )
 
     async def update_generic_data_and_load_platforms(self, load_platforms):
@@ -1288,6 +1340,7 @@ class IndegoHub:
             if ENTITY_LAWN_MOWER in self.entities:
                 try:
                     self.entities[ENTITY_LAWN_MOWER].indego_state = getattr(self._indego_client.state, 'state', None)
+                    self.entities[ENTITY_LAWN_MOWER].indego_state_detail = self.state_description_detail
                 except Exception as exc:
                     _LOGGER.error("Failed to update lawn mower state: %s", str(exc))
 
@@ -1390,7 +1443,9 @@ class IndegoHub:
     async def _update_alerts(self):
         await self._indego_client.update_alerts()
 
-        self.entities[ENTITY_ALERT].state = self._indego_client.alerts_count > 0
+        # Show "Problem" only if there are unread alerts
+        unread_count = sum(1 for alert in self._indego_client.alerts if not alert.read_status)
+        self.entities[ENTITY_ALERT].state = unread_count > 0
 
         if self._indego_client.alerts:
             # Build complete alert attributes
