@@ -13,10 +13,10 @@ A comprehensive Home Assistant integration that provides full control and monito
 
 - 🎮 **Full Mower Control** - Start, pause, dock, and schedule mowing
 - 📊 **Real-time Monitoring** - Battery, location, alerts, and more
-- 📍 **Lawn Mapping** - Visual SVG map with mower position overlay
-- 🤖 **SmartMowing** - Automatic schedule optimization based on weather
-- ⚠️ **Alert Management** - Monitor and manage mower alerts with complete error list extraction
-- 🌍 **Multi-language** - German, English, Dutch, French, Spanish, Italian, and more
+- 📍 **Lawn Mapping** - Visual SVG map with mower position overlay (dynamic streaming based on movement)
+- 🤖 **SmartMowing Switch** - Toggle automatic schedule optimization based on weather
+- ⚠️ **Alert Management** - Monitor and manage mower alerts with action buttons and complete error list extraction
+- 🌍 **Multi-language Support** - German, English, Dutch, French, Spanish, Italian, Danish, Norwegian, Polish, Swedish, Slovak, and more
 - 🏠 **Native Entities** - Lawn Mower and Vacuum entities for seamless Home Assistant integration
 - 📱 **Multiple Mowers** - Support for multiple mowers in one Home Assistant instance
 - 🔌 **Service Monitoring** - Bosch Cloud API availability detection with HTTP 5xx error tracking
@@ -25,6 +25,8 @@ A comprehensive Home Assistant integration that provides full control and monito
 - 📍 **Stuck Detection** - Automatic detection when mower is immobilized (> 60 seconds without movement)
 - 👤 **Custom User Agent** - Configurable User-Agent for API requests to work around Bosch restrictions
 - 📈 **Session Tracking** - Counter for completed mowing sessions
+- 🎯 **Dynamic Camera Streaming** - Camera shows as streaming when mower is actively moving/mowing
+- 🔲 **Alert Action Buttons** - Quick action buttons to manage specific alerts
 
 ## 📖 Table of Contents
 
@@ -155,7 +157,20 @@ All sensors are automatically discovered after setup and will appear as "Unused 
 | **Session Count** | Total number of completed mowing sessions |
 | **Lawn Mower Entity** | Native Home Assistant Lawn Mower entity (Start, Pause, Dock) |
 | **Vacuum Entity** | Legacy Home Assistant Vacuum entity (Start, Pause, Return, Battery) |
-| **Lawn Map** | SVG lawn map with mower position overlay |
+| **Lawn Map** | SVG lawn map with mower position overlay with dynamic streaming state |
+
+### Switches
+
+| Switch | Description |
+|--------|-------------|
+| **SmartMowing** | Toggle SmartMowing mode on/off - enables automatic schedule optimization based on weather conditions |
+
+### Buttons
+
+| Button | Description |
+|--------|-------------|
+| **Delete Alert** | Action button to delete specific alerts from the mower |
+| **Mark Alert as Read** | Action button to mark specific alerts as read |
 
 
 ## 🔍 Advanced Features
@@ -182,6 +197,74 @@ The `binary_sensor.indego_<SERIAL>_service_status` sensor monitors the availabil
 - **Attribute** `last_service_error` - Shows the HTTP error code (e.g., "HTTP 503")
 
 **Note:** 5xx errors are typically temporary Bosch Cloud issues and resolve automatically.
+
+### Intelligent Offline Detection (3-Layer System)
+
+The integration uses a sophisticated 3-layer system to accurately detect when your mower is offline:
+
+**Layer 1: Error Code Detection**
+- Immediately marks mower as offline on API errors: 802, 803, 804 (connection failures)
+- Provides instant feedback when mower loses connectivity
+
+**Layer 2: Timeout System**
+- After 300 seconds (5 minutes) without a successful API response, mower is marked offline
+- Handles situations where the API doesn't return explicit error codes
+- Automatically recovers when connectivity is restored
+
+**Layer 3: Last Successful Update Tracking**
+- Continuously tracks `_last_successful_update` timestamp
+- Monitors refresh cycles to detect prolonged connection loss
+- Works in conjunction with error codes and timeout system
+
+**How It Works:**
+1. Each successful API call updates the timestamp
+2. Every refresh cycle checks for timeout or error conditions
+3. If timeout exceeded OR error codes detected → mower state set to offline
+4. Online state automatically restored when connection resumes
+
+### SmartMowing Switch
+
+Enable or disable SmartMowing directly from Home Assistant using the **SmartMowing** switch entity:
+
+- **Switch Location**: `switch.indego_<SERIAL>_smartmowing`
+- **State Detection**: Automatically detects SmartMowing status from mower's current mowing mode description
+- **Manual Toggle**: Turn the switch on/off to enable/disable SmartMowing
+- **Real-time Sync**: Switch state updates automatically based on mower's current settings
+
+### Dynamic Camera Streaming
+
+The lawn map camera entity provides dynamic streaming capabilities:
+
+- **Streaming State**: Camera's `is_streaming` property indicates active mower movement
+- **Movement Detection**: Automatically detects if mower is in a mowing, moving, or cutting state (states 500-799)
+- **Map Updates**: SVG map reloads when mower movement is detected for fresh position data
+- **Visual Feedback**: Streaming indicator in Home Assistant UI shows when mower is actively working
+
+### Alert Action Buttons
+
+Quick action buttons appear for managing mower alerts:
+
+- **Delete Alert**: Button for removing specific alerts from the mower's alert history
+- **Mark as Read**: Button for marking alerts as read without deleting them
+
+These buttons can be used in automations or dashboards for quick alert management.
+
+### Multilingual Support
+
+The integration includes translations for the following languages:
+- German (Deutsch)
+- English
+- Dutch (Nederlands)
+- French (Français)
+- Spanish (Español)
+- Italian (Italiano)
+- Danish (Dansk)
+- Norwegian (Norsk)
+- Polish (Polski)
+- Swedish (Svenska)
+- Slovak (Slovenčina)
+
+Language selection is handled automatically by Home Assistant based on your system settings.
 
 ### Stuck Detection
 
