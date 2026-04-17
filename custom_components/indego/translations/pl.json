@@ -12,6 +12,9 @@
                     "expose_mower": "Wyświetl kosiarkę Indego jako encję kosiarki w HomeAssistant",
                     "expose_vacuum": "Wyświetl kosiarkę Indego jako encję odkurzacza w HomeAssistant"
                 },
+                "data_description": {
+                    "user_agent": "W przypadku błędów HTTP 4XX (zwłaszcza Reason: 403, message=»Forbidden«) pomocna może okazać się zmiana agenta użytkownika. Nie powinien on zawierać słów „Homeassistant” ani „HA”."
+                },
                 "description": "Ustawienia zaawansowane komponentu Bosch Indego."
             },
             "mower": {
@@ -33,6 +36,9 @@
                   "expose_mower": "Wyświetl kosiarkę Indego jako encję kosiarki w HomeAssistant",
                   "expose_vacuum": "Wyświetl kosiarkę Indego jako encję odkurzacza w HomeAssistant",
                   "show_all_alerts": "Pokaż pełną historię alertów w HomeAssistant. Nie rekomendowane dla większości użytkowników, może mieć wpływ na znaczące zwiększenie rozmiaru bazy danych HomeAssistant!"
+              },
+              "data_description": {
+                  "user_agent": "W przypadku błędów HTTP 4XX (zwłaszcza Reason: 403, message=»Forbidden«) pomocna może okazać się zmiana agenta użytkownika. Nie powinien on zawierać słów „Homeassistant” ani „HA”."
               }
           }
       }

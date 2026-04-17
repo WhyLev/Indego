@@ -13,6 +13,9 @@
                     "expose_mower": "Odhaľte kosačku Indego ako entitu kosačky v aplikácii HomeAssistant",
                     "expose_vacuum": "Odhaľte kosačku Indego ako vákuovú entitu v aplikácii HomeAssistant"
                 },
+                "data_description": {
+                    "user_agent": "V prípade chýb HTTP 4XX (najmä Reason: 403, message=‚Forbidden‘) môže pomôcť zmena User Agent. Nemal by obsahovať Homeassistant ani HA."
+                },
                 "description": "Rozšírené nastavenia komponentu Bosch Indego."
             },
             "mower": {
@@ -38,6 +41,9 @@
                   "expose_mower": "Odhaľte kosačku Indego ako entitu kosačky v aplikácii HomeAssistant",
                   "expose_vacuum": "Odhaľte kosačku Indego ako vákuovú entitu v aplikácii HomeAssistant",
                   "show_all_alerts": "Zobrazte celú históriu upozornení v aplikácii HomeAssistant. Toto sa neodporúča väčšine používateľov, môže to mať významný vplyv na veľkosť databázy HomeAssistant!"
+              },
+              "data_description": {
+                  "user_agent": "V prípade chýb HTTP 4XX (najmä Reason: 403, message=‚Forbidden‘) môže pomôcť zmena User Agent. Nemal by obsahovať Homeassistant ani HA."
               }
           }
       }

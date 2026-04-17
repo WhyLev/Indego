@@ -13,6 +13,9 @@
                     "expose_mower": "Indego Mähroboter als Mower Entität in HomeAssistant anlegen",
                     "expose_vacuum": "Indego Mähroboter als Vacuum Entität in HomeAssistant anlegen"
                 },
+                "data_description": {
+                    "user_agent": "Im Fall von HTTP 4XX Fehlern (besonders Reason: 403, message='Forbidden') kann es helfen den User Agent zu ändern. Dieser sollte nicht Homeassistant oder HA enthalten."
+                },
                 "description": "Erweiterte Einstellung des Bosch Indego Component."
             },
             "mower": {
@@ -38,6 +41,9 @@
                     "expose_mower": "Indego Mähroboter als Mower Entität in HomeAssistant anlegen",
                     "expose_vacuum": "Indego Mähroboter als Vacuum Entität in HomeAssistant anlegen",
                     "show_all_alerts": "Zeige den kompletten Alarm Verlauf in HomeAssistant. Dies wird für die meisten Nutzer nicht empfohlen, da es signifikanten Einfluss auf die Größe der HomeAssistant Datenbank haben kann."
+                },
+                "data_description": {
+                    "user_agent": "Im Fall von HTTP 4XX Fehlern (besonders Reason: 403, message='Forbidden') kann es helfen den User Agent zu ändern. Dieser sollte nicht Homeassistant oder HA enthalten."
                 }
             }
         }
