@@ -218,17 +218,20 @@
     },
     "services": {
         "command": {
-            "description": "Invia comandi al rasaerba. I comandi consentiti sono mow, returnToDock e pause.",
+            "name": "Invia comando",
+            "description": "Invia comandi al robot. Seleziona un comando.",
             "fields": {
                 "mower_serial": {
                     "description": "Numero di serie del rasaerba. Necessario solo quando hai configurato più rasaerba."
                 },
                 "command": {
-                    "description": "Comando per il rasaerba."
+                    "name": "Invia comando",
+                    "description": "Invia comandi al robot. Seleziona un comando."
                 }
             }
         },
         "smartmowing": {
+            "name": "Attiva/Disattiva SmartMowing",
             "description": "Abilita o disabilita SmartMowing. I valori consentiti sono true o false.",
             "fields": {
                 "mower_serial": {
@@ -240,6 +243,7 @@
             }
         },
         "delete_alert": {
+            "name": "Elimina avviso",
             "description": "Elimina l'avviso selezionato.",
             "fields": {
                 "mower_serial": {
@@ -251,6 +255,7 @@
             }
         },
         "delete_alert_all": {
+            "name": "Elimina tutti gli avvisi",
             "description": "Elimina tutti gli avvisi.",
             "fields": {
                 "mower_serial": {
@@ -259,6 +264,7 @@
             }
         },
         "read_alert": {
+            "name": "Segna avviso come letto",
             "description": "Segna l'avviso selezionato come letto.",
             "fields": {
                 "mower_serial": {
@@ -270,6 +276,7 @@
             }
         },
         "read_alert_all": {
+            "name": "Segna tutti gli avvisi come letti",
             "description": "Segna tutti gli avvisi come letti.",
             "fields": {
                 "mower_serial": {
@@ -278,6 +285,7 @@
             }
         },
         "download_map": {
+            "name": "Scarica mappa falciatura",
             "description": "Scarica la mappa di taglio attuale dall'API Bosch Cloud e la salva localmente come \"www/indego_map_base.svg\". La mappa riflette il percorso di taglio registrato più di recente.",
             "fields": {
                 "mower_serial": {
@@ -285,5 +293,22 @@
                 }
             }
         }
+    },
+    "issues": {
+        "auth_failure": {
+            "title": "Bosch Indego authentication expired",
+            "description": "Your authentication with Bosch Indego has expired. Please go to Settings > Devices & Services > Indego > Re-authenticate to restore access to your mower."
+        },
+        "connection_failure": {
+            "title": "Bosch Indego connection problems",
+            "description": "Your mower has not responded to API requests for an extended period. This may indicate network issues, the Bosch service is experiencing problems, or your mower is offline. Please check your internet connection and mower status."
+        }
+    },
+    "system_health": {
+        "can_reach_bosch_api": "Can reach Bosch Indego API",
+        "can_reach_auth_service": "Can reach Bosch authentication service",
+        "bosch_service_status": "Bosch service status",
+        "mower_online": "Mower online status",
+        "last_api_response": "Last successful API response"
     }
 }

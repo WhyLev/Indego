@@ -218,17 +218,20 @@
     },
     "services": {
         "command": {
-            "description": "Befehle an den Mähroboter senden. Mögliche Befehle sind mow, returnToDock und pause.",
+            "name": "Befehl senden",
+            "description": "Befehle an den Mähroboter senden. Wählen Sie einen Befehl aus.",
             "fields": {
                 "mower_serial": {
                     "description": "Seriennummer des Mähroboters. Wird nur benötigt, wenn mehrere Mähroboter eingerichtet sind."
                 },
                 "command": {
-                    "description": "Befehl für den Mähroboter."
+                    "name": "Befehl senden",
+                    "description": "Befehle an den Mähroboter senden. Wählen Sie einen Befehl aus."
                 }
             }
         },
         "smartmowing": {
+            "name": "SmartMowing umschalten",
             "description": "SmartMowing aktivieren oder deaktivieren. Mögliche Werte sind true oder false.",
             "fields": {
                 "mower_serial": {
@@ -240,6 +243,7 @@
             }
         },
         "delete_alert": {
+            "name": "Alert löschen",
             "description": "Löscht den ausgewählten Fehler.",
             "fields": {
                 "mower_serial": {
@@ -251,6 +255,7 @@
             }
         },
         "delete_alert_all": {
+            "name": "Alle Alerts löschen",
             "description": "Löscht alle Fehler.",
             "fields": {
                 "mower_serial": {
@@ -259,6 +264,7 @@
             }
         },
         "read_alert": {
+            "name": "Alert als gelesen markieren",
             "description": "Markiert den ausgewählten Fehler als gelesen.",
             "fields": {
                 "mower_serial": {
@@ -270,6 +276,7 @@
             }
         },
         "read_alert_all": {
+            "name": "Alle Alerts als gelesen markieren",
             "description": "Markiert alle Fehler als gelesen.",
             "fields": {
                 "mower_serial": {
@@ -278,6 +285,7 @@
             }
         },
         "download_map": {
+            "name": "Mähkarte herunterladen",
             "description": "Lädt die aktuelle Mähkarte von der Bosch Cloud API herunter und speichert diese lokal unter \"www/indego_map_base.svg\". Die Karte zeigt die zuletzt aufgezeichnete Mähroute.",
             "fields": {
                 "mower_serial": {
@@ -285,5 +293,22 @@
                 }
             }
         }
+    },
+    "issues": {
+        "auth_failure": {
+            "title": "Bosch Indego Authentifizierung abgelaufen",
+            "description": "Ihre Authentifizierung mit Bosch Indego ist abgelaufen. Gehen Sie zu Einstellungen > Geräte & Dienste > Indego > Erneut authentifizieren, um den Zugriff auf Ihren Mähroboter wiederherzustellen."
+        },
+        "connection_failure": {
+            "title": "Bosch Indego Verbindungsprobleme",
+            "description": "Ihr Mähroboter reagiert über einen längeren Zeitraum nicht auf API-Anfragen. Dies kann auf Netzwerkprobleme, Serviceprobleme bei Bosch oder einen Offline-Mähroboter hindeuten. Bitte überprüfen Sie Ihre Internetverbindung und den Status des Mähroboters."
+        }
+    },
+    "system_health": {
+        "can_reach_bosch_api": "Kann Bosch Indego API erreichen",
+        "can_reach_auth_service": "Kann Bosch Authentifizierungsdienst erreichen",
+        "bosch_service_status": "Bosch-Dienststatus",
+        "mower_online": "Mähroboter Online-Status",
+        "last_api_response": "Letzte erfolgreiche API-Antwort"
     }
 }

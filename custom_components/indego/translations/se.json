@@ -218,17 +218,20 @@
     },
     "services": {
         "command": {
-            "description": "Skicka kommandon till gräsklipparen. Tillåtna kommandon är mow, returnToDock och pause.",
+            "name": "Skicka kommando",
+            "description": "Skicka kommandon till gräsklipparen. Välj ett kommando.",
             "fields": {
                 "mower_serial": {
                     "description": "Gräsklippare serienummer. Krävs endast när du har flera gräsklippare konfigurerade."
                 },
                 "command": {
-                    "description": "Kommando för gräsklipparen."
+                    "name": "Skicka kommando",
+                    "description": "Skicka kommandon till gräsklipparen. Välj ett kommando."
                 }
             }
         },
         "smartmowing": {
+            "name": "Slå SmartMowing på/av",
             "description": "Aktivera eller inaktivera SmartMowing. Tillåtna värden är true eller false.",
             "fields": {
                 "mower_serial": {
@@ -240,6 +243,7 @@
             }
         },
         "delete_alert": {
+            "name": "Ta bort varning",
             "description": "Radera den valda aviseringen.",
             "fields": {
                 "mower_serial": {
@@ -251,6 +255,7 @@
             }
         },
         "delete_alert_all": {
+            "name": "Ta bort alla varningar",
             "description": "Radera alla aviseringar.",
             "fields": {
                 "mower_serial": {
@@ -259,6 +264,7 @@
             }
         },
         "read_alert": {
+            "name": "Markera varning som läst",
             "description": "Markera den valda aviseringen som läst.",
             "fields": {
                 "mower_serial": {
@@ -270,6 +276,7 @@
             }
         },
         "read_alert_all": {
+            "name": "Markera alla varningar som lästa",
             "description": "Markera alla aviseringar som lästa.",
             "fields": {
                 "mower_serial": {
@@ -278,6 +285,7 @@
             }
         },
         "download_map": {
+            "name": "Hämta klippkarta",
             "description": "Hämtar den aktuella klippkartan från Bosch Cloud API och sparar den lokalt som \"www/indego_map_base.svg\". Kartan återspeglar den senast registrerade klippvägen.",
             "fields": {
                 "mower_serial": {
@@ -285,5 +293,22 @@
                 }
             }
         }
+    },
+    "issues": {
+        "auth_failure": {
+            "title": "Bosch Indego authentication expired",
+            "description": "Your authentication with Bosch Indego has expired. Please go to Settings > Devices & Services > Indego > Re-authenticate to restore access to your mower."
+        },
+        "connection_failure": {
+            "title": "Bosch Indego connection problems",
+            "description": "Your mower has not responded to API requests for an extended period. This may indicate network issues, the Bosch service is experiencing problems, or your mower is offline. Please check your internet connection and mower status."
+        }
+    },
+    "system_health": {
+        "can_reach_bosch_api": "Can reach Bosch Indego API",
+        "can_reach_auth_service": "Can reach Bosch authentication service",
+        "bosch_service_status": "Bosch service status",
+        "mower_online": "Mower online status",
+        "last_api_response": "Last successful API response"
     }
 }

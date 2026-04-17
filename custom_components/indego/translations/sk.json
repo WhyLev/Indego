@@ -218,17 +218,20 @@
     },
     "services": {
         "command": {
-            "description": "Odošlite príkazy kosačke. Povolené príkazy sú mow, returnToDock a pause.",
+            "name": "Poslať príkaz",
+            "description": "Poslať príkazy kosačke. Vyberte príkaz.",
             "fields": {
                 "mower_serial": {
                     "description": "Sériové číslo kosačky. Potrebné iba vtedy, keď máte nakonfigurovaných viacero kosačiek."
                 },
                 "command": {
-                    "description": "Príkaz pre kosačku."
+                    "name": "Poslať príkaz",
+                    "description": "Poslať príkazy kosačke. Vyberte príkaz."
                 }
             }
         },
         "smartmowing": {
+            "name": "Prepnúť SmartMowing",
             "description": "Povoliť alebo zakázať funkciu SmartMowing. Povolené hodnoty sú true alebo false.",
             "fields": {
                 "mower_serial": {
@@ -240,6 +243,7 @@
             }
         },
         "delete_alert": {
+            "name": "Odstrániť výstrahu",
             "description": "Odstrániť vybraté upozornenie.",
             "fields": {
                 "mower_serial": {
@@ -251,6 +255,7 @@
             }
         },
         "delete_alert_all": {
+            "name": "Odstrániť všetky výstrahy",
             "description": "Odstráňte všetky upozornenia.",
             "fields": {
                 "mower_serial": {
@@ -259,6 +264,7 @@
             }
         },
         "read_alert": {
+            "name": "Označiť výstrahu ako prečítanú",
             "description": "Označte vybrané upozornenie ako prečítané.",
             "fields": {
                 "mower_serial": {
@@ -270,6 +276,7 @@
             }
         },
         "read_alert_all": {
+            "name": "Označiť všetky výstrahy ako prečítané",
             "description": "Označte všetky upozornenia ako prečítané.",
             "fields": {
                 "mower_serial": {
@@ -278,6 +285,7 @@
             }
         },
         "download_map": {
+            "name": "Stiahnuť mapu kosenia",
             "description": "Stiahne aktuálnu mapu kosenia z Bosch Cloud API a uloží ju lokálne ako \"www/indego_map_base.svg\". Mapa odráža naposledy zaznamenú trasu kosenia.",
             "fields": {
                 "mower_serial": {
@@ -285,5 +293,22 @@
                 }
             }
         }
+    },
+    "issues": {
+        "auth_failure": {
+            "title": "Bosch Indego authentication expired",
+            "description": "Your authentication with Bosch Indego has expired. Please go to Settings > Devices & Services > Indego > Re-authenticate to restore access to your mower."
+        },
+        "connection_failure": {
+            "title": "Bosch Indego connection problems",
+            "description": "Your mower has not responded to API requests for an extended period. This may indicate network issues, the Bosch service is experiencing problems, or your mower is offline. Please check your internet connection and mower status."
+        }
+    },
+    "system_health": {
+        "can_reach_bosch_api": "Can reach Bosch Indego API",
+        "can_reach_auth_service": "Can reach Bosch authentication service",
+        "bosch_service_status": "Bosch service status",
+        "mower_online": "Mower online status",
+        "last_api_response": "Last successful API response"
     }
 }

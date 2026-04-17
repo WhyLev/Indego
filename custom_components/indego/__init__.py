@@ -37,6 +37,8 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.config_entry_oauth2_flow import async_get_config_entry_implementation
 from homeassistant.helpers.event import async_track_point_in_time
 from homeassistant.helpers.event import async_track_time_interval
+from homeassistant.helpers import issue_registry as ir
+from homeassistant.helpers.issue_registry import IssueSeverity
 from pyIndego import IndegoAsyncClient
 
 from .api import IndegoOAuth2Session
@@ -49,6 +51,7 @@ from .camera import IndegoCamera
 from .error_codes import ERROR_CODE_MAP, get_error_description
 from .button import IndegoAlertButton
 from .switch import IndegoSwitch
+from . import diagnostics, system_health, repairs
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -444,6 +447,16 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     except ClientResponseError as exc:
         if 400 <= exc.status < 500:
             _LOGGER.warning("Authentication failed (HTTP %d) - please check your credentials", exc.status)
+            # Create repair issue for auth failure
+            ir.async_create_issue(
+                hass,
+                DOMAIN,
+                "auth_failure",
+                is_fixable=True,
+                severity=IssueSeverity.ERROR,
+                translation_key="auth_failure",
+                data={"entry_id": entry.entry_id},
+            )
             raise ConfigEntryAuthFailed from exc
 
         _LOGGER.error("API connection failed during setup (HTTP %d): %s", exc.status, str(exc))
@@ -452,6 +465,18 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     except AttributeError as exc:
         _LOGGER.error("Configuration error - invalid data structure: %s", str(exc))
         return False
+
+    # Register repairs and initialize diagnostics/system health
+    try:
+        # Diagnostics are automatically discovered by HA - no manual registration needed
+        # System health is automatically discovered by HA when system_health.py exists
+
+        # Register repairs flow
+        from .repairs import async_create_fix_flow
+
+        # HA will automatically call async_create_fix_flow when user clicks "Learn more" on a repair issue
+    except Exception as err:
+        _LOGGER.warning("Error setting up features: %s", err)
 
     def find_instance_for_mower_service_call(call):
         mower_serial = call.data.get(CONF_MOWER_SERIAL, None)
@@ -494,7 +519,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
         await instance._update_alerts()
         await instance._indego_client.delete_alert(index)
-        await instance._update_alerts()     
+        await instance._update_alerts()
 
     async def async_delete_alert_all(call):
         """Handle the service call."""
@@ -503,7 +528,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
         await instance._update_alerts()
         await instance._indego_client.delete_all_alerts()
-        await instance._update_alerts()   
+        await instance._update_alerts()
 
     async def async_read_alert(call):
         """Handle the service call."""
@@ -851,6 +876,33 @@ class IndegoHub:
             update_failed = True
             _LOGGER.debug("Failed to update mower state: %s", str(exc))
             self.set_online_state(False)
+
+        # Check for connection failure repair issue
+        if self._consecutive_timeouts >= 5 and not self._hass.data[DOMAIN].get("connection_issue_reported"):
+            _LOGGER.warning("Connection failure detected - creating repair issue")
+            try:
+                ir.async_create_issue(
+                    self._hass,
+                    DOMAIN,
+                    "connection_failure",
+                    is_fixable=False,
+                    severity=IssueSeverity.ERROR,
+                    translation_key="connection_failure",
+                    data={"entry_id": self._hass.data[DOMAIN].get(CONF_SERVICES_REGISTERED)},
+                )
+                self._hass.data[DOMAIN]["connection_issue_reported"] = True
+            except Exception as err:
+                _LOGGER.warning("Error creating connection issue: %s", err)
+
+        # Clear connection issue if connection restored
+        if self._consecutive_timeouts == 0 and self._hass.data[DOMAIN].get("connection_issue_reported"):
+            _LOGGER.info("Connection restored - clearing repair issue")
+            try:
+                issue_registry = ir.async_get(self._hass)
+                issue_registry.async_delete(f"{DOMAIN}/connection_failure")
+                self._hass.data[DOMAIN]["connection_issue_reported"] = False
+            except Exception as err:
+                _LOGGER.warning("Error deleting connection issue: %s", err)
 
         if self._shutdown:
             return

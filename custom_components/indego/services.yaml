@@ -6,9 +6,14 @@ command:
       example: '"012345789"'
       required: false
     command:
-      description: Command to send to the mower. Allowed values are "mow", "returnToDock" and "pause".
-      example: "mow"
+      description: Command to send to the mower.
       required: true
+      selector:
+        select:
+          options:
+            - "mow"
+            - "returnToDock"
+            - "pause"
 smartmowing:
   description: Enables or disables the SmartMowing feature, which automatically adjusts the mowing schedule based on weather conditions and lawn growth.
   fields:
@@ -16,7 +21,7 @@ smartmowing:
       description: Serial number of the mower. Only required if multiple mowers are configured.
       example: '"012345789"'
       required: false
-    enable: 
+    enable:
       description: Sets the SmartMowing state. Use "true" to enable or "false" to disable the feature.
       example: "true"
       required: true
@@ -27,7 +32,7 @@ delete_alert:
       description: Serial number of the mower. Only required if multiple mowers are configured.
       example: '"0123456789"'
       required: false
-    alert_index: 
+    alert_index:
       description: Index of the alert to delete. 0 = most recent, 1 = second most recent, and so on.
       example: "0"
 delete_alert_all:
@@ -44,7 +49,7 @@ read_alert:
       description: Serial number of the mower. Only required if multiple mowers are configured.
       example: '"0123456789"'
       required: false
-    alert_index: 
+    alert_index:
       description: Index of the alert to mark as read. 0 = most recent, 1 = second most recent, and so on.
       example: "0"
 read_alert_all:

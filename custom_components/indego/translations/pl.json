@@ -218,17 +218,20 @@
     },
     "services": {
         "command": {
-            "description": "Wyślij polecenie do kosiarki. Dostępne polecenia to: mow, returnToDock oraz pause.",
+            "name": "Wyślij polecenie",
+            "description": "Wyślij polecenia do kosiarki. Wybierz polecenie.",
             "fields": {
                 "mower_serial": {
                     "description": "Numer seryjny kosiarki. Wymagany tylko gdy konfigurujesz wiele kosiarek."
                 },
                 "command": {
-                    "description": "Polecenie do wysłania do kosiarki."
+                    "name": "Wyślij polecenie",
+                    "description": "Wyślij polecenia do kosiarki. Wybierz polecenie."
                 }
             }
         },
         "smartmowing": {
+            "name": "Przełącz SmartMowing",
             "description": "Włącz lub wyłącz tryb SmartMowing. Dostępne wartości to true lub false.",
             "fields": {
                 "mower_serial": {
@@ -240,6 +243,7 @@
             }
         },
         "delete_alert": {
+            "name": "Usuń alert",
             "description": "Usuń zaznaczony alert.",
             "fields": {
                 "mower_serial": {
@@ -251,6 +255,7 @@
             }
         },
         "delete_alert_all": {
+            "name": "Usuń wszystkie alerty",
             "description": "Usuń wszystkie alerty.",
             "fields": {
                 "mower_serial": {
@@ -259,6 +264,7 @@
             }
         },
         "read_alert": {
+            "name": "Oznacz alert jako przeczytany",
             "description": "Oznacz alert jako przeczytany.",
             "fields": {
                 "mower_serial": {
@@ -270,6 +276,7 @@
             }
         },
         "read_alert_all": {
+            "name": "Oznacz wszystkie alerty jako przeczytane",
             "description": "Oznacz wszystkie alerty jako przeczytane.",
             "fields": {
                 "mower_serial": {
@@ -278,6 +285,7 @@
             }
         },
         "download_map": {
+            "name": "Pobierz mapę koszenia",
             "description": "Pobiera aktualną mapę koszenia z API Bosch Cloud i zapisuje ją lokalnie jako \"www/indego_map_base.svg\". Mapa odzwierciedla ostatnio zapisaną trasę koszenia.",
             "fields": {
                 "mower_serial": {
@@ -285,5 +293,22 @@
                 }
             }
         }
+    },
+    "issues": {
+        "auth_failure": {
+            "title": "Bosch Indego authentication expired",
+            "description": "Your authentication with Bosch Indego has expired. Please go to Settings > Devices & Services > Indego > Re-authenticate to restore access to your mower."
+        },
+        "connection_failure": {
+            "title": "Bosch Indego connection problems",
+            "description": "Your mower has not responded to API requests for an extended period. This may indicate network issues, the Bosch service is experiencing problems, or your mower is offline. Please check your internet connection and mower status."
+        }
+    },
+    "system_health": {
+        "can_reach_bosch_api": "Can reach Bosch Indego API",
+        "can_reach_auth_service": "Can reach Bosch authentication service",
+        "bosch_service_status": "Bosch service status",
+        "mower_online": "Mower online status",
+        "last_api_response": "Last successful API response"
     }
 }

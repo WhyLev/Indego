@@ -218,17 +218,20 @@
     },
     "services": {
         "command": {
+            "name": "Send command",
             "description": "Send commands to the mower. Allowed commands are mow, returnToDock, and pause.",
             "fields": {
                 "mower_serial": {
                     "description": "Mower serial. Only needed when you have configured multiple mowers."
                 },
                 "command": {
-                    "description": "Command for the mower."
+                    "name": "Command",
+                    "description": "Select a command to send to the mower."
                 }
             }
         },
         "smartmowing": {
+            "name": "Toggle SmartMowing",
             "description": "Enable or disable SmartMowing. Allowed values are true or false.",
             "fields": {
                 "mower_serial": {
@@ -240,6 +243,7 @@
             }
         },
         "delete_alert": {
+            "name": "Delete alert",
             "description": "Delete the selected alert.",
             "fields": {
                 "mower_serial": {
@@ -251,6 +255,7 @@
             }
         },
         "delete_alert_all": {
+            "name": "Delete all alerts",
             "description": "Delete all alerts.",
             "fields": {
                 "mower_serial": {
@@ -259,6 +264,7 @@
             }
         },
         "read_alert": {
+            "name": "Mark alert as read",
             "description": "Mark the selected alert as read.",
             "fields": {
                 "mower_serial": {
@@ -270,6 +276,7 @@
             }
         },
         "read_alert_all": {
+            "name": "Mark all alerts as read",
             "description": "Mark all alerts as read.",
             "fields": {
                 "mower_serial": {
@@ -278,6 +285,7 @@
             }
         },
         "download_map": {
+            "name": "Download mowing map",
             "description": "Downloads the current mowing map from the Bosch Cloud API and saves it locally as \"www/indego_map_base.svg\". The map reflects the most recently recorded mowing route.",
             "fields": {
                 "mower_serial": {
@@ -285,5 +293,22 @@
                 }
             }
         }
+    },
+    "issues": {
+        "auth_failure": {
+            "title": "Bosch Indego authentication expired",
+            "description": "Your authentication with Bosch Indego has expired. Please go to Settings > Devices & Services > Indego > Re-authenticate to restore access to your mower."
+        },
+        "connection_failure": {
+            "title": "Bosch Indego connection problems",
+            "description": "Your mower has not responded to API requests for an extended period. This may indicate network issues, the Bosch service is experiencing problems, or your mower is offline. Please check your internet connection and mower status."
+        }
+    },
+    "system_health": {
+        "can_reach_bosch_api": "Can reach Bosch Indego API",
+        "can_reach_auth_service": "Can reach Bosch authentication service",
+        "bosch_service_status": "Bosch service status",
+        "mower_online": "Mower online status",
+        "last_api_response": "Last successful API response"
     }
 }
