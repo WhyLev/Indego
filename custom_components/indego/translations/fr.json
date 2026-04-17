@@ -84,6 +84,9 @@
             },
             "service_status": {
                 "name": "État du service"
+            },
+            "battery_charging": {
+                "name": "État de charge"
             }
         },
         "sensor": {

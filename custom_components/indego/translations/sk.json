@@ -84,6 +84,9 @@
             },
             "service_status": {
                 "name": "Stav služby"
+            },
+            "battery_charging": {
+                "name": "Stav nabíjania"
             }
         },
         "sensor": {

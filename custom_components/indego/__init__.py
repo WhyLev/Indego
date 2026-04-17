@@ -28,7 +28,7 @@ from homeassistant.const import (
     UnitOfTemperature,
 )
 from homeassistant.components.binary_sensor import BinarySensorDeviceClass
-from homeassistant.components.sensor import SensorDeviceClass
+from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.event import async_call_later
 from homeassistant.util.dt import utcnow
@@ -163,6 +163,7 @@ ENTITY_DEFINITIONS = {
             f"battery_temp_{UnitOfTemperature.CELSIUS}",
             f"ambient_temp_{UnitOfTemperature.CELSIUS}",
         ],
+        CONF_STATE_CLASS: SensorStateClass.MEASUREMENT,
         CONF_TRANSLATION_KEY: "battery_percentage",
     },
     ENTITY_LAWN_MOWED: {
@@ -183,11 +184,12 @@ ENTITY_DEFINITIONS = {
     ENTITY_LAWN_MOWED_SIZE: {
         CONF_TYPE: SENSOR_TYPE,
         CONF_ICON: "mdi:grass",
-        CONF_DEVICE_CLASS: None,
+        CONF_DEVICE_CLASS: SensorDeviceClass.AREA,
         CONF_UNIT_OF_MEASUREMENT: "m²",
         CONF_ATTR: [
             "last_updated",
         ],
+        CONF_STATE_CLASS: SensorStateClass.MEASUREMENT,
         CONF_TRANSLATION_KEY: "lawn_mowed_size",
     },
     ENTITY_LAST_COMPLETED: {
@@ -224,6 +226,7 @@ ENTITY_DEFINITIONS = {
             "total_charging_time_h",
             "total_operation_time_h",
         ],
+        CONF_STATE_CLASS: SensorStateClass.TOTAL_INCREASING,
         CONF_TRANSLATION_KEY: "runtime_total",
     },
     ENTITY_VACUUM: {
@@ -350,6 +353,14 @@ ENTITY_DEFINITIONS = {
         CONF_ENABLED_BY_DEFAULT: False,
         CONF_ENTITY_CATEGORY: EntityCategory.DIAGNOSTIC,
         CONF_TRANSLATION_KEY: "battery_discharge",
+    },
+    ENTITY_BATTERY_CHARGING: {
+        CONF_TYPE: BINARY_SENSOR_TYPE,
+        CONF_ICON: "mdi:battery-charging",
+        CONF_DEVICE_CLASS: BinarySensorDeviceClass.BATTERY_CHARGING,
+        CONF_ATTR: [],
+        CONF_ENTITY_CATEGORY: EntityCategory.DIAGNOSTIC,
+        CONF_TRANSLATION_KEY: "battery_charging",
     },
     ENTITY_SERVICE_STATUS: {
         CONF_TYPE: BINARY_SENSOR_TYPE,
@@ -708,6 +719,7 @@ class IndegoHub:
                     translation_key=entity[CONF_TRANSLATION_KEY] if CONF_TRANSLATION_KEY in entity else None,
                     enabled_by_default=entity[CONF_ENABLED_BY_DEFAULT] if CONF_ENABLED_BY_DEFAULT in entity else True,
                     entity_category=entity[CONF_ENTITY_CATEGORY] if CONF_ENTITY_CATEGORY in entity else None,
+                    state_class=entity[CONF_STATE_CLASS] if CONF_STATE_CLASS in entity else None,
                 )
 
             elif entity[CONF_TYPE] == BINARY_SENSOR_TYPE:
@@ -1304,9 +1316,16 @@ class IndegoHub:
                 self.entities[ENTITY_BATTERY].charging = (
                     self._indego_client.state_description_detail == "Charging"
                 )
+                # Also update battery charging binary sensor if it exists
+                if ENTITY_BATTERY_CHARGING in self.entities:
+                    self.entities[ENTITY_BATTERY_CHARGING].state = (
+                        self._indego_client.state_description_detail == "Charging"
+                    )
             except Exception as exc:
                 _LOGGER.error("Failed to update battery charging state: %s", str(exc))
                 self.entities[ENTITY_BATTERY].charging = False
+                if ENTITY_BATTERY_CHARGING in self.entities:
+                    self.entities[ENTITY_BATTERY_CHARGING].state = False
 
             # Update state attributes
             self.entities[ENTITY_MOWER_STATE].add_attributes(
