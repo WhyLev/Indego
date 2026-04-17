@@ -88,6 +88,7 @@
         },
         "sensor": {
             "mower_state": {
+                "name": "Stan kosiarki",
                 "state": {
                     "Mowing": "Koszenie",
                     "Docked": "W stacji",
@@ -96,6 +97,7 @@
                 }
             },
             "mower_state_detail": {
+                "name": "Szczegóły dotyczące stanu kosiarki",
                 "state": {
                     "Sleeping": "Uśpiony",
                     "Reading status": "Odczyt statusu",
@@ -206,6 +208,11 @@
             },
             "read_last_alert": {
                 "name": "Oznacz ostatni alert jako przeczytany"
+            }
+        },
+        "switch": {
+            "indego_smartmowing": {
+                "name": "SmartMowing"
             }
         }
     },

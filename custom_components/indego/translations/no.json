@@ -88,6 +88,7 @@
         },
         "sensor": {
             "mower_state": {
+                "name": "Klipperens tilstand",
                 "state": {
                     "Mowing": "Klipper",
                     "Docked": "Docket",
@@ -96,6 +97,7 @@
                 }
             },
             "mower_state_detail": {
+                "name": "Detaljer om gressklipperens tilstand",
                 "state": {
                     "Reading status": "Leser status",
                     "Charging": "Lader",
@@ -206,6 +208,11 @@
             },
             "read_last_alert": {
                 "name": "Merk siste advarsel som lest"
+            }
+        },
+        "switch": {
+            "indego_smartmowing": {
+                "name": "SmartMowing"
             }
         }
     },

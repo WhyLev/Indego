@@ -88,6 +88,7 @@
         },
         "sensor": {
             "mower_state": {
+                "name": "Stav kosačky",
                 "state": {
                     "Mowing": "Kosenie",
                     "Docked": "Zaparkované",
@@ -96,6 +97,7 @@
                 }
             },
             "mower_state_detail": {
+                "name": "Podrobnosti o stave kosačky",
                 "state": {
                     "Reading status": "Čítanie stavu",
                     "Charging": "Nabíjanie",
@@ -206,6 +208,11 @@
             },
             "read_last_alert": {
                 "name": "Označiť poslednú výstrahu ako prečítanú"
+            }
+        },
+        "switch": {
+            "indego_smartmowing": {
+                "name": "SmartMowing"
             }
         }
     },

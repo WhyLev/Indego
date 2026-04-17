@@ -88,6 +88,7 @@
         },
         "sensor": {
             "mower_state": {
+                "name": "Mower State",
                 "state": {
                     "Mowing": "Mowing",
                     "Docked": "Docked",
@@ -96,6 +97,7 @@
                 }
             },
             "mower_state_detail": {
+                "name": "Mower State Detail",
                 "state": {
                     "Reading status": "Reading status",
                     "Charging": "Charging",
@@ -206,6 +208,11 @@
             },
             "read_last_alert": {
                 "name": "Mark Last Alert as Read"
+            }
+        },
+        "switch": {
+            "indego_smartmowing": {
+                "name": "SmartMowing"
             }
         }
     },

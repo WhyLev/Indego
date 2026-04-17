@@ -88,6 +88,7 @@
         },
         "sensor": {
             "mower_state": {
+                "name": "État de la tondeuse",
                 "state": {
                     "Mowing": "Tonte en cours",
                     "Docked": "Dans station de charge",
@@ -96,6 +97,7 @@
                 }
             },
             "mower_state_detail": {
+                "name": "Détails sur l'état de la tondeuse",
                 "state": {
                     "Sleeping": "En veille",
                     "Reading status": "Obtention du statut en cours",
@@ -206,6 +208,11 @@
             },
             "read_last_alert": {
                 "name": "Marquer la dernière alerte comme lue"
+            }
+        },
+        "switch": {
+            "indego_smartmowing": {
+                "name": "SmartMowing"
             }
         }
     },

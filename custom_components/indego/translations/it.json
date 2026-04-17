@@ -88,6 +88,7 @@
         },
         "sensor": {
             "mower_state": {
+                "name": "Stato del tosaerba",
                 "state": {
                     "Mowing": "Tagliando",
                     "Docked": "Attraccato",
@@ -96,6 +97,7 @@
                 }
             },
             "mower_state_detail": {
+                "name": "Dettagli sullo stato del tosaerba",
                 "state": {
                     "Reading status": "Lettura dello stato",
                     "Charging": "In carica",
@@ -206,6 +208,11 @@
             },
             "read_last_alert": {
                 "name": "Contrassegna ultimo avviso come letto"
+            }
+        },
+        "switch": {
+            "indego_smartmowing": {
+                "name": "SmartMowing"
             }
         }
     },

@@ -11,8 +11,13 @@ class IndegoEntity(RestoreEntity):
 
     def __init__(self, entity_id, name, icon, attributes, device_info: DeviceInfo):
         self.entity_id = entity_id
-        self._unique_id = entity_id
-        self._name = name
+        self._attr_unique_id = entity_id
+        self._attr_has_entity_name = True
+
+        # Only set _attr_name if explicitly provided (not None)
+        # When name is None, HA translation system will use _attr_translation_key
+        if name is not None:
+            self._attr_name = name
 
         self._icon = icon
         if icon is not None:
@@ -22,7 +27,7 @@ class IndegoEntity(RestoreEntity):
                 self._icon = None
 
         self._attr = {key: None for key in attributes} if attributes is not None else None
-        self._device_info = device_info
+        self._attr_device_info = device_info
         self._state = None
         self._attr_connected_to_cloud = None
         self._should_poll = False
@@ -39,11 +44,6 @@ class IndegoEntity(RestoreEntity):
     def _schedule_immediate_update(self):
         """Schedule update."""
         self.async_schedule_update_ha_state(True)
-
-    @property
-    def name(self) -> str:
-        """Return name."""
-        return self._name
 
     @property
     def icon(self):
@@ -93,12 +93,12 @@ class IndegoEntity(RestoreEntity):
     @property
     def unique_id(self) -> str:
         """Get unique_id."""
-        return self._unique_id
+        return self._attr_unique_id
 
     @property
     def device_info(self) -> DeviceInfo:
         """Return a device description for device registry."""
-        return self._device_info
+        return self._attr_device_info
 
     @property
     def available(self) -> bool:

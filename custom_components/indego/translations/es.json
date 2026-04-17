@@ -88,6 +88,7 @@
         },
         "sensor": {
             "mower_state": {
+                "name": "Estado del cortacésped",
                 "state": {
                     "Mowing": "Cortando",
                     "Docked": "Acoplado",
@@ -96,6 +97,7 @@
                 }
             },
             "mower_state_detail": {
+                "name": "Detalles del estado del cortacésped",
                 "state": {
                     "Reading status": "Leyendo estado",
                     "Charging": "Cargando",
@@ -206,6 +208,11 @@
             },
             "read_last_alert": {
                 "name": "Marcar última alerta como leída"
+            }
+        },
+        "switch": {
+            "indego_smartmowing": {
+                "name": "SmartMowing"
             }
         }
     },

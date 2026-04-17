@@ -88,6 +88,7 @@
         },
         "sensor": {
             "mower_state": {
+                "name": "Mäher Status",
                 "state": {
                     "Mowing": "Mähen",
                     "Docked": "Angedockt",
@@ -96,6 +97,7 @@
                 }
             },
             "mower_state_detail": {
+                "name": "Mäher Status Detail",
                 "state": {
                     "Reading status": "Status wird abgerufen",
                     "Charging": "Laden",
@@ -206,6 +208,11 @@
             },
             "read_last_alert": {
                 "name": "Letzten Fehler als gelesen markieren"
+            }
+        },
+        "switch": {
+            "indego_smartmowing": {
+                "name": "SmartMowing"
             }
         }
     },

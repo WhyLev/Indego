@@ -88,6 +88,7 @@
         },
         "sensor": {
             "mower_state": {
+                "name": "Status van de maaier",
                 "state": {
                     "Mowing": "Maaien",
                     "Docked": "Geparkeerd",
@@ -96,6 +97,7 @@
                 }
             },
             "mower_state_detail": {
+                "name": "Details over de status van de maaier",
                 "state": {
                     "Sleeping": "Inactief",
                     "Reading status": "Status ophalen",
@@ -206,6 +208,11 @@
             },
             "read_last_alert": {
                 "name": "Laatste waarschuwing als gelezen markeren"
+            }
+        },
+        "switch": {
+            "indego_smartmowing": {
+                "name": "SmartMowing"
             }
         }
     },
