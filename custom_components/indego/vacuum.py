@@ -5,7 +5,6 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.entity import DeviceInfo
-from homeassistant.helpers.icon import icon_for_battery_level
 from homeassistant.components.vacuum import (
     StateVacuumEntity,
     VacuumEntityFeature,
@@ -70,7 +69,6 @@ INDEGO_VACUUM_FEATURES = (
     VacuumEntityFeature.STATE
     | VacuumEntityFeature.PAUSE
     | VacuumEntityFeature.RETURN_HOME
-    | VacuumEntityFeature.BATTERY
     | VacuumEntityFeature.START
 )
 
@@ -99,8 +97,6 @@ class IndegoVacuum(IndegoEntity, StateVacuumEntity):
         self._attr_supported_features = INDEGO_VACUUM_FEATURES
         self._attr_indego_state = None
         self._attr_state = None
-        self._attr_battery_level = None
-        self._attr_battery_charging = False
 
     async def async_start(self) -> None:
         """Start or resume the cleaning task."""
@@ -133,37 +129,3 @@ class IndegoVacuum(IndegoEntity, StateVacuumEntity):
 
             if self._attr_state is None:
                 _LOGGER.warning("Received unsupported Indego mower state: %i", indego_state)
-
-    @property
-    def battery_level(self) -> int | None:
-        """Get the battery level of the mower."""
-        return self._attr_battery_level
-
-    @battery_level.setter
-    def battery_level(self, level: int):
-        """Set the battery level of the mower."""
-        try:
-            self._attr_battery_level = int(level)
-            _LOGGER.debug("Battery level updated to %i%%", self._attr_battery_level)
-
-        except ValueError:
-            _LOGGER.debug("Battery level update failed for value: %s", level)
-            self._attr_battery_level = None
-
-    @property
-    def battery_charging(self) -> bool:
-        """Get the battery charging state of the mower."""
-        return self._attr_battery_charging
-
-    @battery_charging.setter
-    def battery_charging(self, charging: bool):
-        """Set the battery charging state of the mower."""
-        self._attr_battery_charging = bool(charging)
-        _LOGGER.debug("Battery charging state updated to %s", self._attr_battery_charging)
-
-    @property
-    def battery_icon(self) -> str:
-        """Return the battery icon for the vacuum cleaner."""
-        return icon_for_battery_level(
-            battery_level=self.battery_level, charging=self.battery_charging
-        )

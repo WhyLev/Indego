@@ -651,9 +651,6 @@ class IndegoHub:
         if self._indego_client.operating_data:
             self.entities[ENTITY_BATTERY].state = self._indego_client.operating_data.battery.percent_adjusted
 
-            if ENTITY_VACUUM in self.entities:
-                self.entities[ENTITY_VACUUM].battery_level = self._indego_client.operating_data.battery.percent_adjusted
-
             self.entities[ENTITY_BATTERY].add_attributes(
                 {
                     "last_updated": last_updated_now(),
@@ -730,7 +727,6 @@ class IndegoHub:
 
         if ENTITY_VACUUM in self.entities:
             self.entities[ENTITY_VACUUM].indego_state = self._indego_client.state.state
-            self.entities[ENTITY_VACUUM].battery_charging = self.entities[ENTITY_BATTERY].charging
 
         if ENTITY_LAWN_MOWER in self.entities:
             self.entities[ENTITY_LAWN_MOWER].indego_state = self._indego_client.state.state
