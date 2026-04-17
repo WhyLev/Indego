@@ -1,0 +1,317 @@
+{
+    "config": {
+        "abort": {
+            "already_configured": "Questo rasaerba Bosch Indego è già stato configurato!",
+            "connection_error": "La connessione all'API di Bosch Indego non è riuscita! Utilizzare la pagina dei problemi noti (https://github.com/sander1988/Indego?tab=readme-ov-file#known-issues) per le possibili soluzioni.",
+            "no_mowers_found": "Nessun rasaerba trovato in questo account Bosch Indego!",
+            "reauth_successful": "La ri-autenticazione è stata completata. L'accesso all'API di Bosch è stato ripristinato."
+        },
+        "step": {
+            "advanced": {
+                "data": {
+                    "user_agent": "User-Agent",
+                    "expose_mower": "Esponi il rasaerba Indego come entità mower in Home Assistant",
+                    "expose_vacuum": "Esponi il rasaerba Indego come entità aspirapolvere in Home Assistant"
+                },
+                "data_description": {
+                    "user_agent": "Intestazione User-Agent personalizzata per le richieste API a Bosch Indego Cloud. Lasciare vuoto per utilizzare il valore predefinito. Alcuni utenti potrebbero aver bisogno di impostare un valore personalizzato se il loro account ha restrizioni di accesso all'API."
+                },
+                "description": "Impostazioni avanzate del componente Bosch Indego."
+            },
+            "mower": {
+                "data": {
+                    "mower_serial": "Numero di serie del rasaerba",
+                    "mower_name": "Nome del rasaerba"
+                },
+                "description": "Selezionare il numero di serie del rasaerba Bosch che si desidera aggiungere."
+            },
+            "reauth_confirm": {
+                "title": "Autenticazione scaduta",
+                "description": "L'autenticazione dell'API di Bosch Indego è scaduta. Si prega di eseguire nuovamente l'autenticazione utilizzando il tuo Bosch SingleKey ID."
+            }
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "title": "Impostazioni avanzate",
+                "description": "Impostazioni avanzate del componente Bosch Indego. Potrebbe essere necessario ricaricare il componente dopo aver modificato queste impostazioni.",
+                "data": {
+                    "user_agent": "User-Agent",
+                    "expose_mower": "Esponi il rasaerba Indego come entità mower in Home Assistant",
+                    "expose_vacuum": "Esponi il rasaerba Indego come entità aspirapolvere in Home Assistant",
+                    "show_all_alerts": "Mostra la cronologia completa degli avvisi in Home Assistant. Questo non è consigliato per la maggior parte degli utenti, in quanto potrebbe avere un impatto significativo sulla dimensione del database di Home Assistant!"
+                },
+                "data_description": {
+                    "user_agent": "Intestazione User-Agent personalizzata per le richieste API a Bosch Indego Cloud. Lasciare vuoto per utilizzare il valore predefinito. Alcuni utenti potrebbero aver bisogno di impostare un valore personalizzato se il loro account ha restrizioni di accesso all'API."
+                }
+            }
+        }
+    },
+    "entity": {
+        "binary_sensor": {
+            "indego_alert": {
+                "state_attributes": {
+                    "alerts_count": {
+                        "name": "Numero di avvisi"
+                    },
+                    "last_alert_error_code": {
+                        "name": "Codice di errore (più recente)"
+                    },
+                    "last_alert_message": {
+                        "name": "Messaggio di avviso (più recente)"
+                    },
+                    "last_alert_date": {
+                        "name": "Data dell'avviso (più recente)"
+                    },
+                    "last_alert_read": {
+                        "name": "Stato avviso (più recente)",
+                        "state": {
+                            "read": "Letto",
+                            "unread": "Non letto"
+                        }
+                    }
+                }
+            },
+            "online": {
+                "name": "Online"
+            },
+            "update_available": {
+                "name": "Aggiornamento disponibile"
+            },
+            "mower_stuck": {
+                "name": "Robot bloccato"
+            },
+            "service_status": {
+                "name": "Stato del servizio"
+            },
+            "battery_charging": {
+                "name": "Stato di carica"
+            }
+        },
+        "sensor": {
+            "mower_state": {
+                "name": "Stato del tosaerba",
+                "state": {
+                    "Mowing": "Tagliando",
+                    "Docked": "Attraccato",
+                    "Sleeping": "Dormendo",
+                    "Paused": "In pausa"
+                }
+            },
+            "mower_state_detail": {
+                "name": "Dettagli sullo stato del tosaerba",
+                "state": {
+                    "Reading status": "Lettura dello stato",
+                    "Charging": "In carica",
+                    "Docked": "Attraccato",
+                    "Sleeping": "Dormendo",
+                    "Docked - Software update": "Attraccato - Aggiornamento software",
+                    "Docked - Loading map": "Attraccato - Caricamento mappa",
+                    "Docked - Saving map": "Attraccato - Salvataggio mappa",
+                    "Docked - Leaving Dock": "Attraccato - Uscita dalla base",
+                    "Mowing": "Tagliando",
+                    "Mowing - Relocalising": "Tagliando - Ricalcolando posizione",
+                    "Mowing - Learning Lawn": "Tagliando - Imparando il prato",
+                    "Mowing - Learning Lawn paused": "Tagliando - Apprendimento prato in pausa",
+                    "SpotMow": "SpotMow",
+                    "Mowing randomly": "Tagliando casualmente",
+                    "Diagnostic mode": "Modalità diagnostica",
+                    "End of life": "Fine della vita",
+                    "Software update": "Aggiornamento software",
+                    "Energy save mode": "Modalità risparmio energetico",
+                    "Relocalising": "Ricalcolando posizione",
+                    "Loading map": "Caricamento mappa",
+                    "Learning lawn": "Imparando il prato",
+                    "Paused": "In pausa",
+                    "Border cut": "Taglio del bordo",
+                    "Idle in lawn": "Inattivo nel prato",
+                    "Stuck on lawn, help needed": "Bloccato nel prato, aiuto necessario",
+                    "Returning to Dock": "Ritorno alla base",
+                    "Returning to Dock - Battery low": "Ritorno alla base - Batteria scarica",
+                    "Returning to dock - Calendar timeslot ended": "Ritorno alla base - Slot temporale calendario terminato",
+                    "Returning to dock - Battery temp range": "Ritorno alla base - Intervallo temperatura batteria",
+                    "Returning to dock - Lawn complete": "Ritorno alla base - Prato completamente tagliato",
+                    "Returning to dock - Relocalising": "Ritorno alla base - Ricalcolando posizione",
+                    "Returning to dock - requested by user/app": "Ritorno alla base - Richiesto da utente/app"
+                }
+            },
+            "battery_percentage": {
+                "name": "Batteria"
+            },
+            "lawn_mowed": {
+                "name": "Prato tagliato"
+            },
+            "lawn_mowed_size": {
+                "name": "Superficie prato tagliato"
+            },
+            "last_completed": {
+                "name": "Ultimo completato"
+            },
+            "next_mow": {
+                "name": "Prossimo taglio"
+            },
+            "mowing_mode": {
+                "name": "Modalità di taglio"
+            },
+            "runtime_total": {
+                "name": "Tempo totale di taglio"
+            },
+            "garden_size": {
+                "name": "Dimensione giardino"
+            },
+            "mower_position_x": {
+                "name": "Posizione robot X"
+            },
+            "mower_position_y": {
+                "name": "Posizione robot Y"
+            },
+            "last_error_code": {
+                "name": "Ultimo errore"
+            },
+            "firmware_version": {
+                "name": "Versione firmware"
+            },
+            "maintenance_hours": {
+                "name": "Ore di manutenzione"
+            },
+            "session_count": {
+                "name": "Conteggio sessioni"
+            },
+            "battery_voltage": {
+                "name": "Tensione batteria"
+            },
+            "battery_temperature": {
+                "name": "Temperatura batteria"
+            },
+            "ambient_temperature": {
+                "name": "Temperatura ambiente"
+            },
+            "battery_cycles": {
+                "name": "Cicli batteria"
+            },
+            "battery_discharge": {
+                "name": "Scarica batteria"
+            }
+        },
+        "camera": {
+            "mowing_map": {
+                "name": "Mappa di taglio"
+            }
+        },
+        "button": {
+            "delete_all_alerts": {
+                "name": "Elimina tutti gli avvisi"
+            },
+            "delete_last_alert": {
+                "name": "Elimina ultimo avviso"
+            },
+            "read_all_alerts": {
+                "name": "Contrassegna tutti gli avvisi come letti"
+            },
+            "read_last_alert": {
+                "name": "Contrassegna ultimo avviso come letto"
+            }
+        },
+        "switch": {
+            "indego_smartmowing": {
+                "name": "SmartMowing"
+            }
+        }
+    },
+    "services": {
+        "command": {
+            "name": "Invia comando",
+            "description": "Invia comandi al robot. Seleziona un comando.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Numero di serie del rasaerba. Necessario solo quando hai configurato più rasaerba."
+                },
+                "command": {
+                    "name": "Invia comando",
+                    "description": "Invia comandi al robot. Seleziona un comando."
+                }
+            }
+        },
+        "smartmowing": {
+            "name": "Attiva/Disattiva SmartMowing",
+            "description": "Abilita o disabilita SmartMowing. I valori consentiti sono true o false.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Numero di serie del rasaerba. Necessario solo quando hai configurato più rasaerba."
+                },
+                "enable": {
+                    "description": "Abilita SmartMowing."
+                }
+            }
+        },
+        "delete_alert": {
+            "name": "Elimina avviso",
+            "description": "Elimina l'avviso selezionato.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Numero di serie del rasaerba. Necessario solo quando hai configurato più rasaerba."
+                },
+                "alert_index": {
+                    "description": "Elimina l'avviso selezionato. 0 per l'avviso più recente."
+                }
+            }
+        },
+        "delete_alert_all": {
+            "name": "Elimina tutti gli avvisi",
+            "description": "Elimina tutti gli avvisi.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Numero di serie del rasaerba. Necessario solo quando hai configurato più rasaerba."
+                }
+            }
+        },
+        "read_alert": {
+            "name": "Segna avviso come letto",
+            "description": "Segna l'avviso selezionato come letto.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Numero di serie del rasaerba. Necessario solo quando hai configurato più rasaerba."
+                },
+                "alert_index": {
+                    "description": "Segna l'avviso selezionato come letto. 0 per l'avviso più recente."
+                }
+            }
+        },
+        "read_alert_all": {
+            "name": "Segna tutti gli avvisi come letti",
+            "description": "Segna tutti gli avvisi come letti.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Numero di serie del rasaerba. Necessario solo quando hai configurato più rasaerba."
+                }
+            }
+        },
+        "download_map": {
+            "name": "Scarica mappa falciatura",
+            "description": "Scarica la mappa di taglio attuale dall'API Bosch Cloud e la salva localmente come \"www/indego_map_base.svg\". La mappa riflette il percorso di taglio registrato più di recente.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Numero di serie del rasaerba. Necessario solo quando hai configurato più rasaerba."
+                }
+            }
+        }
+    },
+    "issues": {
+        "auth_failure": {
+            "title": "Bosch Indego authentication expired",
+            "description": "Your authentication with Bosch Indego has expired. Please go to Settings > Devices & Services > Indego > Re-authenticate to restore access to your mower."
+        },
+        "connection_failure": {
+            "title": "Bosch Indego connection problems",
+            "description": "Your mower has not responded to API requests for an extended period. This may indicate network issues, the Bosch service is experiencing problems, or your mower is offline. Please check your internet connection and mower status."
+        }
+    },
+    "system_health": {
+        "can_reach_bosch_api": "Can reach Bosch Indego API",
+        "can_reach_auth_service": "Can reach Bosch authentication service",
+        "bosch_service_status": "Bosch service status",
+        "mower_online": "Mower online status",
+        "last_api_response": "Last successful API response"
+    }
+}

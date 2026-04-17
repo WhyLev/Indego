@@ -1,0 +1,317 @@
+{
+    "config": {
+        "abort": {
+            "already_configured": "Denne Bosch Indego-gressklipperen er allerede konfigurert!",
+            "connection_error": "Tilkoblingen til Bosch Indego API mislyktes! Bruk siden for kjente problemer (https://github.com/sander1988/Indego?tab=readme-ov-file#known-issues) for mulige løsninger.",
+            "no_mowers_found": "Ingen gressklippere funnet på denne Bosch Indego-kontoen!",
+            "reauth_successful": "Gjenautentisering var vellykket. Tilgangen til Bosch API er gjenopprettet."
+        },
+        "step": {
+            "advanced": {
+                "data": {
+                    "user_agent": "User-Agent",
+                    "expose_mower": "Vis Indego-gressklipperen som en mower-enhet i Home Assistant",
+                    "expose_vacuum": "Vis Indego-gressklipperen som en støvsuger-enhet i Home Assistant"
+                },
+                "data_description": {
+                    "user_agent": "Brukerdefinert User-Agent header for API-forespørsler til Bosch Indego Cloud. La være tom for å bruke standard. Noen brukere må kanskje angi en brukerdefinert verdi hvis kontoen deres har API-tilgangsbegrensninger."
+                },
+                "description": "Avanserte innstillinger for Bosch Indego-komponenten."
+            },
+            "mower": {
+                "data": {
+                    "mower_serial": "Gressklipperens serienummer",
+                    "mower_name": "Gressklippernavn"
+                },
+                "description": "Velg serienummeret på Bosch-gressklipperen du vil legge til."
+            },
+            "reauth_confirm": {
+                "title": "Autentisering utløpt",
+                "description": "Autentiseringen av Bosch Indego API er utløpt. Autentiser på nytt med din Bosch SingleKey ID."
+            }
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "title": "Avanserte innstillinger",
+                "description": "Avanserte innstillinger for Bosch Indego-komponenten. Du må kanskje laste inn komponenten på nytt etter å ha endret disse innstillingene.",
+                "data": {
+                    "user_agent": "User-Agent",
+                    "expose_mower": "Vis Indego-gressklipperen som en mower-enhet i Home Assistant",
+                    "expose_vacuum": "Vis Indego-gressklipperen som en støvsuger-enhet i Home Assistant",
+                    "show_all_alerts": "Vis hele advarselshistorikken i Home Assistant. Dette anbefales ikke for de fleste brukere, da det kan ha en betydelig innvirkning på Home Assistant-databasens størrelse!"
+                },
+                "data_description": {
+                    "user_agent": "Brukerdefinert User-Agent header for API-forespørsler til Bosch Indego Cloud. La være tom for å bruke standard. Noen brukere må kanskje angi en brukerdefinert verdi hvis kontoen deres har API-tilgangsbegrensninger."
+                }
+            }
+        }
+    },
+    "entity": {
+        "binary_sensor": {
+            "indego_alert": {
+                "state_attributes": {
+                    "alerts_count": {
+                        "name": "Antall advarsler"
+                    },
+                    "last_alert_error_code": {
+                        "name": "Feilkode (siste)"
+                    },
+                    "last_alert_message": {
+                        "name": "Advarselmelding (siste)"
+                    },
+                    "last_alert_date": {
+                        "name": "Advarselsdato (siste)"
+                    },
+                    "last_alert_read": {
+                        "name": "Advarselsstatus (siste)",
+                        "state": {
+                            "read": "Lest",
+                            "unread": "Ulest"
+                        }
+                    }
+                }
+            },
+            "online": {
+                "name": "Online"
+            },
+            "update_available": {
+                "name": "Oppdatering tilgjengelig"
+            },
+            "mower_stuck": {
+                "name": "Robot sittende fast"
+            },
+            "service_status": {
+                "name": "Servicestatus"
+            },
+            "battery_charging": {
+                "name": "Ladestatus"
+            }
+        },
+        "sensor": {
+            "mower_state": {
+                "name": "Klipperens tilstand",
+                "state": {
+                    "Mowing": "Klipper",
+                    "Docked": "Docket",
+                    "Sleeping": "Sover",
+                    "Paused": "Pauset"
+                }
+            },
+            "mower_state_detail": {
+                "name": "Detaljer om gressklipperens tilstand",
+                "state": {
+                    "Reading status": "Leser status",
+                    "Charging": "Lader",
+                    "Docked": "Docket",
+                    "Sleeping": "Sover",
+                    "Docked - Software update": "Docket - Programvareoppdatering",
+                    "Docked - Loading map": "Docket - Laster kart",
+                    "Docked - Saving map": "Docket - Lagrer kart",
+                    "Docked - Leaving Dock": "Docket - Forlater dockingstasjon",
+                    "Mowing": "Klipper",
+                    "Mowing - Relocalising": "Klipper - Omposisjonering",
+                    "Mowing - Learning Lawn": "Klipper - Lærer gressplenen",
+                    "Mowing - Learning Lawn paused": "Klipper - Læring av gressplenen pauset",
+                    "SpotMow": "SpotMow",
+                    "Mowing randomly": "Klipper tilfeldig",
+                    "Diagnostic mode": "Diagnostisk modus",
+                    "End of life": "Levetids slutt",
+                    "Software update": "Programvareoppdatering",
+                    "Energy save mode": "Energispareringsmodus",
+                    "Relocalising": "Omposisjonering",
+                    "Loading map": "Laster kart",
+                    "Learning lawn": "Lærer gressplenen",
+                    "Paused": "Pauset",
+                    "Border cut": "Kantklipp",
+                    "Idle in lawn": "Inaktiv på gressplenen",
+                    "Stuck on lawn, help needed": "Stukket fast på gressplenen, hjelp trengs",
+                    "Returning to Dock": "Returnerer til dockingstasjon",
+                    "Returning to Dock - Battery low": "Returnerer til dockingstasjon - Batteri lavt",
+                    "Returning to dock - Calendar timeslot ended": "Returnerer til dockingstasjon - Kalender-tidsrom endt",
+                    "Returning to dock - Battery temp range": "Returnerer til dockingstasjon - Batteritemperaturbereich",
+                    "Returning to dock - Lawn complete": "Returnerer til dockingstasjon - Gressplenen helt klippet",
+                    "Returning to dock - Relocalising": "Returnerer til dockingstasjon - Omposisjonering",
+                    "Returning to dock - requested by user/app": "Returnerer til dockingstasjon - Forespurt av bruker/app"
+                }
+            },
+            "battery_percentage": {
+                "name": "Batteri"
+            },
+            "lawn_mowed": {
+                "name": "Plen klippet"
+            },
+            "lawn_mowed_size": {
+                "name": "Plenarea klippet"
+            },
+            "last_completed": {
+                "name": "Sist fullført"
+            },
+            "next_mow": {
+                "name": "Neste klipping"
+            },
+            "mowing_mode": {
+                "name": "Klippemodus"
+            },
+            "runtime_total": {
+                "name": "Total klippetid"
+            },
+            "garden_size": {
+                "name": "Hagstørrelse"
+            },
+            "mower_position_x": {
+                "name": "Robot posisjon X"
+            },
+            "mower_position_y": {
+                "name": "Robot posisjon Y"
+            },
+            "last_error_code": {
+                "name": "Siste feil"
+            },
+            "firmware_version": {
+                "name": "Fastvareversjoner"
+            },
+            "maintenance_hours": {
+                "name": "Vedlikeholdstimer"
+            },
+            "session_count": {
+                "name": "Sesjonstellinger"
+            },
+            "battery_voltage": {
+                "name": "Batterimoduler"
+            },
+            "battery_temperature": {
+                "name": "Batteritemperatur"
+            },
+            "ambient_temperature": {
+                "name": "Omgivelsestemperatur"
+            },
+            "battery_cycles": {
+                "name": "Batterisykler"
+            },
+            "battery_discharge": {
+                "name": "Batteriutladning"
+            }
+        },
+        "camera": {
+            "mowing_map": {
+                "name": "Klippekart"
+            }
+        },
+        "button": {
+            "delete_all_alerts": {
+                "name": "Slett alle advarsler"
+            },
+            "delete_last_alert": {
+                "name": "Slett siste advarsel"
+            },
+            "read_all_alerts": {
+                "name": "Merk alle advarsler som lest"
+            },
+            "read_last_alert": {
+                "name": "Merk siste advarsel som lest"
+            }
+        },
+        "switch": {
+            "indego_smartmowing": {
+                "name": "SmartMowing"
+            }
+        }
+    },
+    "services": {
+        "command": {
+            "name": "Send kommando",
+            "description": "Send kommandoer til gressklipperen. Velg en kommando.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Gressklipperens serienummer. Bare nødvendig hvis du har konfigurert flere gressklippere."
+                },
+                "command": {
+                    "name": "Send kommando",
+                    "description": "Send kommandoer til gressklipperen. Velg en kommando."
+                }
+            }
+        },
+        "smartmowing": {
+            "name": "Slå SmartMowing på/av",
+            "description": "Aktiver eller deaktiver SmartMowing. Tillatte verdier er true eller false.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Gressklipperens serienummer. Bare nødvendig hvis du har konfigurert flere gressklippere."
+                },
+                "enable": {
+                    "description": "Aktiver SmartMowing."
+                }
+            }
+        },
+        "delete_alert": {
+            "name": "Slett varsel",
+            "description": "Slett den valgte advarselen.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Gressklipperens serienummer. Bare nødvendig hvis du har konfigurert flere gressklippere."
+                },
+                "alert_index": {
+                    "description": "Slett den valgte advarselen. 0 for den siste advarselen."
+                }
+            }
+        },
+        "delete_alert_all": {
+            "name": "Slett alle varsler",
+            "description": "Slett alle advarsler.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Gressklipperens serienummer. Bare nødvendig hvis du har konfigurert flere gressklippere."
+                }
+            }
+        },
+        "read_alert": {
+            "name": "Merk varsel som lest",
+            "description": "Merk den valgte advarselen som lest.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Gressklipperens serienummer. Bare nødvendig hvis du har konfigurert flere gressklippere."
+                },
+                "alert_index": {
+                    "description": "Merk den valgte advarselen som lest. 0 for den siste advarselen."
+                }
+            }
+        },
+        "read_alert_all": {
+            "name": "Merk alle varsler som lest",
+            "description": "Merk alle advarsler som leste.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Gressklipperens serienummer. Bare nødvendig hvis du har konfigurert flere gressklippere."
+                }
+            }
+        },
+        "download_map": {
+            "name": "Last ned klippekart",
+            "description": "Henter det aktuelle klippkartet fra Bosch Cloud API og lagrer det lokalt som \"www/indego_map_base.svg\". Kartet gjenspeiler den senest registrerte klippingen rute.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Gressklipperens serienummer. Bare nødvendig hvis du har konfigurert flere gressklippere."
+                }
+            }
+        }
+    },
+    "issues": {
+        "auth_failure": {
+            "title": "Bosch Indego authentication expired",
+            "description": "Your authentication with Bosch Indego has expired. Please go to Settings > Devices & Services > Indego > Re-authenticate to restore access to your mower."
+        },
+        "connection_failure": {
+            "title": "Bosch Indego connection problems",
+            "description": "Your mower has not responded to API requests for an extended period. This may indicate network issues, the Bosch service is experiencing problems, or your mower is offline. Please check your internet connection and mower status."
+        }
+    },
+    "system_health": {
+        "can_reach_bosch_api": "Can reach Bosch Indego API",
+        "can_reach_auth_service": "Can reach Bosch authentication service",
+        "bosch_service_status": "Bosch service status",
+        "mower_online": "Mower online status",
+        "last_api_response": "Last successful API response"
+    }
+}

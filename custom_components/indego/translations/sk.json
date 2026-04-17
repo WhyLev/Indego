@@ -4,14 +4,17 @@
             "already_configured": "Táto kosačka Bosch Indego je už nakonfigurovaná!",
             "connection_error": "Pripojenie k Bosch Indego API zlyhalo! Použite stránku so známymi problémami (https://github.com/sander1988/Indego?tab=readme-ov-file#known-issues) pre možné riešenia.",
             "no_mowers_found": "V tomto účte Bosch Indego sa nenašli žiadne kosačky!",
-            "reauth_successful": "Opätovné overenie bolo úspešné. Prístup k rozhraniu Bosch API bol obnovený."
+            "reauth_successful": "Opätovné overenie totožnosti bolo úspešné. Prístup k Bosch API bol obnovený."
         },
         "step": {
             "advanced": {
                 "data": {
                     "user_agent": "User-Agent",
-                    "expose_mower": "Odhaľte kosačku Indego ako entitu kosačky v aplikácii HomeAssistant",
-                    "expose_vacuum": "Odhaľte kosačku Indego ako vákuovú entitu v aplikácii HomeAssistant"
+                    "expose_mower": "Zobraziť kosačku Indego ako entitu kosačky v Home Assistant",
+                    "expose_vacuum": "Zobraziť kosačku Indego ako entitu vysávača v Home Assistant"
+                },
+                "data_description": {
+                    "user_agent": "Vlastná hlavička User-Agent pre požiadavky API na Bosch Indego Cloud. Nechajte prázdne na použitie štandardnej hodnoty. Niektorí používatelia budú musieť nastaviť vlastnú hodnotu, ak má ich účet obmedzenia prístupu k API."
                 },
                 "data_description": {
                     "user_agent": "V prípade chýb HTTP 4XX (najmä Reason: 403, message=‚Forbidden‘) môže pomôcť zmena User Agent. Nemal by obsahovať Homeassistant ani HA."
@@ -20,33 +23,33 @@
             },
             "mower": {
                 "data": {
-                    "mower_serial": "Séria kosačky",
+                    "mower_serial": "Sériové číslo kosačky",
                     "mower_name": "Názov kosačky"
                 },
                 "description": "Vyberte prosím sériové číslo kosačky Bosch, ktorú chcete pridať."
             },
             "reauth_confirm": {
-                "title": "Overenie vypršalo",
-                "description": "Platnosť overenia rozhrania API pre systém Bosch Indego vypršala. Znova sa overte pomocou svojho identifikátora Bosch SingleKey."
+                "title": "Overenie totožnosti vypršalo",
+                "description": "Overenie totožnosti Bosch Indego API vypršalo. Prihláste sa znova pomocou svojho Bosch SingleKey ID."
             }
         }
     },
     "options": {
-      "step": {
-          "init": {
-              "title": "Pokročilé nastavenia",
-              "description": "Rozšírené nastavenia komponentu Bosch Indego. Po zmene týchto nastavení možno budete musieť znova načítať komponent.",
-              "data": {
-                  "user_agent": "User-Agent",
-                  "expose_mower": "Odhaľte kosačku Indego ako entitu kosačky v aplikácii HomeAssistant",
-                  "expose_vacuum": "Odhaľte kosačku Indego ako vákuovú entitu v aplikácii HomeAssistant",
-                  "show_all_alerts": "Zobrazte celú históriu upozornení v aplikácii HomeAssistant. Toto sa neodporúča väčšine používateľov, môže to mať významný vplyv na veľkosť databázy HomeAssistant!"
-              },
-              "data_description": {
-                  "user_agent": "V prípade chýb HTTP 4XX (najmä Reason: 403, message=‚Forbidden‘) môže pomôcť zmena User Agent. Nemal by obsahovať Homeassistant ani HA."
-              }
-          }
-      }
+        "step": {
+            "init": {
+                "title": "Pokročilé nastavenia",
+                "description": "Rozšírené nastavenia komponentu Bosch Indego. Po zmene týchto nastavení možno budete musieť znova načítať komponent.",
+                "data": {
+                    "user_agent": "User-Agent",
+                    "expose_mower": "Zobraziť kosačku Indego ako entitu kosačky v Home Assistant",
+                    "expose_vacuum": "Zobraziť kosačku Indego ako entitu vysávača v Home Assistant",
+                    "show_all_alerts": "Zobraziť celú históriu upozornení v Home Assistant. Toto sa neodporúča väčšine používateľov, môže to mať významný vplyv na veľkosť databázy Home Assistant!"
+                },
+                "data_description": {
+                    "user_agent": "Vlastný nástroj User-Agent v hlavičke pre požiadavky API na Bosch Indego Cloud. Nechajte prázdne na použitie štandardnej hodnoty. Niektorí používatelia budú musieť nastaviť vlastnú hodnotu, ak má ich účet obmedzenia prístupu k API."
+                }
+            }
+        }
     },
     "entity": {
         "binary_sensor": {
@@ -72,26 +75,173 @@
                         }
                     }
                 }
+            },
+            "online": {
+                "name": "Online"
+            },
+            "update_available": {
+                "name": "Dostupná aktualizácia"
+            },
+            "mower_stuck": {
+                "name": "Robot uviaznutý"
+            },
+            "service_status": {
+                "name": "Stav služby"
+            },
+            "battery_charging": {
+                "name": "Stav nabíjania"
+            }
+        },
+        "sensor": {
+            "mower_state": {
+                "name": "Stav kosačky",
+                "state": {
+                    "Mowing": "Kosenie",
+                    "Docked": "Zaparkované",
+                    "Sleeping": "Spí",
+                    "Paused": "Pozastavené"
+                }
+            },
+            "mower_state_detail": {
+                "name": "Podrobnosti o stave kosačky",
+                "state": {
+                    "Reading status": "Čítanie stavu",
+                    "Charging": "Nabíjanie",
+                    "Docked": "Zaparkované",
+                    "Sleeping": "Spí",
+                    "Docked - Software update": "Zaparkované - Softvérová aktualizácia",
+                    "Docked - Loading map": "Zaparkované - Načítavanie mapy",
+                    "Docked - Saving map": "Zaparkované - Ukladanie mapy",
+                    "Docked - Leaving Dock": "Zaparkované - Opúšťa stanicu",
+                    "Mowing": "Kosenie",
+                    "Mowing - Relocalising": "Kosenie - Presunutie",
+                    "Mowing - Learning Lawn": "Kosenie - Učenie sa záhrady",
+                    "Mowing - Learning Lawn paused": "Kosenie - Učenie sa záhrady pozastavené",
+                    "SpotMow": "Bodové kosenie",
+                    "Mowing randomly": "Náhodné kosenie",
+                    "Diagnostic mode": "Diagnostický režim",
+                    "End of life": "Koniec životnosti",
+                    "Software update": "Softvérová aktualizácia",
+                    "Energy save mode": "Režim šetriace energie",
+                    "Relocalising": "Presunutie",
+                    "Loading map": "Načítavanie mapy",
+                    "Learning lawn": "Učenie sa záhrady",
+                    "Paused": "Pozastavené",
+                    "Border cut": "Косenie okrajov",
+                    "Idle in lawn": "Nečinnosť na trávniku",
+                    "Stuck on lawn, help needed": "Uviaznuté na trávniku, potrebná pomoc",
+                    "Returning to Dock": "Návrat do stanice",
+                    "Returning to Dock - Battery low": "Návrat do stanice - Nízka batéria",
+                    "Returning to dock - Calendar timeslot ended": "Návrat do stanice - Kalendárny časový úsek skončil",
+                    "Returning to dock - Battery temp range": "Návrat do stanice - Teplota batérie",
+                    "Returning to dock - Lawn complete": "Návrat do stanice - Trávnik dokončený",
+                    "Returning to dock - Relocalising": "Návrat do stanice - Presunutie",
+                    "Returning to dock - requested by user/app": "Návrat do stanice - Požiadavka užívateľa"
+                }
+            },
+            "battery_percentage": {
+                "name": "Batéria"
+            },
+            "lawn_mowed": {
+                "name": "Trávnik pokosený"
+            },
+            "lawn_mowed_size": {
+                "name": "Plocha trávnika pokosená"
+            },
+            "last_completed": {
+                "name": "Naposledy dokončené"
+            },
+            "next_mow": {
+                "name": "Budúce kosenie"
+            },
+            "mowing_mode": {
+                "name": "Režim kosenia"
+            },
+            "runtime_total": {
+                "name": "Celkový čas kosenia"
+            },
+            "garden_size": {
+                "name": "Veľkosť záhrady"
+            },
+            "mower_position_x": {
+                "name": "Pozícia robota X"
+            },
+            "mower_position_y": {
+                "name": "Pozícia robota Y"
+            },
+            "last_error_code": {
+                "name": "Posledná chyba"
+            },
+            "firmware_version": {
+                "name": "Verzia firmvéru"
+            },
+            "maintenance_hours": {
+                "name": "Hodiny údržby"
+            },
+            "session_count": {
+                "name": "Počet sedení"
+            },
+            "battery_voltage": {
+                "name": "Napätie batérie"
+            },
+            "battery_temperature": {
+                "name": "Teplota batérie"
+            },
+            "ambient_temperature": {
+                "name": "Teplota okolia"
+            },
+            "battery_cycles": {
+                "name": "Cykly batérie"
+            },
+            "battery_discharge": {
+                "name": "Vybíjanie batérie"
+            }
+        },
+        "camera": {
+            "mowing_map": {
+                "name": "Mapa kosenia"
+            }
+        },
+        "button": {
+            "delete_all_alerts": {
+                "name": "Odstrániť všetky upozornenia"
+            },
+            "delete_last_alert": {
+                "name": "Odstrániť poslednú výstrahu"
+            },
+            "read_all_alerts": {
+                "name": "Označiť všetky výstrahy ako prečítané"
+            },
+            "read_last_alert": {
+                "name": "Označiť poslednú výstrahu ako prečítanú"
+            }
+        },
+        "switch": {
+            "indego_smartmowing": {
+                "name": "SmartMowing"
             }
         }
     },
     "services": {
         "command": {
-            "description": "Odošlite príkazy kosačke. Povolené príkazy sú teraz, vráťte sa do doku a pozastavte.",
+            "name": "Poslať príkaz",
+            "description": "Poslať príkazy kosačke. Vyberte príkaz.",
             "fields": {
                 "mower_serial": {
-                    "description": "Sériová kosačka. Potrebné iba vtedy, keď máte nakonfigurovaných viacero kosačiek."
+                    "description": "Sériové číslo kosačky. Potrebné iba vtedy, keď máte nakonfigurovaných viacero kosačiek."
                 },
                 "command": {
-                    "description": "Príkaz pre kosačku."
+                    "name": "Poslať príkaz",
+                    "description": "Poslať príkazy kosačke. Vyberte príkaz."
                 }
             }
         },
         "smartmowing": {
-            "description": "Povoliť alebo zakázať funkciu SmartMowing. Povolené príkazy sú true alebo false.",
+            "name": "Prepnúť SmartMowing",
+            "description": "Povoliť alebo zakázať funkciu SmartMowing. Povolené hodnoty sú true alebo false.",
             "fields": {
                 "mower_serial": {
-                    "description": "Sériová kosačka. Potrebné iba vtedy, keď máte nakonfigurovaných viacero kosačiek."
+                    "description": "Sériové číslo kosačky. Potrebné iba vtedy, keď máte nakonfigurovaných viacero kosačiek."
                 },
                 "enable": {
                     "description": "Povoliť SmartMowing."
@@ -99,29 +249,32 @@
             }
         },
         "delete_alert": {
+            "name": "Odstrániť výstrahu",
             "description": "Odstrániť vybraté upozornenie.",
             "fields": {
                 "mower_serial": {
-                    "description": "Sériová kosačka. Potrebné iba vtedy, keď máte nakonfigurovaných viacero kosačiek."
+                    "description": "Sériové číslo kosačky. Potrebné iba vtedy, keď máte nakonfigurovaných viacero kosačiek."
                 },
                 "alert_index": {
-                    "description": "Odstrániť vybraté upozornenia. 0 pre najnovšie upozornenie."
+                    "description": "Odstrániť vybraté upozornenie. 0 pre najnovšie upozornenie."
                 }
             }
         },
         "delete_alert_all": {
+            "name": "Odstrániť všetky výstrahy",
             "description": "Odstráňte všetky upozornenia.",
             "fields": {
                 "mower_serial": {
-                    "description": "Sériová kosačka. Potrebné iba vtedy, keď máte nakonfigurovaných viacero kosačiek."
+                    "description": "Sériové číslo kosačky. Potrebné iba vtedy, keď máte nakonfigurovaných viacero kosačiek."
                 }
             }
         },
         "read_alert": {
+            "name": "Označiť výstrahu ako prečítanú",
             "description": "Označte vybrané upozornenie ako prečítané.",
             "fields": {
                 "mower_serial": {
-                    "description": "Sériová kosačka. Potrebné iba vtedy, keď máte nakonfigurovaných viacero kosačiek."
+                    "description": "Sériové číslo kosačky. Potrebné iba vtedy, keď máte nakonfigurovaných viacero kosačiek."
                 },
                 "alert_index": {
                     "description": "Označte vybrané upozornenie ako prečítané. 0 pre najnovšie upozornenie."
@@ -129,12 +282,39 @@
             }
         },
         "read_alert_all": {
+            "name": "Označiť všetky výstrahy ako prečítané",
             "description": "Označte všetky upozornenia ako prečítané.",
             "fields": {
                 "mower_serial": {
-                    "description": "Sériová kosačka. Potrebné iba vtedy, keď máte nakonfigurovaných viacero kosačiek."
+                    "description": "Sériové číslo kosačky. Potrebné iba vtedy, keď máte nakonfigurovaných viacero kosačiek."
+                }
+            }
+        },
+        "download_map": {
+            "name": "Stiahnuť mapu kosenia",
+            "description": "Stiahne aktuálnu mapu kosenia z Bosch Cloud API a uloží ju lokálne ako \"www/indego_map_base.svg\". Mapa odráža naposledy zaznamenú trasu kosenia.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Sériové číslo kosačky. Potrebné iba vtedy, keď máte nakonfigurovaných viacero kosačiek."
                 }
             }
         }
+    },
+    "issues": {
+        "auth_failure": {
+            "title": "Bosch Indego authentication expired",
+            "description": "Your authentication with Bosch Indego has expired. Please go to Settings > Devices & Services > Indego > Re-authenticate to restore access to your mower."
+        },
+        "connection_failure": {
+            "title": "Bosch Indego connection problems",
+            "description": "Your mower has not responded to API requests for an extended period. This may indicate network issues, the Bosch service is experiencing problems, or your mower is offline. Please check your internet connection and mower status."
+        }
+    },
+    "system_health": {
+        "can_reach_bosch_api": "Can reach Bosch Indego API",
+        "can_reach_auth_service": "Can reach Bosch authentication service",
+        "bosch_service_status": "Bosch service status",
+        "mower_online": "Mower online status",
+        "last_api_response": "Last successful API response"
     }
 }

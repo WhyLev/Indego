@@ -9,9 +9,6 @@ from homeassistant.components.vacuum import (
     StateVacuumEntity,
     VacuumEntityFeature,
     VacuumActivity,
-)
-
-from homeassistant.components.vacuum import (
     ENTITY_ID_FORMAT as VACUUM_SENSOR_FORMAT,
 )
 
@@ -20,7 +17,7 @@ from .mixins import IndegoEntity
 
 _LOGGER = logging.getLogger(__name__)
 
-INDEGO_STATE_TO_VACUUM_MAPPING: dict[int, VacuumActivity] = {
+INDEGO_STATE_TO_VACUUM_MAPPING = {
     0: VacuumActivity.DOCKED,
     101: VacuumActivity.DOCKED,
     257: VacuumActivity.DOCKED,
@@ -96,7 +93,7 @@ class IndegoVacuum(IndegoEntity, StateVacuumEntity):
         self._indego_hub = indego_hub
         self._attr_supported_features = INDEGO_VACUUM_FEATURES
         self._attr_indego_state = None
-        self._attr_state = None
+        self._attr_activity = None
 
     async def async_start(self) -> None:
         """Start or resume the cleaning task."""
@@ -111,21 +108,27 @@ class IndegoVacuum(IndegoEntity, StateVacuumEntity):
         await self._indego_hub.async_send_command_to_client("returnToDock")
 
     @property
+    def activity(self) -> VacuumActivity:
+        """Return the current activity of the vacuum."""
+        return self._attr_activity
+
+    @property
     def indego_state(self) -> int:
         """Get the Indego mower state."""
         return self._attr_indego_state
 
     @indego_state.setter
-    def indego_state(self, indego_state: int) -> None:
-        """Set the mower state by converting Indego state to VacuumActivity."""
+    def indego_state(self, indego_state: int):
+        """Set the mower state by converting the Indego mower state to a vacuum state."""
         self._attr_indego_state = indego_state
+        new_activity = INDEGO_STATE_TO_VACUUM_MAPPING[indego_state] \
+            if indego_state in INDEGO_STATE_TO_VACUUM_MAPPING \
+            else None
 
-        new_state = INDEGO_STATE_TO_VACUUM_MAPPING.get(indego_state)
-
-        if self._attr_state != new_state:
-            self._attr_state = new_state
+        if self._attr_activity != new_activity:
+            self._attr_activity = new_activity
             self.async_schedule_update_ha_state()
-            _LOGGER.debug("Mower/vacuum state updated to: %s", self._attr_state)
+            _LOGGER.debug("Vacuum activity: %s (mower state: %d)", self._attr_activity, indego_state)
 
-            if self._attr_state is None:
-                _LOGGER.warning("Received unsupported Indego mower state: %i", indego_state)
+            if self._attr_activity is None:
+                _LOGGER.warning("Unsupported mower state received: %d - vacuum activity cannot be determined", indego_state)

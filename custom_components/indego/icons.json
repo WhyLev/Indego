@@ -1,0 +1,26 @@
+{
+  "services": {
+    "command": {
+      "service": "mdi:play-circle-outline"
+    },
+    "smartmowing": {
+      "service": "mdi:alpha-m-circle-outline"
+    },
+    "delete_alert": {
+      "service": "mdi:alert-remove"
+    },
+    "delete_alert_all": {
+      "service": "mdi:alert-remove-outline"
+    },
+    "read_alert": {
+      "service": "mdi:message-check-outline"
+    },
+    "read_alert_all": {
+      "service": "mdi:message-check-multiple-outline"
+    },
+    "download_map": {
+      "service": "mdi:download"
+    }
+  }
+}
+

@@ -1,56 +1,68 @@
 command:
-  description: Send commands to the mower. Allowed commands are mow, returnToDock and pause.
+  description: Sends a control command to the mower. Valid commands are "mow" (start mowing), "returnToDock" (return to charging station) and "pause" (pause mowing).
   fields:
     mower_serial:
-      description: Mower serial. Only needed when you have configured multiple mowers.
+      description: Serial number of the mower. Only required if multiple mowers are configured.
       example: '"012345789"'
       required: false
     command:
-      description: Command for the mower.
-      example: "mow"
+      description: Command to send to the mower.
       required: true
+      selector:
+        select:
+          options:
+            - "mow"
+            - "returnToDock"
+            - "pause"
 smartmowing:
-  description: Enable or Disable SmartMowing. Allowed commands are true or false.
+  description: Enables or disables the SmartMowing feature, which automatically adjusts the mowing schedule based on weather conditions and lawn growth.
   fields:
     mower_serial:
-      description: Mower serial. Only needed when you have configured multiple mowers.
+      description: Serial number of the mower. Only required if multiple mowers are configured.
       example: '"012345789"'
       required: false
-    enable: 
-      description: Enable SmartMowing.
+    enable:
+      description: Sets the SmartMowing state. Use "true" to enable or "false" to disable the feature.
       example: "true"
       required: true
 delete_alert:
-  description: Delete the selected alert.
+  description: Deletes a specific alert by its index. Index 0 refers to the most recent alert.
   fields:
     mower_serial:
-      description: Mower serial. Only needed when you have configured multiple mowers.
+      description: Serial number of the mower. Only required if multiple mowers are configured.
       example: '"0123456789"'
       required: false
-    alert_index: 
-      description: Delete the selected alerts. 0 for the latest alert.
+    alert_index:
+      description: Index of the alert to delete. 0 = most recent, 1 = second most recent, and so on.
       example: "0"
 delete_alert_all:
-  description: Delete all alerts.
+  description: Deletes all existing alerts for the mower at once.
   fields:
     mower_serial:
-      description: Mower serial. Only needed when you have configured multiple mowers.
+      description: Serial number of the mower. Only required if multiple mowers are configured.
       example: '"0123456789"'
       required: false
 read_alert:
-  description: Mark the selected alert as read.
+  description: Marks a specific alert as read by its index. Index 0 refers to the most recent alert.
   fields:
     mower_serial:
-      description: Mower serial. Only needed when you have configured multiple mowers.
+      description: Serial number of the mower. Only required if multiple mowers are configured.
       example: '"0123456789"'
       required: false
-    alert_index: 
-      description: Mark the selected alert as read. 0 for the latest alert.
+    alert_index:
+      description: Index of the alert to mark as read. 0 = most recent, 1 = second most recent, and so on.
       example: "0"
 read_alert_all:
-  description: Mark all alerts as read.
+  description: Marks all existing alerts for the mower as read.
   fields:
     mower_serial:
-      description: Mower serial. Only needed when you have configured multiple mowers.
+      description: Serial number of the mower. Only required if multiple mowers are configured.
+      example: '"0123456789"'
+      required: false
+download_map:
+  description: Downloads the current mowing map from the Bosch Cloud API and saves it locally as "www/indego_map_base.svg". The map reflects the most recently recorded mowing route.
+  fields:
+    mower_serial:
+      description: Serial number of the mower. Only required if multiple mowers are configured.
       example: '"0123456789"'
       required: false

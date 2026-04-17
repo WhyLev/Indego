@@ -1,7 +1,7 @@
 """Class for Indego Sensors."""
 import logging
 
-from homeassistant.components.sensor import SensorEntity, ENTITY_ID_FORMAT as SENSOR_FORMAT
+from homeassistant.components.sensor import SensorEntity, SensorStateClass, ENTITY_ID_FORMAT as SENSOR_FORMAT
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.config_entries import ConfigEntry
@@ -33,7 +33,7 @@ async def async_setup_entry(
 class IndegoSensor(IndegoEntity, SensorEntity):
     """Class for Indego Sensors."""
 
-    def __init__(self, entity_id, name, icon, device_class, unit_of_measurement, attributes, device_info: DeviceInfo, translation_key: str = None):
+    def __init__(self, entity_id, name, icon, device_class, unit_of_measurement, attributes, device_info: DeviceInfo, translation_key: str = None, enabled_by_default: bool = True, entity_category = None, state_class = None):
         """Initialize a sensor.
 
         Args:
@@ -44,13 +44,19 @@ class IndegoSensor(IndegoEntity, SensorEntity):
             unit_of_measurement (str): unit of measurement of the sensor
             device_info (DeviceInfo): Initial device info
             translation_key: Optional translation key for (custom state) translations
+            enabled_by_default: Whether the entity should be enabled by default
+            entity_category: Optional entity category for the sensor
+            state_class: Optional state class (MEASUREMENT, TOTAL, TOTAL_INCREASING)
         """
         super().__init__(SENSOR_FORMAT.format(entity_id), name, icon, attributes, device_info)
 
         self._device_class = device_class
         self._unit = unit_of_measurement
+        self._state_class = state_class
         self.charging = False
         self._attr_translation_key = translation_key
+        self._attr_entity_registry_enabled_default = enabled_by_default
+        self._attr_entity_category = entity_category
 
     async def async_added_to_hass(self):
         """Once the sensor is added, see if it was there before and pull in that state."""
@@ -75,12 +81,17 @@ class IndegoSensor(IndegoEntity, SensorEntity):
         """Set the state to new."""
         if self._state != new:
             self._state = new
-            self.async_schedule_update_ha_state()
+            self.async_write_ha_state()
 
     @property
     def device_class(self) -> str:
         """Return device class."""
         return self._device_class
+
+    @property
+    def state_class(self):
+        """Return state class."""
+        return self._state_class
 
     @property
     def icon(self) -> str:

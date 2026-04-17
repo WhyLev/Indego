@@ -10,8 +10,11 @@
             "advanced": {
                 "data": {
                     "user_agent": "User-Agent",
-                    "expose_mower": "Voeg de Indego robotmaaier toe als grasmaaier entiteit aan HomeAssistant",
-                    "expose_vacuum": "Voeg de Indego robotmaaier toe als stofzuiger entiteit aan HomeAssistant"
+                    "expose_mower": "Voeg de Indego robotmaaier toe als grasmaaier entiteit aan Home Assistant",
+                    "expose_vacuum": "Voeg de Indego robotmaaier toe als stofzuiger entiteit aan Home Assistant"
+                },
+                "data_description": {
+                    "user_agent": "Custom User-Agent header voor API-verzoeken naar Bosch Indego Cloud. Leeg laten om de standaardwaarde te gebruiken. Sommige gebruikers moeten mogelijk een aangepaste waarde instellen als hun account API-toegangsbeperkingen heeft."
                 },
                 "data_description": {
                     "user_agent": "Bij HTTP 4XX-fouten (met name Reason: 403, message=‘Forbidden’) kan het helpen om de User Agent aan te passen. Deze mag geen Homeassistant of HA bevatten."
@@ -32,21 +35,21 @@
         }
     },
     "options": {
-      "step": {
-          "init": {
-              "title": "Geavanceerde instellingen",
-              "description": "Geavanceerde instellingen van het Bosch Indego component. Mogelijk moet het component opnieuw geladen worden na het wijzigen van deze instellingen.",
-              "data": {
-                  "user_agent": "User-Agent",
-                  "expose_mower": "Voeg de Indego robotmaaier toe als grasmaaier entiteit aan HomeAssistant",
-                  "expose_vacuum": "Voeg de Indego robotmaaier toe als stofzuiger entiteit aan HomeAssistant",
-                  "show_all_alerts": "Toon de volledige melding/waarschuwing geschiedenis in HomeAssistant. Dit wordt niet aangeraden voor de meeste gebruikers, het heeft mogelijk een significante impact op de HomeAssistant database!"
-              },
-              "data_description": {
-                  "user_agent": "Bij HTTP 4XX-fouten (met name Reason: 403, message=‘Forbidden’) kan het helpen om de User Agent aan te passen. Deze mag geen Homeassistant of HA bevatten."
-              }
-          }
-      }
+        "step": {
+            "init": {
+                "title": "Geavanceerde instellingen",
+                "description": "Geavanceerde instellingen van het Bosch Indego component. Mogelijk moet het component opnieuw geladen worden na het wijzigen van deze instellingen.",
+                "data": {
+                    "user_agent": "User-Agent",
+                    "expose_mower": "Voeg de Indego robotmaaier toe als grasmaaier entiteit aan Home Assistant",
+                    "expose_vacuum": "Voeg de Indego robotmaaier toe als stofzuiger entiteit aan Home Assistant",
+                    "show_all_alerts": "Toon de volledige melding/waarschuwing geschiedenis in Home Assistant. Dit wordt niet aangeraden voor de meeste gebruikers, het heeft mogelijk een significante impact op de Home Assistant database!"
+                },
+                "data_description": {
+                    "user_agent": "Custom User-Agent header voor API-verzoeken naar Bosch Indego Cloud. Leeg laten om de standaardwaarde te gebruiken. Sommige gebruikers moeten mogelijk een aangepaste waarde instellen als hun account API-toegangsbeperkingen heeft."
+                }
+            }
+        }
     },
     "entity": {
         "binary_sensor": {
@@ -72,10 +75,26 @@
                         }
                     }
                 }
+            },
+            "online": {
+                "name": "Online"
+            },
+            "update_available": {
+                "name": "Update beschikbaar"
+            },
+            "mower_stuck": {
+                "name": "Robot vast"
+            },
+            "service_status": {
+                "name": "Servicestatus"
+            },
+            "battery_charging": {
+                "name": "Laadstatus"
             }
         },
         "sensor": {
             "mower_state": {
+                "name": "Status van de maaier",
                 "state": {
                     "Mowing": "Maaien",
                     "Docked": "Geparkeerd",
@@ -84,6 +103,7 @@
                 }
             },
             "mower_state_detail": {
+                "name": "Details over de status van de maaier",
                 "state": {
                     "Sleeping": "Inactief",
                     "Reading status": "Status ophalen",
@@ -104,7 +124,7 @@
                     "Software update": "Software update",
                     "Energy save mode": "Energiespaarstand",
                     "Relocalising": "Herlokaliseren",
-                    "Loading map": "Map laden map",
+                    "Loading map": "Map laden",
                     "Learning lawn": "Gazon leren",
                     "Paused": "Gepauzeerd",
                     "Border cut": "Rand maaien",
@@ -112,50 +132,136 @@
                     "Stuck on lawn, help needed": "Vastgelopen op gazon, hulp nodig",
                     "Returning to Dock": "Terugkeren naar basisstation",
                     "Returning to Dock - Battery low": "Terugkeren naar basisstation - Batterij bijna leeg",
-                    "Returning to dock - Calendar timeslot ended": "Terugkeren naar basisstation - Kalender tijdslot eindigd",
+                    "Returning to dock - Calendar timeslot ended": "Terugkeren naar basisstation - Kalender tijdslot verstreken",
                     "Returning to dock - Battery temp range": "Terugkeren naar basisstation - Batterij temperatuur",
                     "Returning to dock - Lawn complete": "Terugkeren naar basisstation - Maaien voltooid",
                     "Returning to dock - Relocalising": "Terugkeren naar basisstation - Herlokaliseren",
                     "Returning to dock - requested by user/app": "Terugkeren naar basisstation - verzocht door gebruiker"
                 }
+            },
+            "battery_percentage": {
+                "name": "Batterij"
+            },
+            "lawn_mowed": {
+                "name": "Gazon gemaaid"
+            },
+            "lawn_mowed_size": {
+                "name": "Gazonoppervlak gemaaid"
+            },
+            "last_completed": {
+                "name": "Laatst voltooid"
+            },
+            "next_mow": {
+                "name": "Volgende maaien"
+            },
+            "mowing_mode": {
+                "name": "Maaimode"
+            },
+            "runtime_total": {
+                "name": "Totale maaibedrijf"
+            },
+            "garden_size": {
+                "name": "Tuingrootte"
+            },
+            "mower_position_x": {
+                "name": "Robot positie X"
+            },
+            "mower_position_y": {
+                "name": "Robot positie Y"
+            },
+            "last_error_code": {
+                "name": "Laatste fout"
+            },
+            "firmware_version": {
+                "name": "Firmwareversie"
+            },
+            "maintenance_hours": {
+                "name": "Onderhoudsuren"
+            },
+            "session_count": {
+                "name": "Sessieaantal"
+            },
+            "battery_voltage": {
+                "name": "Batterijspanning"
+            },
+            "battery_temperature": {
+                "name": "Batterijtemperatuur"
+            },
+            "ambient_temperature": {
+                "name": "Omgevingstemperatuur"
+            },
+            "battery_cycles": {
+                "name": "Batterijcycli"
+            },
+            "battery_discharge": {
+                "name": "Batterijontlading"
+            }
+        },
+        "camera": {
+            "mowing_map": {
+                "name": "Maaikaart"
+            }
+        },
+        "button": {
+            "delete_all_alerts": {
+                "name": "Alle waarschuwingen verwijderen"
+            },
+            "delete_last_alert": {
+                "name": "Laatste waarschuwing verwijderen"
+            },
+            "read_all_alerts": {
+                "name": "Alle waarschuwingen als gelezen markeren"
+            },
+            "read_last_alert": {
+                "name": "Laatste waarschuwing als gelezen markeren"
+            }
+        },
+        "switch": {
+            "indego_smartmowing": {
+                "name": "SmartMowing"
             }
         }
     },
     "services": {
         "command": {
-            "description": "Stuur een opdracht naar de grasmaaier. Ondersteunde opdrachten zijn: mow, returnToDock en pause.",
+            "name": "Stuur commando",
+            "description": "Stuur commando's naar de grasmaaier. Selecteer een commando.",
             "fields": {
                 "mower_serial": {
                     "description": "Grasmaaier serienummer. Alleen nodig wanneer je meerdere grasmaaiers hebt geconfigureerd."
                 },
                 "command": {
-                    "description": "De opdracht voor de grasmaaier."
+                    "name": "Stuur commando",
+                    "description": "Stuur commando's naar de grasmaaier. Selecteer een commando."
                 }
             }
         },
         "smartmowing": {
-            "description": "Schakel smart-maaier in of uit. Ondersteunde waardes zijn: true of false.",
+            "name": "SmartMowing inschakelen",
+            "description": "Schakel SmartMowing in of uit. Ondersteunde waardes zijn: true of false.",
             "fields": {
                 "mower_serial": {
                     "description": "Grasmaaier serienummer. Alleen nodig wanneer je meerdere grasmaaiers hebt geconfigureerd."
                 },
                 "enable": {
-                    "description": "Schakel smart-maaier in of uit."
+                    "description": "Schakel SmartMowing in of uit."
                 }
             }
         },
         "delete_alert": {
+            "name": "Waarschuwing verwijderen",
             "description": "Verwijder een specifieke melding.",
             "fields": {
                 "mower_serial": {
                     "description": "Grasmaaier serienummer. Alleen nodig wanneer je meerdere grasmaaiers hebt geconfigureerd."
                 },
                 "alert_index": {
-                    "description": "De index van het melding. 0 is het nieuwste bericht."
+                    "description": "De index van de melding. 0 is het nieuwste bericht."
                 }
             }
         },
         "delete_alert_all": {
+            "name": "Alle waarschuwingen verwijderen",
             "description": "Verwijder alle meldingen.",
             "fields": {
                 "mower_serial": {
@@ -164,23 +270,51 @@
             }
         },
         "read_alert": {
+            "name": "Waarschuwing als gelezen markeren",
             "description": "Markeer een specifieke melding als gelezen.",
             "fields": {
                 "mower_serial": {
                     "description": "Grasmaaier serienummer. Alleen nodig wanneer je meerdere grasmaaiers hebt geconfigureerd."
                 },
                 "alert_index": {
-                    "description": "De index van het melding. 0 is het nieuwste bericht."
+                    "description": "De index van de melding. 0 is het nieuwste bericht."
                 }
             }
         },
         "read_alert_all": {
+            "name": "Alle waarschuwingen als gelezen markeren",
             "description": "Markeer alle meldingen als gelezen.",
             "fields": {
                 "mower_serial": {
                     "description": "Grasmaaier serienummer. Alleen nodig wanneer je meerdere grasmaaiers hebt geconfigureerd."
                 }
             }
+        },
+        "download_map": {
+            "name": "Maaiwerkkaart downloaden",
+            "description": "Downloaded de huidge maaikaart van de Bosch Cloud API en slaat deze lokaal op als \"www/indego_map_base.svg\". De kaart weerspiegelt de laatst opgenomen maairoute.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Grasmaaier serienummer. Alleen nodig wanneer je meerdere grasmaaiers hebt geconfigureerd."
+                }
+            }
         }
+    },
+    "issues": {
+        "auth_failure": {
+            "title": "Bosch Indego authentication expired",
+            "description": "Your authentication with Bosch Indego has expired. Please go to Settings > Devices & Services > Indego > Re-authenticate to restore access to your mower."
+        },
+        "connection_failure": {
+            "title": "Bosch Indego connection problems",
+            "description": "Your mower has not responded to API requests for an extended period. This may indicate network issues, the Bosch service is experiencing problems, or your mower is offline. Please check your internet connection and mower status."
+        }
+    },
+    "system_health": {
+        "can_reach_bosch_api": "Can reach Bosch Indego API",
+        "can_reach_auth_service": "Can reach Bosch authentication service",
+        "bosch_service_status": "Bosch service status",
+        "mower_online": "Mower online status",
+        "last_api_response": "Last successful API response"
     }
 }

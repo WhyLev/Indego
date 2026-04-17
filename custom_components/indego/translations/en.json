@@ -10,8 +10,11 @@
             "advanced": {
                 "data": {
                     "user_agent": "User-Agent",
-                    "expose_mower": "Expose Indego mower as mower entity in HomeAssistant",
-                    "expose_vacuum": "Expose Indego mower as vacuum entity in HomeAssistant"
+                    "expose_mower": "Expose Indego mower as mower entity in Home Assistant",
+                    "expose_vacuum": "Expose Indego mower as vacuum entity in Home Assistant"
+                },
+                "data_description": {
+                    "user_agent": "Custom User-Agent header for API requests to Bosch Indego Cloud. Leave empty to use default. Some users may need to set a custom value if their account has API access restrictions."
                 },
                 "data_description": {
                     "user_agent": "In case of HTTP 4XX errors (especially Reason: 403, message='Forbidden') it might help to change the User Agent. Should not contain Homeassistant or HA."
@@ -23,7 +26,7 @@
                     "mower_serial": "Mower serial",
                     "mower_name": "Mower name"
                 },
-                "description": "Please select the serial of the Bosch Mower your would like to add."
+                "description": "Please select the serial of the Bosch Mower you would like to add."
             },
             "reauth_confirm": {
                 "title": "Authentication expired",
@@ -32,21 +35,21 @@
         }
     },
     "options": {
-      "step": {
-          "init": {
-              "title": "Advanced settings",
-              "description": "Advanced settings of the Bosch Indego component. You might have to reload the component after changing these settings.",
-              "data": {
-                  "user_agent": "User-Agent",
-                  "expose_mower": "Expose Indego mower as mower entity in HomeAssistant",
-                  "expose_vacuum": "Expose Indego mower as vacuum entity in HomeAssistant",
-                  "show_all_alerts": "Show the full alert history into HomeAssistant. This is not recommended for most users, it might have a significant impact on the HomeAssistant database size!"
-              },
-              "data_description": {
-                  "user_agent": "In case of HTTP 4XX errors (especially Reason: 403, message='Forbidden') it might help to change the User Agent. Should not contain Homeassistant or HA."
-              }
-          }
-      }
+        "step": {
+            "init": {
+                "title": "Advanced settings",
+                "description": "Advanced settings of the Bosch Indego component. You might have to reload the component after changing these settings.",
+                "data": {
+                    "user_agent": "User-Agent",
+                    "expose_mower": "Expose Indego mower as mower entity in Home Assistant",
+                    "expose_vacuum": "Expose Indego mower as vacuum entity in Home Assistant",
+                    "show_all_alerts": "Show the full alert history in Home Assistant. This is not recommended for most users, as it might have a significant impact on the Home Assistant database size!"
+                },
+                "data_description": {
+                    "user_agent": "Custom User-Agent header for API requests to Bosch Indego Cloud. Leave empty to use default. Some users may need to set a custom value if their account has API access restrictions."
+                }
+            }
+        }
     },
     "entity": {
         "binary_sensor": {
@@ -62,7 +65,7 @@
                         "name": "Alert message (most recent)"
                     },
                     "last_alert_date": {
-                        "name": " Alert date (most recent)"
+                        "name": "Alert date (most recent)"
                     },
                     "last_alert_read": {
                         "name": "Alert status (most recent)",
@@ -72,23 +75,170 @@
                         }
                     }
                 }
+            },
+            "online": {
+                "name": "Online"
+            },
+            "update_available": {
+                "name": "Update Available"
+            },
+            "mower_stuck": {
+                "name": "Mower Stuck"
+            },
+            "service_status": {
+                "name": "Service Status"
+            },
+            "battery_charging": {
+                "name": "Charge Status"
+            }
+        },
+        "sensor": {
+            "mower_state": {
+                "name": "Mower State",
+                "state": {
+                    "Mowing": "Mowing",
+                    "Docked": "Docked",
+                    "Sleeping": "Sleeping",
+                    "Paused": "Paused"
+                }
+            },
+            "mower_state_detail": {
+                "name": "Mower State Detail",
+                "state": {
+                    "Reading status": "Reading status",
+                    "Charging": "Charging",
+                    "Docked": "Docked",
+                    "Sleeping": "Sleeping",
+                    "Docked - Software update": "Docked - Software update",
+                    "Docked - Loading map": "Docked - Loading map",
+                    "Docked - Saving map": "Docked - Saving map",
+                    "Docked - Leaving Dock": "Docked - Leaving Dock",
+                    "Mowing": "Mowing",
+                    "Mowing - Relocalising": "Mowing - Relocating",
+                    "Mowing - Learning Lawn": "Mowing - Learning Lawn",
+                    "Mowing - Learning Lawn paused": "Mowing - Learning Lawn paused",
+                    "SpotMow": "SpotMow",
+                    "Mowing randomly": "Mowing randomly",
+                    "Diagnostic mode": "Diagnostic mode",
+                    "End of life": "End of life",
+                    "Software update": "Software update",
+                    "Energy save mode": "Energy save mode",
+                    "Relocalising": "Relocating",
+                    "Loading map": "Loading map",
+                    "Learning lawn": "Learning lawn",
+                    "Paused": "Paused",
+                    "Border cut": "Border cut",
+                    "Idle in lawn": "Idle in lawn",
+                    "Stuck on lawn, help needed": "Stuck on lawn, help needed",
+                    "Returning to Dock": "Returning to Dock",
+                    "Returning to Dock - Battery low": "Returning to Dock - Battery low",
+                    "Returning to dock - Calendar timeslot ended": "Returning to Dock - Calendar timeslot ended",
+                    "Returning to dock - Battery temp range": "Returning to Dock - Battery temp range",
+                    "Returning to dock - Lawn complete": "Returning to Dock - Lawn complete",
+                    "Returning to dock - Relocalising": "Returning to Dock - Relocating",
+                    "Returning to dock - requested by user/app": "Returning to Dock - requested by user/app"
+                }
+            },
+            "battery_percentage": {
+                "name": "Battery"
+            },
+            "lawn_mowed": {
+                "name": "Lawn Mowed"
+            },
+            "lawn_mowed_size": {
+                "name": "Lawn Mowed Size"
+            },
+            "last_completed": {
+                "name": "Last Completed"
+            },
+            "next_mow": {
+                "name": "Next Mow"
+            },
+            "mowing_mode": {
+                "name": "Mowing Mode"
+            },
+            "runtime_total": {
+                "name": "Mow Time Total"
+            },
+            "garden_size": {
+                "name": "Garden Size"
+            },
+            "mower_position_x": {
+                "name": "Mower Position X"
+            },
+            "mower_position_y": {
+                "name": "Mower Position Y"
+            },
+            "last_error_code": {
+                "name": "Last Error"
+            },
+            "firmware_version": {
+                "name": "Firmware Version"
+            },
+            "maintenance_hours": {
+                "name": "Maintenance Hours"
+            },
+            "session_count": {
+                "name": "Session Count"
+            },
+            "battery_voltage": {
+                "name": "Battery Voltage"
+            },
+            "battery_temperature": {
+                "name": "Battery Temperature"
+            },
+            "ambient_temperature": {
+                "name": "Ambient Temperature"
+            },
+            "battery_cycles": {
+                "name": "Battery Cycles"
+            },
+            "battery_discharge": {
+                "name": "Battery Discharge"
+            }
+        },
+        "camera": {
+            "mowing_map": {
+                "name": "Mowing Map"
+            }
+        },
+        "button": {
+            "delete_all_alerts": {
+                "name": "Delete All Alerts"
+            },
+            "delete_last_alert": {
+                "name": "Delete Last Alert"
+            },
+            "read_all_alerts": {
+                "name": "Mark All Alerts as Read"
+            },
+            "read_last_alert": {
+                "name": "Mark Last Alert as Read"
+            }
+        },
+        "switch": {
+            "indego_smartmowing": {
+                "name": "SmartMowing"
             }
         }
     },
     "services": {
         "command": {
-            "description": "Send commands to the mower. Allowed commands are mow, returnToDock and pause.",
+            "name": "Send command",
+            "description": "Send commands to the mower. Allowed commands are mow, returnToDock, and pause.",
             "fields": {
                 "mower_serial": {
                     "description": "Mower serial. Only needed when you have configured multiple mowers."
                 },
                 "command": {
-                    "description": "Command for the mower."
+                    "name": "Command",
+                    "description": "Select a command to send to the mower."
                 }
             }
         },
         "smartmowing": {
-            "description": "Enable or Disable SmartMowing. Allowed commands are true or false.",
+            "name": "Toggle SmartMowing",
+            "description": "Enable or disable SmartMowing. Allowed values are true or false.",
             "fields": {
                 "mower_serial": {
                     "description": "Mower serial. Only needed when you have configured multiple mowers."
@@ -99,17 +249,19 @@
             }
         },
         "delete_alert": {
+            "name": "Delete alert",
             "description": "Delete the selected alert.",
             "fields": {
                 "mower_serial": {
                     "description": "Mower serial. Only needed when you have configured multiple mowers."
                 },
                 "alert_index": {
-                    "description": "Delete the selected alerts. 0 for the latest alert."
+                    "description": "Delete the selected alert. 0 for the latest alert."
                 }
             }
         },
         "delete_alert_all": {
+            "name": "Delete all alerts",
             "description": "Delete all alerts.",
             "fields": {
                 "mower_serial": {
@@ -118,6 +270,7 @@
             }
         },
         "read_alert": {
+            "name": "Mark alert as read",
             "description": "Mark the selected alert as read.",
             "fields": {
                 "mower_serial": {
@@ -129,12 +282,39 @@
             }
         },
         "read_alert_all": {
+            "name": "Mark all alerts as read",
             "description": "Mark all alerts as read.",
             "fields": {
                 "mower_serial": {
                     "description": "Mower serial. Only needed when you have configured multiple mowers."
                 }
             }
+        },
+        "download_map": {
+            "name": "Download mowing map",
+            "description": "Downloads the current mowing map from the Bosch Cloud API and saves it locally as \"www/indego_map_base.svg\". The map reflects the most recently recorded mowing route.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Mower serial. Only needed when you have configured multiple mowers."
+                }
+            }
         }
+    },
+    "issues": {
+        "auth_failure": {
+            "title": "Bosch Indego authentication expired",
+            "description": "Your authentication with Bosch Indego has expired. Please go to Settings > Devices & Services > Indego > Re-authenticate to restore access to your mower."
+        },
+        "connection_failure": {
+            "title": "Bosch Indego connection problems",
+            "description": "Your mower has not responded to API requests for an extended period. This may indicate network issues, the Bosch service is experiencing problems, or your mower is offline. Please check your internet connection and mower status."
+        }
+    },
+    "system_health": {
+        "can_reach_bosch_api": "Can reach Bosch Indego API",
+        "can_reach_auth_service": "Can reach Bosch authentication service",
+        "bosch_service_status": "Bosch service status",
+        "mower_online": "Mower online status",
+        "last_api_response": "Last successful API response"
     }
 }

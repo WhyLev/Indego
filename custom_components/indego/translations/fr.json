@@ -4,14 +4,17 @@
             "already_configured": "Cette tondeuse Bosch Indego a déjà été configurée !",
             "connection_error": "La connexion à l'API Bosch Indego a échoué ! Regardez la page des problèmes connus (https://github.com/sander1988/Indego?tab=readme-ov-file#known-issues) pour trouver une solution éventuelle.",
             "no_mowers_found": "Aucune tondeuse n'a été trouvée sur ce compte Bosch Indego !",
-            "reauth_successful": "Ré-authentication réussie. L'accès à l'API Bosch a été rétabli."
+            "reauth_successful": "Ré-authentification réussie. L'accès à l'API Bosch a été rétabli."
         },
         "step": {
             "advanced": {
                 "data": {
                     "user_agent": "User-Agent",
-                    "expose_mower": "Exposer la tondeuse Indego comme une entité tondeuse dans HomeAssistant",
-                    "expose_vacuum": "Exposer la tondeuse Indego comme une entité aspirateur dans HomeAssistant"
+                    "expose_mower": "Exposer la tondeuse Indego comme une entité tondeuse dans Home Assistant",
+                    "expose_vacuum": "Exposer la tondeuse Indego comme une entité aspirateur dans Home Assistant"
+                },
+                "data_description": {
+                    "user_agent": "En-tête User-Agent personnalisé pour les requêtes API vers Bosch Indego Cloud. Laisser vide pour utiliser la valeur par défaut. Certains utilisateurs devront peut-être définir une valeur personnalisée si leur compte a des restrictions d'accès à l'API."
                 },
                 "data_description": {
                     "user_agent": "En cas d'erreurs HTTP 4XX (notamment avec le code 403 et le message « Forbidden »), il peut être utile de modifier l'agent utilisateur. Celui-ci ne doit pas contenir les termes « Homeassistant » ou « HA »."
@@ -23,30 +26,30 @@
                     "mower_serial": "Numéro de série de la tondeuse",
                     "mower_name": "Nom de la tondeuse"
                 },
-                "description": "Sélectionez le numéro de série de la tondeuse Bosch que vous souhaitez ajouter."
+                "description": "Sélectionnez le numéro de série de la tondeuse Bosch que vous souhaitez ajouter."
             },
             "reauth_confirm": {
-                "title": "Authentication expirée",
+                "title": "Authentification expirée",
                 "description": "L'authentification de l'API Bosch Indego a expiré. Re-authentifiez-vous avec votre Bosch SingleKey ID."
             }
         }
     },
     "options": {
-      "step": {
-          "init": {
-              "title": "Réglages avancés",
-              "description": "Réglages avancés du composant Bosch Indego. Vous devrez recharger le composant après avoir changé ces paramètres.",
-              "data": {
-                  "user_agent": "User-Agent",
-                  "expose_mower": "Exposer la tondeuse Indego comme une entité tondeuse dans HomeAssistant",
-                  "expose_vacuum": "Exposer la tondeuse Indego comme une entité aspirateur dans HomeAssistant",
-                  "show_all_alerts": "Montrer l'historique complet des alertes dans HomeAssistant. Non recommandé pour la plupart des utilisateurs, l'impact sur la taille de la base de données HomeAssistant peut être assez important!"
-              },
-              "data_description": {
-                  "user_agent": "En cas d'erreurs HTTP 4XX (notamment avec le code 403 et le message « Forbidden »), il peut être utile de modifier l'agent utilisateur. Celui-ci ne doit pas contenir les termes « Homeassistant » ou « HA »."
-              }
-          }
-      }
+        "step": {
+            "init": {
+                "title": "Réglages avancés",
+                "description": "Réglages avancés du composant Bosch Indego. Vous devrez recharger le composant après avoir changé ces paramètres.",
+                "data": {
+                    "user_agent": "User-Agent",
+                    "expose_mower": "Exposer la tondeuse Indego comme une entité tondeuse dans Home Assistant",
+                    "expose_vacuum": "Exposer la tondeuse Indego comme une entité aspirateur dans Home Assistant",
+                    "show_all_alerts": "Montrer l'historique complet des alertes dans Home Assistant. Non recommandé pour la plupart des utilisateurs, l'impact sur la taille de la base de données Home Assistant peut être assez important !"
+                },
+                "data_description": {
+                    "user_agent": "En-tête User-Agent personnalisé pour les requêtes API vers Bosch Indego Cloud. Laisser vide pour utiliser la valeur par défaut. Certains utilisateurs devront peut-être définir une valeur personnalisée si leur compte a des restrictions d'accès à l'API."
+                }
+            }
+        }
     },
     "entity": {
         "binary_sensor": {
@@ -62,20 +65,36 @@
                         "name": "Message d'alerte (plus récent)"
                     },
                     "last_alert_date": {
-                        "name": " Date de l'alerte (plus récent)"
+                        "name": "Date de l'alerte (plus récente)"
                     },
                     "last_alert_read": {
                         "name": "Statut de l'alerte (plus récent)",
                         "state": {
-                            "read": "Lues",
-                            "unread": "Non lues"
+                            "read": "Lue",
+                            "unread": "Non lue"
                         }
                     }
                 }
+            },
+            "online": {
+                "name": "En ligne"
+            },
+            "update_available": {
+                "name": "Mise à jour disponible"
+            },
+            "mower_stuck": {
+                "name": "Robot bloqué"
+            },
+            "service_status": {
+                "name": "État du service"
+            },
+            "battery_charging": {
+                "name": "État de charge"
             }
         },
         "sensor": {
             "mower_state": {
+                "name": "État de la tondeuse",
                 "state": {
                     "Mowing": "Tonte en cours",
                     "Docked": "Dans station de charge",
@@ -84,6 +103,7 @@
                 }
             },
             "mower_state_detail": {
+                "name": "Détails sur l'état de la tondeuse",
                 "state": {
                     "Sleeping": "En veille",
                     "Reading status": "Obtention du statut en cours",
@@ -118,23 +138,107 @@
                     "Returning to dock - Relocalising": "Retour à la station - Cherche position",
                     "Returning to dock - requested by user/app": "Retour à la station - Demandé par l'utilisateur"
                 }
+            },
+            "battery_percentage": {
+                "name": "Batterie"
+            },
+            "lawn_mowed": {
+                "name": "Pelouse tondue"
+            },
+            "lawn_mowed_size": {
+                "name": "Superficie pelouse tondue"
+            },
+            "last_completed": {
+                "name": "Dernier réalisé"
+            },
+            "next_mow": {
+                "name": "Prochain tontes"
+            },
+            "mowing_mode": {
+                "name": "Mode de tonte"
+            },
+            "runtime_total": {
+                "name": "Temps de tontes total"
+            },
+            "garden_size": {
+                "name": "Taille du jardin"
+            },
+            "mower_position_x": {
+                "name": "Position du robot X"
+            },
+            "mower_position_y": {
+                "name": "Position du robot Y"
+            },
+            "last_error_code": {
+                "name": "Dernière erreur"
+            },
+            "firmware_version": {
+                "name": "Version du firmware"
+            },
+            "maintenance_hours": {
+                "name": "Heures de maintenance"
+            },
+            "session_count": {
+                "name": "Nombre de séances"
+            },
+            "battery_voltage": {
+                "name": "Tension batterie"
+            },
+            "battery_temperature": {
+                "name": "Température batterie"
+            },
+            "ambient_temperature": {
+                "name": "Température ambiante"
+            },
+            "battery_cycles": {
+                "name": "Cycles batterie"
+            },
+            "battery_discharge": {
+                "name": "Décharge batterie"
+            }
+        },
+        "camera": {
+            "mowing_map": {
+                "name": "Carte de tonte"
+            }
+        },
+        "button": {
+            "delete_all_alerts": {
+                "name": "Supprimer toutes les alertes"
+            },
+            "delete_last_alert": {
+                "name": "Supprimer la dernière alerte"
+            },
+            "read_all_alerts": {
+                "name": "Marquer toutes les alertes comme lues"
+            },
+            "read_last_alert": {
+                "name": "Marquer la dernière alerte comme lue"
+            }
+        },
+        "switch": {
+            "indego_smartmowing": {
+                "name": "SmartMowing"
             }
         }
     },
     "services": {
         "command": {
-            "description": "Envoyer des commandes à la tondeuse. Les commandes autorisées sont mow (tondre), returnToDock (retour à la station de charge) et pause.",
+            "name": "Envoyer une commande",
+            "description": "Envoyer des commandes à la tondeuse. Sélectionnez une commande.",
             "fields": {
                 "mower_serial": {
                     "description": "Numéro de série de la tondeuse. Uniquement nécessaire si vous avez configuré plusieurs tondeuses."
                 },
                 "command": {
-                    "description": "Commande pour la tondeuse."
+                    "name": "Envoyer une commande",
+                    "description": "Envoyer des commandes à la tondeuse. Sélectionnez une commande."
                 }
             }
         },
         "smartmowing": {
-            "description": "Activer ou Désactiver le SmartMowing. Les commandes autorisées sont true (activé) ou false (déactivé).",
+            "name": "Basculer SmartMowing",
+            "description": "Activer ou désactiver le SmartMowing. Les valeurs autorisées sont true (activé) ou false (désactivé).",
             "fields": {
                 "mower_serial": {
                     "description": "Numéro de série de la tondeuse. Uniquement nécessaire si vous avez configuré plusieurs tondeuses."
@@ -145,6 +249,7 @@
             }
         },
         "delete_alert": {
+            "name": "Supprimer l'alerte",
             "description": "Effacer l'alerte sélectionnée.",
             "fields": {
                 "mower_serial": {
@@ -156,6 +261,7 @@
             }
         },
         "delete_alert_all": {
+            "name": "Supprimer toutes les alertes",
             "description": "Effacer toutes les alertes.",
             "fields": {
                 "mower_serial": {
@@ -164,6 +270,7 @@
             }
         },
         "read_alert": {
+            "name": "Marquer l'alerte comme lue",
             "description": "Marquer l'alerte sélectionnée comme lue.",
             "fields": {
                 "mower_serial": {
@@ -175,12 +282,39 @@
             }
         },
         "read_alert_all": {
+            "name": "Marquer toutes les alertes comme lues",
             "description": "Marquer toutes les alertes comme lues.",
             "fields": {
                 "mower_serial": {
                     "description": "Numéro de série de la tondeuse. Uniquement nécessaire si vous avez configuré plusieurs tondeuses."
                 }
             }
+        },
+        "download_map": {
+            "name": "Télécharger la carte de tonte",
+            "description": "Télécharge la carte de tonte actuelle depuis l'API Bosch Cloud et l'enregistre localement sous \"www/indego_map_base.svg\". La carte reflète l'itinéraire de tonte le plus récemment enregistré.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Numéro de série de la tondeuse. Uniquement nécessaire si vous avez configuré plusieurs tondeuses."
+                }
+            }
         }
+    },
+    "issues": {
+        "auth_failure": {
+            "title": "Bosch Indego authentication expired",
+            "description": "Your authentication with Bosch Indego has expired. Please go to Settings > Devices & Services > Indego > Re-authenticate to restore access to your mower."
+        },
+        "connection_failure": {
+            "title": "Bosch Indego connection problems",
+            "description": "Your mower has not responded to API requests for an extended period. This may indicate network issues, the Bosch service is experiencing problems, or your mower is offline. Please check your internet connection and mower status."
+        }
+    },
+    "system_health": {
+        "can_reach_bosch_api": "Can reach Bosch Indego API",
+        "can_reach_auth_service": "Can reach Bosch authentication service",
+        "bosch_service_status": "Bosch service status",
+        "mower_online": "Mower online status",
+        "last_api_response": "Last successful API response"
     }
 }

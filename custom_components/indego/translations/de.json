@@ -2,21 +2,21 @@
     "config": {
         "abort": {
             "already_configured": "Dieser Bosch Indego Mähroboter wurde bereits konfiguriert!",
-            "connection_error": "Die Verbindung zur Bosch Indego API ist fehlgeschlagen! Bitte die Known Issues Seite (https://github.com/sander1988/Indego?tab=readme-ov-file#known-issues) für möglche Lösungen nutzen.",
+            "connection_error": "Die Verbindung zur Bosch Indego API ist fehlgeschlagen! Bitte die Known Issues Seite (https://github.com/sander1988/Indego?tab=readme-ov-file#known-issues) für mögliche Lösungen nutzen.",
             "no_mowers_found": "In diesem Bosch Indego Account wurden keine Mähroboter gefunden!",
-            "reauth_successful": "Re-Authentifizierung war erfolgreich. Zugang zur Bosch API wurde wiederhergestellt."
+            "reauth_successful": "Die Re-Authentifizierung war erfolgreich. Zugang zur Bosch API wurde wiederhergestellt."
         },
         "step": {
             "advanced": {
                 "data": {
                     "user_agent": "User-Agent",
-                    "expose_mower": "Indego Mähroboter als Mower Entität in HomeAssistant anlegen",
-                    "expose_vacuum": "Indego Mähroboter als Vacuum Entität in HomeAssistant anlegen"
+                    "expose_mower": "Indego Mähroboter als Mower Entität in Home Assistant anlegen",
+                    "expose_vacuum": "Indego Mähroboter als Vacuum Entität in Home Assistant anlegen"
                 },
                 "data_description": {
-                    "user_agent": "Im Fall von HTTP 4XX Fehlern (besonders Reason: 403, message='Forbidden') kann es helfen den User Agent zu ändern. Dieser sollte nicht Homeassistant oder HA enthalten."
+                    "user_agent": "Custom User-Agent Header für API-Anfragen zur Bosch Indego Cloud. Um die Standardeinstellung zu verwenden, leer lassen. Einige Benutzer müssen möglicherweise einen benutzerdefinierten Wert festlegen, wenn auf ihrem Konto API-Zugriffsbeschränkungen gelten."
                 },
-                "description": "Erweiterte Einstellung des Bosch Indego Component."
+                "description": "Erweiterte Einstellungen der Bosch Indego Komponente."
             },
             "mower": {
                 "data": {
@@ -27,23 +27,23 @@
             },
             "reauth_confirm": {
                 "title": "Authentifizierung abgelaufen",
-                "description": "Die Bosch Indego API Authentifizierung ist abgelaufen. Bitte mit der Bosch SingleKey ID neu Authentifizieren."
+                "description": "Die Bosch Indego API Authentifizierung ist abgelaufen. Bitte mit der Bosch SingleKey ID neu authentifizieren."
             }
         }
     },
     "options": {
         "step": {
             "init": {
-                "title": "Erweiterte Einstellung",
-                "description": "Erweiterte Einstellung des Bosch Indego Component.",
+                "title": "Erweiterte Einstellungen",
+                "description": "Erweiterte Einstellungen der Bosch Indego Komponente.",
                 "data": {
                     "user_agent": "User-Agent",
-                    "expose_mower": "Indego Mähroboter als Mower Entität in HomeAssistant anlegen",
-                    "expose_vacuum": "Indego Mähroboter als Vacuum Entität in HomeAssistant anlegen",
-                    "show_all_alerts": "Zeige den kompletten Alarm Verlauf in HomeAssistant. Dies wird für die meisten Nutzer nicht empfohlen, da es signifikanten Einfluss auf die Größe der HomeAssistant Datenbank haben kann."
+                    "expose_mower": "Indego Mähroboter als Mower Entität in Home Assistant anlegen",
+                    "expose_vacuum": "Indego Mähroboter als Vacuum Entität in Home Assistant anlegen",
+                    "show_all_alerts": "Zeige den kompletten Fehlerverlauf in Home Assistant. Dies wird für die meisten Nutzer nicht empfohlen, da es signifikanten Einfluss auf die Größe der Home Assistant Datenbank haben kann."
                 },
                 "data_description": {
-                    "user_agent": "Im Fall von HTTP 4XX Fehlern (besonders Reason: 403, message='Forbidden') kann es helfen den User Agent zu ändern. Dieser sollte nicht Homeassistant oder HA enthalten."
+                    "user_agent": "Custom User-Agent Header für API-Anfragen zur Bosch Indego Cloud. Um die Standardeinstellung zu verwenden, leer lassen. Einige Benutzer müssen möglicherweise einen benutzerdefinierten Wert festlegen, wenn auf ihrem Konto API-Zugriffsbeschränkungen gelten."
                 }
             }
         }
@@ -53,29 +53,45 @@
             "indego_alert": {
                 "state_attributes": {
                     "alerts_count": {
-                        "name": "Anzahl der Alarme"
+                        "name": "Anzahl der Fehler"
                     },
                     "last_alert_error_code": {
-                        "name": "Error Code (letztes Auftreten)"
+                        "name": "Fehlercode (letztes Auftreten)"
                     },
                     "last_alert_message": {
-                        "name": "Alarm Nachricht (letztes Auftreten)"
+                        "name": "Fehlernachricht (letztes Auftreten)"
                     },
                     "last_alert_date": {
-                        "name": " Alarm Datum (letztes Auftreten)"
+                        "name": "Fehlerdatum (letztes Auftreten)"
                     },
                     "last_alert_read": {
-                        "name": "Alarm Status (letztes Auftreten)",
+                        "name": "Fehlerstatus (letztes Auftreten)",
                         "state": {
                             "read": "Gelesen",
                             "unread": "Ungelesen"
                         }
                     }
                 }
+            },
+            "online": {
+                "name": "Online"
+            },
+            "update_available": {
+                "name": "Update verfügbar"
+            },
+            "mower_stuck": {
+                "name": "Mähroboter festgefahren"
+            },
+            "service_status": {
+                "name": "Servicestatus"
+            },
+            "battery_charging": {
+                "name": "Ladestatus"
             }
         },
         "sensor": {
             "mower_state": {
+                "name": "Mäher Status",
                 "state": {
                     "Mowing": "Mähen",
                     "Docked": "Angedockt",
@@ -84,13 +100,13 @@
                 }
             },
             "mower_state_detail": {
+                "name": "Mäher Status Detail",
                 "state": {
-                    "Sleeping": "Schläft",
-                    "Reading status": "Status abrufen",
+                    "Reading status": "Status wird abgerufen",
                     "Charging": "Laden",
                     "Docked": "Angedockt",
                     "Sleeping": "Schläft",
-                    "Docked - Software update": "Angedockt - Software Update",
+                    "Docked - Software update": "Angedockt - Software-Update",
                     "Docked - Loading map": "Angedockt - Karte laden",
                     "Docked - Saving map": "Angedockt - Karte speichern",
                     "Docked - Leaving Dock": "Angedockt - Verlässt Ladestation",
@@ -100,9 +116,9 @@
                     "Mowing - Learning Lawn paused": "Mähen - Karte lernen pausiert",
                     "SpotMow": "SpotMow",
                     "Mowing randomly": "Zufälliges Mähen",
-                    "Diagnostic mode": "Diagnose Modus",
+                    "Diagnostic mode": "Diagnosemodus",
                     "End of life": "Lebensende",
-                    "Software update": "Software Update",
+                    "Software update": "Software-Update",
                     "Energy save mode": "Energiesparmodus",
                     "Relocalising": "Position bestimmen",
                     "Loading map": "Karte laden",
@@ -113,29 +129,113 @@
                     "Stuck on lawn, help needed": "Festgefahren, Hilfe nötig",
                     "Returning to Dock": "Zurück zur Ladestation",
                     "Returning to Dock - Battery low": "Zurück zur Ladestation - Batteriestand niedrig",
-                    "Returning to dock - Calendar timeslot ended": "Zurück zur Ladestation - Kalender Zeitfenser zu Ende",
-                    "Returning to dock - Battery temp range": "Zurück zur Ladestation - Batterie Temperaturfenster",
+                    "Returning to dock - Calendar timeslot ended": "Zurück zur Ladestation - Kalender-Zeitfenster zu Ende",
+                    "Returning to dock - Battery temp range": "Zurück zur Ladestation - Batterie-Temperaturfenster",
                     "Returning to dock - Lawn complete": "Zurück zur Ladestation - Rasen vollständig gemäht",
                     "Returning to dock - Relocalising": "Zurück zur Ladestation - Position bestimmen",
-                    "Returning to dock - requested by user/app": "Zurück zur Ladestation - Angefordert vom Benutzer"
+                    "Returning to dock - requested by user/app": "Zurück zur Ladestation - Vom Benutzer angefordert"
                 }
+            },
+            "battery_percentage": {
+                "name": "Batterie"
+            },
+            "lawn_mowed": {
+                "name": "Rasen gemäht"
+            },
+            "lawn_mowed_size": {
+                "name": "Rasenfläche gemäht"
+            },
+            "last_completed": {
+                "name": "Zuletzt abgeschlossen"
+            },
+            "next_mow": {
+                "name": "Nächster Mähtermin"
+            },
+            "mowing_mode": {
+                "name": "Mähmodus"
+            },
+            "runtime_total": {
+                "name": "Gesamtmähzeit"
+            },
+            "garden_size": {
+                "name": "Gartengröße"
+            },
+            "mower_position_x": {
+                "name": "Mähroboter Position X"
+            },
+            "mower_position_y": {
+                "name": "Mähroboter Position Y"
+            },
+            "last_error_code": {
+                "name": "Letzter Fehler"
+            },
+            "firmware_version": {
+                "name": "Firmware-Version"
+            },
+            "maintenance_hours": {
+                "name": "Wartungsstunden"
+            },
+            "session_count": {
+                "name": "Sitzungsanzahl"
+            },
+            "battery_voltage": {
+                "name": "Batteriespannung"
+            },
+            "battery_temperature": {
+                "name": "Batterietemperatur"
+            },
+            "ambient_temperature": {
+                "name": "Umgebungstemperatur"
+            },
+            "battery_cycles": {
+                "name": "Batteriezyklen"
+            },
+            "battery_discharge": {
+                "name": "Batterieentladung"
+            }
+        },
+        "camera": {
+            "mowing_map": {
+                "name": "Mähkarte"
+            }
+        },
+        "button": {
+            "delete_all_alerts": {
+                "name": "Alle Fehler löschen"
+            },
+            "delete_last_alert": {
+                "name": "Letzten Fehler löschen"
+            },
+            "read_all_alerts": {
+                "name": "Alle Fehler als gelesen markieren"
+            },
+            "read_last_alert": {
+                "name": "Letzten Fehler als gelesen markieren"
+            }
+        },
+        "switch": {
+            "indego_smartmowing": {
+                "name": "SmartMowing"
             }
         }
     },
     "services": {
         "command": {
-            "description": "Befehle an den Mähroboter senden. Möglich Befehle sind mow, returnToDock und pause.",
+            "name": "Befehl senden",
+            "description": "Befehle an den Mähroboter senden. Wählen Sie einen Befehl aus.",
             "fields": {
                 "mower_serial": {
                     "description": "Seriennummer des Mähroboters. Wird nur benötigt, wenn mehrere Mähroboter eingerichtet sind."
                 },
                 "command": {
-                    "description": "Befehl für den Mähroboter."
+                    "name": "Befehl senden",
+                    "description": "Befehle an den Mähroboter senden. Wählen Sie einen Befehl aus."
                 }
             }
         },
         "smartmowing": {
-            "description": "SmartMowing aktivieren oder deaktivieren. Mögliche Befehle sind true oder false.",
+            "name": "SmartMowing umschalten",
+            "description": "SmartMowing aktivieren oder deaktivieren. Mögliche Werte sind true oder false.",
             "fields": {
                 "mower_serial": {
                     "description": "Seriennummer des Mähroboters. Wird nur benötigt, wenn mehrere Mähroboter eingerichtet sind."
@@ -146,6 +246,7 @@
             }
         },
         "delete_alert": {
+            "name": "Alert löschen",
             "description": "Löscht den ausgewählten Fehler.",
             "fields": {
                 "mower_serial": {
@@ -157,6 +258,7 @@
             }
         },
         "delete_alert_all": {
+            "name": "Alle Alerts löschen",
             "description": "Löscht alle Fehler.",
             "fields": {
                 "mower_serial": {
@@ -165,6 +267,7 @@
             }
         },
         "read_alert": {
+            "name": "Alert als gelesen markieren",
             "description": "Markiert den ausgewählten Fehler als gelesen.",
             "fields": {
                 "mower_serial": {
@@ -176,12 +279,39 @@
             }
         },
         "read_alert_all": {
+            "name": "Alle Alerts als gelesen markieren",
             "description": "Markiert alle Fehler als gelesen.",
             "fields": {
                 "mower_serial": {
                     "description": "Seriennummer des Mähroboters. Wird nur benötigt, wenn mehrere Mähroboter eingerichtet sind."
                 }
             }
+        },
+        "download_map": {
+            "name": "Mähkarte herunterladen",
+            "description": "Lädt die aktuelle Mähkarte von der Bosch Cloud API herunter und speichert diese lokal unter \"www/indego_map_base.svg\". Die Karte zeigt die zuletzt aufgezeichnete Mähroute.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Seriennummer des Mähroboters. Wird nur benötigt, wenn mehrere Mähroboter eingerichtet sind."
+                }
+            }
         }
+    },
+    "issues": {
+        "auth_failure": {
+            "title": "Bosch Indego Authentifizierung abgelaufen",
+            "description": "Ihre Authentifizierung mit Bosch Indego ist abgelaufen. Gehen Sie zu Einstellungen > Geräte & Dienste > Indego > Erneut authentifizieren, um den Zugriff auf Ihren Mähroboter wiederherzustellen."
+        },
+        "connection_failure": {
+            "title": "Bosch Indego Verbindungsprobleme",
+            "description": "Ihr Mähroboter reagiert über einen längeren Zeitraum nicht auf API-Anfragen. Dies kann auf Netzwerkprobleme, Serviceprobleme bei Bosch oder einen Offline-Mähroboter hindeuten. Bitte überprüfen Sie Ihre Internetverbindung und den Status des Mähroboters."
+        }
+    },
+    "system_health": {
+        "can_reach_bosch_api": "Kann Bosch Indego API erreichen",
+        "can_reach_auth_service": "Kann Bosch Authentifizierungsdienst erreichen",
+        "bosch_service_status": "Bosch-Dienststatus",
+        "mower_online": "Mähroboter Online-Status",
+        "last_api_response": "Letzte erfolgreiche API-Antwort"
     }
 }

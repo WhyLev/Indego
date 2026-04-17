@@ -2,15 +2,19 @@
     "config": {
         "abort": {
             "already_configured": "Ta kosiarka Bosch Indego została już wcześniej skonfigurowana!",
-            "connection_error": "Błąd połączenia z Bosch Indego API! Please use the known issues page (https://github.com/sander1988/Indego?tab=readme-ov-file#known-issues) for possible solutions.",
-            "no_mowers_found": "Na tym koncie Bosch Indego nie znaleziono żadnej kosiarki!"
+            "connection_error": "Błąd połączenia z Bosch Indego API! Użyj strony ze znanymi problemami (https://github.com/sander1988/Indego?tab=readme-ov-file#known-issues) w celu znalezienia możliwych rozwiązań.",
+            "no_mowers_found": "Na tym koncie Bosch Indego nie znaleziono żadnej kosiarki!",
+            "reauth_successful": "Ponowne uwierzytelnienie zakończyło się powodzeniem. Dostęp do Bosch API został przywrócony."
         },
         "step": {
             "advanced": {
                 "data": {
                     "user_agent": "User-Agent",
-                    "expose_mower": "Wyświetl kosiarkę Indego jako encję kosiarki w HomeAssistant",
-                    "expose_vacuum": "Wyświetl kosiarkę Indego jako encję odkurzacza w HomeAssistant"
+                    "expose_mower": "Wyświetl kosiarkę Indego jako encję kosiarki w Home Assistant",
+                    "expose_vacuum": "Wyświetl kosiarkę Indego jako encję odkurzacza w Home Assistant"
+                },
+                "data_description": {
+                    "user_agent": "Niestandardowy nagłówek User-Agent dla żądań API do Bosch Indego Cloud. Pozostaw puste, aby użyć wartości domyślnej. Niektórzy użytkownicy mogą potrzebować ustawić wartość niestandardową, jeśli ich konto ma ograniczenia dostępu do API."
                 },
                 "data_description": {
                     "user_agent": "W przypadku błędów HTTP 4XX (zwłaszcza Reason: 403, message=»Forbidden«) pomocna może okazać się zmiana agenta użytkownika. Nie powinien on zawierać słów „Homeassistant” ani „HA”."
@@ -23,25 +27,29 @@
                     "mower_name": "Nazwa kosiarki"
                 },
                 "description": "Proszę wybrać numer seryjny kosiarki Bosch którą chcesz dodać."
+            },
+            "reauth_confirm": {
+                "title": "Uwierzytelnienie wygasło",
+                "description": "Uwierzytelnienie Bosch Indego API wygasło. Zaloguj się ponownie przy użyciu swojego Bosch SingleKey ID."
             }
         }
     },
     "options": {
-      "step": {
-          "init": {
-              "title": "Ustawienia zaawansowane",
-              "description": "Ustawienia zaawansowane komponentu Bosch Indego. Po zmianie tych ustawień może być konieczne ponowne załadowanie komponentu.",
-              "data": {
-                  "user_agent": "User-Agent",
-                  "expose_mower": "Wyświetl kosiarkę Indego jako encję kosiarki w HomeAssistant",
-                  "expose_vacuum": "Wyświetl kosiarkę Indego jako encję odkurzacza w HomeAssistant",
-                  "show_all_alerts": "Pokaż pełną historię alertów w HomeAssistant. Nie rekomendowane dla większości użytkowników, może mieć wpływ na znaczące zwiększenie rozmiaru bazy danych HomeAssistant!"
-              },
-              "data_description": {
-                  "user_agent": "W przypadku błędów HTTP 4XX (zwłaszcza Reason: 403, message=»Forbidden«) pomocna może okazać się zmiana agenta użytkownika. Nie powinien on zawierać słów „Homeassistant” ani „HA”."
-              }
-          }
-      }
+        "step": {
+            "init": {
+                "title": "Ustawienia zaawansowane",
+                "description": "Ustawienia zaawansowane komponentu Bosch Indego. Po zmianie tych ustawień może być konieczne ponowne załadowanie komponentu.",
+                "data": {
+                    "user_agent": "User-Agent",
+                    "expose_mower": "Wyświetl kosiarkę Indego jako encję kosiarki w Home Assistant",
+                    "expose_vacuum": "Wyświetl kosiarkę Indego jako encję odkurzacza w Home Assistant",
+                    "show_all_alerts": "Pokaż pełną historię alertów w Home Assistant. Nie rekomendowane dla większości użytkowników, może mieć wpływ na znaczące zwiększenie rozmiaru bazy danych Home Assistant!"
+                },
+                "data_description": {
+                    "user_agent": "Niestandardowy nagłówek User-Agent dla żądań API do Bosch Indego Cloud. Pozostaw puste, aby użyć wartości domyślnej. Niektórzy użytkownicy mogą potrzebować ustawić wartość niestandardową, jeśli ich konto ma ograniczenia dostępu do API."
+                }
+            }
+        }
     },
     "entity": {
         "binary_sensor": {
@@ -54,7 +62,7 @@
                         "name": "Kod ostatniego błędu"
                     },
                     "last_alert_message": {
-                        "name": "Treść ostatniegoalertu"
+                        "name": "Treść ostatniego alertu"
                     },
                     "last_alert_date": {
                         "name": "Data ostatniego alertu"
@@ -67,69 +75,170 @@
                         }
                     }
                 }
+            },
+            "online": {
+                "name": "Online"
+            },
+            "update_available": {
+                "name": "Dostępna aktualizacja"
+            },
+            "mower_stuck": {
+                "name": "Robot zablokowany"
+            },
+            "service_status": {
+                "name": "Stan usługi"
+            },
+            "battery_charging": {
+                "name": "Status ładowania"
             }
         },
         "sensor": {
             "mower_state": {
+                "name": "Stan kosiarki",
                 "state": {
-                    "Mowing": "Mowing",
-                    "Docked": "Docked",
-                    "Sleeping": "Sleeping",
-                    "Paused": "Paused"
+                    "Mowing": "Koszenie",
+                    "Docked": "W stacji",
+                    "Sleeping": "Uśpiony",
+                    "Paused": "Wstrzymany"
                 }
             },
             "mower_state_detail": {
+                "name": "Szczegóły dotyczące stanu kosiarki",
                 "state": {
-                    "Sleeping": "Sleeping",
-                    "Reading status": "Reading status",
-                    "Charging": "Charging",
-                    "Docked": "Docked",
-                    "Docked - Software update": "Docked - Software update",
-                    "Docked - Loading map": "Docked - Loading map",
-                    "Docked - Saving map": "Docked - Saving map",
-                    "Docked - Leaving Dock": "Docked - Leaving Dock",
-                    "Mowing": "Mowing",
-                    "Mowing - Relocalising": "Mowing - Relocalising",
-                    "Mowing - Learning Lawn": "Mowing - Learning Lawn",
-                    "Mowing - Learning Lawn paused": "Mowing - Learning Lawn paused",
+                    "Sleeping": "Uśpiony",
+                    "Reading status": "Odczyt statusu",
+                    "Charging": "Ładowanie",
+                    "Docked": "W stacji",
+                    "Docked - Software update": "W stacji - Aktualizacja oprogramowania",
+                    "Docked - Loading map": "W stacji - Ładowanie mapy",
+                    "Docked - Saving map": "W stacji - Zapisywanie mapy",
+                    "Docked - Leaving Dock": "W stacji - Opuszczanie stacji",
+                    "Mowing": "Koszenie",
+                    "Mowing - Relocalising": "Koszenie - Lokalizowanie",
+                    "Mowing - Learning Lawn": "Koszenie - Uczenie trawnika",
+                    "Mowing - Learning Lawn paused": "Koszenie - Uczenie trawnika wstrzymane",
                     "SpotMow": "SpotMow",
-                    "Mowing randomly": "Mowing randomly",
-                    "Diagnostic mode": "Diagnostic mode",
-                    "End of life": "End of life",
-                    "Software update": "Software update",
-                    "Energy save mode": "Energy save mode",
-                    "Relocalising": "Relocalising",
-                    "Loading map": "Loading map",
-                    "Learning lawn": "Learning lawn",
-                    "Paused": "Paused",
-                    "Border cut": "Border cut",
-                    "Idle in lawn": "Idle in lawn",
-                    "Stuck on lawn, help needed": "Stuck on lawn, help needed",
-                    "Returning to Dock": "Returning to Dock",
-                    "Returning to Dock - Battery low": "Returning to Dock - Battery low",
-                    "Returning to dock - Calendar timeslot ended": "Returning to dock - Calendar timeslot ended",
-                    "Returning to dock - Battery temp range": "Returning to dock - Battery temp range",
-                    "Returning to dock - Lawn complete": "Returning to dock - Lawn complete",
-                    "Returning to dock - Relocalising": "Returning to dock - Relocalising",
-                    "Returning to dock - requested by user/app": "Returning to dock - requested by user/app"
+                    "Mowing randomly": "Losowe koszenie",
+                    "Diagnostic mode": "Tryb diagnostyczny",
+                    "End of life": "Koniec okresu użytkowania",
+                    "Software update": "Aktualizacja oprogramowania",
+                    "Energy save mode": "Tryb oszczędzania energii",
+                    "Relocalising": "Lokalizowanie",
+                    "Loading map": "Ładowanie mapy",
+                    "Learning lawn": "Uczenie trawnika",
+                    "Paused": "Wstrzymany",
+                    "Border cut": "Koszenie krawędzi",
+                    "Idle in lawn": "Bezczynny na trawniku",
+                    "Stuck on lawn, help needed": "Utknął na trawniku, potrzebna pomoc",
+                    "Returning to Dock": "Powrót do stacji",
+                    "Returning to Dock - Battery low": "Powrót do stacji - Niski poziom baterii",
+                    "Returning to dock - Calendar timeslot ended": "Powrót do stacji - Zakończył się slot kalendarza",
+                    "Returning to dock - Battery temp range": "Powrót do stacji - Temperatura baterii poza zakresem",
+                    "Returning to dock - Lawn complete": "Powrót do stacji - Trawnik skoszony",
+                    "Returning to dock - Relocalising": "Powrót do stacji - Lokalizowanie",
+                    "Returning to dock - requested by user/app": "Powrót do stacji - Na żądanie użytkownika"
                 }
+            },
+            "battery_percentage": {
+                "name": "Bateria"
+            },
+            "lawn_mowed": {
+                "name": "Trawnik koszony"
+            },
+            "lawn_mowed_size": {
+                "name": "Powierzchnia trawnika koszona"
+            },
+            "last_completed": {
+                "name": "Ostatnio ukończone"
+            },
+            "next_mow": {
+                "name": "Następne koszenie"
+            },
+            "mowing_mode": {
+                "name": "Tryb koszenia"
+            },
+            "runtime_total": {
+                "name": "Całkowity czas koszenia"
+            },
+            "garden_size": {
+                "name": "Rozmiar ogrodu"
+            },
+            "mower_position_x": {
+                "name": "Pozycja robota X"
+            },
+            "mower_position_y": {
+                "name": "Pozycja robota Y"
+            },
+            "last_error_code": {
+                "name": "Ostatni błąd"
+            },
+            "firmware_version": {
+                "name": "Wersja oprogramowania"
+            },
+            "maintenance_hours": {
+                "name": "Godziny konserwacji"
+            },
+            "session_count": {
+                "name": "Liczba sesji"
+            },
+            "battery_voltage": {
+                "name": "Napięcie baterii"
+            },
+            "battery_temperature": {
+                "name": "Temperatura baterii"
+            },
+            "ambient_temperature": {
+                "name": "Temperatura otoczenia"
+            },
+            "battery_cycles": {
+                "name": "Cykle baterii"
+            },
+            "battery_discharge": {
+                "name": "Rozładowanie baterii"
+            }
+        },
+        "camera": {
+            "mowing_map": {
+                "name": "Mapa koszenia"
+            }
+        },
+        "button": {
+            "delete_all_alerts": {
+                "name": "Usuń wszystkie alerty"
+            },
+            "delete_last_alert": {
+                "name": "Usuń ostatni alert"
+            },
+            "read_all_alerts": {
+                "name": "Oznacz wszystkie alerty jako przeczytane"
+            },
+            "read_last_alert": {
+                "name": "Oznacz ostatni alert jako przeczytany"
+            }
+        },
+        "switch": {
+            "indego_smartmowing": {
+                "name": "SmartMowing"
             }
         }
     },
     "services": {
         "command": {
-            "description": "Wyślij polecenie do kosiarki. Dostępne polecenia to: mow, returnToDock oraz pause.",
+            "name": "Wyślij polecenie",
+            "description": "Wyślij polecenia do kosiarki. Wybierz polecenie.",
             "fields": {
                 "mower_serial": {
                     "description": "Numer seryjny kosiarki. Wymagany tylko gdy konfigurujesz wiele kosiarek."
                 },
                 "command": {
-                    "description": "Polecenie do wysłania do kosiarki."
+                    "name": "Wyślij polecenie",
+                    "description": "Wyślij polecenia do kosiarki. Wybierz polecenie."
                 }
             }
         },
         "smartmowing": {
-            "description": "Włącz lub wyłącz tryb SmartMowing. Dostępne polecenia to true lub false.",
+            "name": "Przełącz SmartMowing",
+            "description": "Włącz lub wyłącz tryb SmartMowing. Dostępne wartości to true lub false.",
             "fields": {
                 "mower_serial": {
                     "description": "Numer seryjny kosiarki. Wymagany tylko gdy konfigurujesz wiele kosiarek."
@@ -140,6 +249,7 @@
             }
         },
         "delete_alert": {
+            "name": "Usuń alert",
             "description": "Usuń zaznaczony alert.",
             "fields": {
                 "mower_serial": {
@@ -151,6 +261,7 @@
             }
         },
         "delete_alert_all": {
+            "name": "Usuń wszystkie alerty",
             "description": "Usuń wszystkie alerty.",
             "fields": {
                 "mower_serial": {
@@ -159,6 +270,7 @@
             }
         },
         "read_alert": {
+            "name": "Oznacz alert jako przeczytany",
             "description": "Oznacz alert jako przeczytany.",
             "fields": {
                 "mower_serial": {
@@ -170,12 +282,39 @@
             }
         },
         "read_alert_all": {
+            "name": "Oznacz wszystkie alerty jako przeczytane",
             "description": "Oznacz wszystkie alerty jako przeczytane.",
             "fields": {
                 "mower_serial": {
                     "description": "Numer seryjny kosiarki. Wymagany tylko gdy konfigurujesz wiele kosiarek."
                 }
             }
+        },
+        "download_map": {
+            "name": "Pobierz mapę koszenia",
+            "description": "Pobiera aktualną mapę koszenia z API Bosch Cloud i zapisuje ją lokalnie jako \"www/indego_map_base.svg\". Mapa odzwierciedla ostatnio zapisaną trasę koszenia.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Numer seryjny kosiarki. Wymagany tylko gdy konfigurujesz wiele kosiarek."
+                }
+            }
         }
+    },
+    "issues": {
+        "auth_failure": {
+            "title": "Bosch Indego authentication expired",
+            "description": "Your authentication with Bosch Indego has expired. Please go to Settings > Devices & Services > Indego > Re-authenticate to restore access to your mower."
+        },
+        "connection_failure": {
+            "title": "Bosch Indego connection problems",
+            "description": "Your mower has not responded to API requests for an extended period. This may indicate network issues, the Bosch service is experiencing problems, or your mower is offline. Please check your internet connection and mower status."
+        }
+    },
+    "system_health": {
+        "can_reach_bosch_api": "Can reach Bosch Indego API",
+        "can_reach_auth_service": "Can reach Bosch authentication service",
+        "bosch_service_status": "Bosch service status",
+        "mower_online": "Mower online status",
+        "last_api_response": "Last successful API response"
     }
 }

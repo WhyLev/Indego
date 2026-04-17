@@ -90,11 +90,11 @@ class IndegoOptionsFlowHandler(OptionsFlowWithConfigEntry):
         if CONF_USER_AGENT in data and default_user_agent_in_config(data):
             del data[CONF_USER_AGENT]
 
-        _LOGGER.debug("Updating config options: '%s'", data)
+        _LOGGER.debug("Saving updated configuration options")
 
         if CONF_USER_AGENT in data:
             self.hass.data[DOMAIN][self.config_entry.entry_id].client.set_default_header(HTTP_HEADER_USER_AGENT, data[CONF_USER_AGENT])
-            _LOGGER.debug("Applied new User-Agent '%s' to Indego API client.", data[CONF_USER_AGENT])
+            _LOGGER.info("Custom User-Agent applied to Indego API client")
 
         return self.async_create_entry(title="", data=data)
 
@@ -133,10 +133,10 @@ class IndegoFlowHandler(config_entry_oauth2_flow.AbstractOAuth2FlowHandler, doma
                 DOMAIN,
                 ClientCredential(OAUTH2_CLIENT_ID, "", DOMAIN)
             )
-            _LOGGER.debug("OK: Imported OAuth client credentials (or are already exists)")
+            _LOGGER.debug("OAuth client credentials imported successfully")
 
         except Exception as exc:
-            _LOGGER.error("Failed to create application credentials! Reason: %s", str(exc))
+            _LOGGER.error("Failed to import OAuth client credentials: %s", str(exc))
             raise
 
         # This will launch the HA OAuth (external webpage) opener.
@@ -155,7 +155,7 @@ class IndegoFlowHandler(config_entry_oauth2_flow.AbstractOAuth2FlowHandler, doma
     ) -> FlowResult:
         """Handle config flow advanced settings step ."""
         if user_input is not None:
-            _LOGGER.debug("Testing API access by retrieving available mowers...")
+            _LOGGER.debug("Testing Indego API connection and retrieving available mowers")
 
             api_client = IndegoAsyncClient(
                 token=self._data["token"]["access_token"],
@@ -171,13 +171,13 @@ class IndegoFlowHandler(config_entry_oauth2_flow.AbstractOAuth2FlowHandler, doma
 
             try:
                 self._mower_serials = await api_client.get_mowers()
-                _LOGGER.debug("Found mowers in account: %s", self._mower_serials)
+                _LOGGER.info("Connected successfully - found %d mower(s) in account", len(self._mower_serials))
 
                 if len(self._mower_serials) == 0:
                     return self.async_abort(reason="no_mowers_found")
 
             except Exception as exc:
-                _LOGGER.error("Error while retrieving mower serial in account! Reason: %s", str(exc))
+                _LOGGER.error("Failed to connect to Indego API or retrieve mowers: %s", str(exc))
                 return self.async_abort(reason="connection_error")
 
             if self.source == SOURCE_REAUTH:
@@ -187,8 +187,7 @@ class IndegoFlowHandler(config_entry_oauth2_flow.AbstractOAuth2FlowHandler, doma
                 self.async_set_unique_id(self._data[CONF_MOWER_SERIAL])
                 self._abort_if_unique_id_mismatch()
 
-                _LOGGER.debug("Reauth entry with data: '%s'", self._data)
-                _LOGGER.debug("Reauth entry with options: '%s'", self._options)
+                _LOGGER.debug("Reauth - updating configuration for mower: %s", self._data[CONF_MOWER_SERIAL])
 
                 return self.async_update_reload_and_abort(
                     self._get_reauth_entry(),
@@ -229,8 +228,8 @@ class IndegoFlowHandler(config_entry_oauth2_flow.AbstractOAuth2FlowHandler, doma
             self._data[CONF_MOWER_SERIAL] = user_input[CONF_MOWER_SERIAL]
             self._data[CONF_MOWER_NAME] = user_input[CONF_MOWER_NAME]
 
-            _LOGGER.debug("Creating entry with data: '%s'", self._data)
-            _LOGGER.debug("Creating entry with options: '%s'", self._options)
+            _LOGGER.info("Creating new Indego integration entry: %s (%s)",
+                        user_input[CONF_MOWER_NAME], user_input[CONF_MOWER_SERIAL])
 
             return self.async_create_entry(
                 title=("%s (%s)" % (user_input[CONF_MOWER_NAME], user_input[CONF_MOWER_SERIAL])),
@@ -254,8 +253,7 @@ class IndegoFlowHandler(config_entry_oauth2_flow.AbstractOAuth2FlowHandler, doma
         self._data = dict(current_config.data)
         self._options = dict(current_config.options)
 
-        _LOGGER.debug("Loaded reauth with data: '%s'", self._data)
-        _LOGGER.debug("Loaded reauth with options: '%s'", self._options)
+        _LOGGER.info("Re-authentication required for mower: %s", self._data.get(CONF_MOWER_SERIAL, "Unknown"))
 
         return await self.async_step_reauth_confirm()
 

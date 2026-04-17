@@ -1,0 +1,317 @@
+{
+    "config": {
+        "abort": {
+            "already_configured": "¡Este robot cortacésped Bosch Indego ya ha sido configurado!",
+            "connection_error": "¡La conexión a la API de Bosch Indego ha fallado! Por favor, utilice la página de problemas conocidos (https://github.com/sander1988/Indego?tab=readme-ov-file#known-issues) para posibles soluciones.",
+            "no_mowers_found": "¡No se encontraron robots cortacésped en esta cuenta de Bosch Indego!",
+            "reauth_successful": "La re-autenticación fue exitosa. Se ha restaurado el acceso a la API de Bosch."
+        },
+        "step": {
+            "advanced": {
+                "data": {
+                    "user_agent": "User-Agent",
+                    "expose_mower": "Exponer el robot cortacésped Indego como entidad mower en Home Assistant",
+                    "expose_vacuum": "Exponer el robot cortacésped Indego como entidad vacuum en Home Assistant"
+                },
+                "data_description": {
+                    "user_agent": "Encabezado User-Agent personalizado para solicitudes API a Bosch Indego Cloud. Dejar vacío para usar el valor por defecto. Algunos usuarios pueden necesitar establecer un valor personalizado si su cuenta tiene restricciones de acceso a la API."
+                },
+                "description": "Configuración avanzada del componente Bosch Indego."
+            },
+            "mower": {
+                "data": {
+                    "mower_serial": "Número de serie del robot",
+                    "mower_name": "Nombre del robot"
+                },
+                "description": "Seleccione el número de serie del robot cortacésped Bosch que desea añadir."
+            },
+            "reauth_confirm": {
+                "title": "Autenticación expirada",
+                "description": "La autenticación de la API de Bosch Indego ha expirado. Por favor, re-autentíquese utilizando su Bosch SingleKey ID."
+            }
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "title": "Configuración avanzada",
+                "description": "Configuración avanzada del componente Bosch Indego. Es posible que deba recargar el componente después de cambiar estas configuraciones.",
+                "data": {
+                    "user_agent": "User-Agent",
+                    "expose_mower": "Exponer el robot cortacésped Indego como entidad mower en Home Assistant",
+                    "expose_vacuum": "Exponer el robot cortacésped Indego como entidad vacuum en Home Assistant",
+                    "show_all_alerts": "Mostrar el historial completo de alertas en Home Assistant. Esto no se recomienda para la mayoría de los usuarios, ya que podría tener un impacto significativo en el tamaño de la base de datos de Home Assistant."
+                },
+                "data_description": {
+                    "user_agent": "Encabezado User-Agent personalizado para solicitudes API a Bosch Indego Cloud. Dejar vacío para usar el valor por defecto. Algunos usuarios pueden necesitar establecer un valor personalizado si su cuenta tiene restricciones de acceso a la API."
+                }
+            }
+        }
+    },
+    "entity": {
+        "binary_sensor": {
+            "indego_alert": {
+                "state_attributes": {
+                    "alerts_count": {
+                        "name": "Número de alertas"
+                    },
+                    "last_alert_error_code": {
+                        "name": "Código de error (más reciente)"
+                    },
+                    "last_alert_message": {
+                        "name": "Mensaje de alerta (más reciente)"
+                    },
+                    "last_alert_date": {
+                        "name": "Fecha de alerta (más reciente)"
+                    },
+                    "last_alert_read": {
+                        "name": "Estado de alerta (más reciente)",
+                        "state": {
+                            "read": "Leído",
+                            "unread": "No leído"
+                        }
+                    }
+                }
+            },
+            "online": {
+                "name": "En línea"
+            },
+            "update_available": {
+                "name": "Actualización disponible"
+            },
+            "mower_stuck": {
+                "name": "Robot atascado"
+            },
+            "service_status": {
+                "name": "Estado del servicio"
+            },
+            "battery_charging": {
+                "name": "Estado de carga"
+            }
+        },
+        "sensor": {
+            "mower_state": {
+                "name": "Estado del cortacésped",
+                "state": {
+                    "Mowing": "Cortando",
+                    "Docked": "Acoplado",
+                    "Sleeping": "Durmiendo",
+                    "Paused": "Pausado"
+                }
+            },
+            "mower_state_detail": {
+                "name": "Detalles del estado del cortacésped",
+                "state": {
+                    "Reading status": "Leyendo estado",
+                    "Charging": "Cargando",
+                    "Docked": "Acoplado",
+                    "Sleeping": "Durmiendo",
+                    "Docked - Software update": "Acoplado - Actualización de software",
+                    "Docked - Loading map": "Acoplado - Cargando mapa",
+                    "Docked - Saving map": "Acoplado - Guardando mapa",
+                    "Docked - Leaving Dock": "Acoplado - Saliendo del puerto",
+                    "Mowing": "Cortando",
+                    "Mowing - Relocalising": "Cortando - Reubicando",
+                    "Mowing - Learning Lawn": "Cortando - Aprendiendo el jardín",
+                    "Mowing - Learning Lawn paused": "Cortando - Aprendizaje del jardín pausado",
+                    "SpotMow": "SpotMow",
+                    "Mowing randomly": "Cortando aleatoriamente",
+                    "Diagnostic mode": "Modo de diagnóstico",
+                    "End of life": "Fin de vida",
+                    "Software update": "Actualización de software",
+                    "Energy save mode": "Modo de ahorro de energía",
+                    "Relocalising": "Reubicando",
+                    "Loading map": "Cargando mapa",
+                    "Learning lawn": "Aprendiendo el jardín",
+                    "Paused": "Pausado",
+                    "Border cut": "Corte de borde",
+                    "Idle in lawn": "Inactivo en el jardín",
+                    "Stuck on lawn, help needed": "Atrapado en el jardín, se necesita ayuda",
+                    "Returning to Dock": "Regresando al puerto",
+                    "Returning to Dock - Battery low": "Regresando al puerto - Batería baja",
+                    "Returning to dock - Calendar timeslot ended": "Regresando al puerto - Tiempo del calendario finalizado",
+                    "Returning to dock - Battery temp range": "Regresando al puerto - Rango de temperatura de batería",
+                    "Returning to dock - Lawn complete": "Regresando al puerto - Jardín completamente cortado",
+                    "Returning to dock - Relocalising": "Regresando al puerto - Reubicando",
+                    "Returning to dock - requested by user/app": "Regresando al puerto - Solicitado por usuario/aplicación"
+                }
+            },
+            "battery_percentage": {
+                "name": "Batería"
+            },
+            "lawn_mowed": {
+                "name": "Césped cortado"
+            },
+            "lawn_mowed_size": {
+                "name": "Área de césped cortada"
+            },
+            "last_completed": {
+                "name": "Último completado"
+            },
+            "next_mow": {
+                "name": "Próximo corte"
+            },
+            "mowing_mode": {
+                "name": "Modo de corte"
+            },
+            "runtime_total": {
+                "name": "Tiempo total de corte"
+            },
+            "garden_size": {
+                "name": "Tamaño del jardín"
+            },
+            "mower_position_x": {
+                "name": "Posición del robot X"
+            },
+            "mower_position_y": {
+                "name": "Posición del robot Y"
+            },
+            "last_error_code": {
+                "name": "Último error"
+            },
+            "firmware_version": {
+                "name": "Versión del firmware"
+            },
+            "maintenance_hours": {
+                "name": "Horas de mantenimiento"
+            },
+            "session_count": {
+                "name": "Número de sesiones"
+            },
+            "battery_voltage": {
+                "name": "Voltaje de batería"
+            },
+            "battery_temperature": {
+                "name": "Temperatura de batería"
+            },
+            "ambient_temperature": {
+                "name": "Temperatura ambiente"
+            },
+            "battery_cycles": {
+                "name": "Ciclos de batería"
+            },
+            "battery_discharge": {
+                "name": "Descarga de batería"
+            }
+        },
+        "camera": {
+            "mowing_map": {
+                "name": "Mapa de corte"
+            }
+        },
+        "button": {
+            "delete_all_alerts": {
+                "name": "Eliminar todas las alertas"
+            },
+            "delete_last_alert": {
+                "name": "Eliminar última alerta"
+            },
+            "read_all_alerts": {
+                "name": "Marcar todas las alertas como leídas"
+            },
+            "read_last_alert": {
+                "name": "Marcar última alerta como leída"
+            }
+        },
+        "switch": {
+            "indego_smartmowing": {
+                "name": "SmartMowing"
+            }
+        }
+    },
+    "services": {
+        "command": {
+            "name": "Enviar comando",
+            "description": "Enviar comandos al cortacésped. Seleccione un comando.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Número de serie del robot. Solo es necesario cuando tiene configurados varios robots cortacéspedes."
+                },
+                "command": {
+                    "name": "Enviar comando",
+                    "description": "Enviar comandos al cortacésped. Seleccione un comando."
+                }
+            }
+        },
+        "smartmowing": {
+            "name": "Alternar SmartMowing",
+            "description": "Habilitar o deshabilitar SmartMowing. Los valores permitidos son true o false.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Número de serie del robot. Solo es necesario cuando tiene configurados varios robots cortacéspedes."
+                },
+                "enable": {
+                    "description": "Habilitar SmartMowing."
+                }
+            }
+        },
+        "delete_alert": {
+            "name": "Eliminar alerta",
+            "description": "Eliminar la alerta seleccionada.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Número de serie del robot. Solo es necesario cuando tiene configurados varios robots cortacéspedes."
+                },
+                "alert_index": {
+                    "description": "Eliminar la alerta seleccionada. 0 para la alerta más reciente."
+                }
+            }
+        },
+        "delete_alert_all": {
+            "name": "Eliminar todas las alertas",
+            "description": "Eliminar todas las alertas.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Número de serie del robot. Solo es necesario cuando tiene configurados varios robots cortacéspedes."
+                }
+            }
+        },
+        "read_alert": {
+            "name": "Marcar alerta como leída",
+            "description": "Marcar la alerta seleccionada como leída.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Número de serie del robot. Solo es necesario cuando tiene configurados varios robots cortacéspedes."
+                },
+                "alert_index": {
+                    "description": "Marcar la alerta seleccionada como leída. 0 para la alerta más reciente."
+                }
+            }
+        },
+        "read_alert_all": {
+            "name": "Marcar todas las alertas como leídas",
+            "description": "Marcar todas las alertas como leídas.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Número de serie del robot. Solo es necesario cuando tiene configurados varios robots cortacéspedes."
+                }
+            }
+        },
+        "download_map": {
+            "name": "Descargar mapa de corte",
+            "description": "Descarga el mapa de corte actual desde la API de Bosch Cloud y lo guarda localmente como \"www/indego_map_base.svg\". El mapa refleja la ruta de corte más recientemente registrada.",
+            "fields": {
+                "mower_serial": {
+                    "description": "Número de serie del robot. Solo es necesario cuando tiene configurados varios robots cortacéspedes."
+                }
+            }
+        }
+    },
+    "issues": {
+        "auth_failure": {
+            "title": "Bosch Indego authentication expired",
+            "description": "Your authentication with Bosch Indego has expired. Please go to Settings > Devices & Services > Indego > Re-authenticate to restore access to your mower."
+        },
+        "connection_failure": {
+            "title": "Bosch Indego connection problems",
+            "description": "Your mower has not responded to API requests for an extended period. This may indicate network issues, the Bosch service is experiencing problems, or your mower is offline. Please check your internet connection and mower status."
+        }
+    },
+    "system_health": {
+        "can_reach_bosch_api": "Can reach Bosch Indego API",
+        "can_reach_auth_service": "Can reach Bosch authentication service",
+        "bosch_service_status": "Bosch service status",
+        "mower_online": "Mower online status",
+        "last_api_response": "Last successful API response"
+    }
+}
