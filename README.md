@@ -92,15 +92,12 @@ To keep your dashboard organized, the integration splits data into logical secti
 
 ## Installation
 
-### ~~Option 1: Via HACS (Recommended)~~
+### Option 1: Via HACS (Recommended)
 
-~~1. Add this repository to HACS (Community Store)~~  
-~~2. Search for "Bosch Indego"~~  
-~~3. Click "Install"~~  
-~~4. Restart Home Assistant~~
-
-> [!NOTE]  
-> The integration is currently **not** available in the default HACS store. Please use **Option 2** (Custom Repository) or **Option 3** below to install it.
+1. Add this repository to HACS (Community Store) 
+2. Search for "Bosch Indego"
+3. Click "Install"  
+4. Restart Home Assistant
 
 ---
 
@@ -826,7 +823,7 @@ _Not seeing your model? Please [open an issue](https://github.com/sander1988/Ind
 
 ## 🙏 Credits
 
-**Maintainers:** [@sander1988](https://github.com/sander1988), [@kimzeuner](https://github.com/kimzeuner)
+**Maintainers:** [@sander1988](https://github.com/sander1988), [@WhyLev](https://github.com/whylev), [@kimzeuner](https://github.com/kimzeuner)
 
 **Contributors:**
 [@sander1988](https://github.com/sander1988), [Eduard](https://github.com/eavanvalkenburg), [Jumper78](https://github.com/Jumper78), [dykandDK](https://github.com/dykandDK), [ultrasub](https://github.com/UltraSub), [Gnol86](https://github.com/Gnol86), naethan, bekkm, onkelfarmor, ltjessem, nsimb, jjandersson, [Shamshala](https://github.com/Shamshala), nath, [urbatecte](https://github.com/urbatecte), [Windmelodie](https://github.com/Windmelodie), [Fuempel](https://github.com/Fuempel), [MagaliDB](https://github.com/MagaliDB), [mhosse](https://github.com/mhosse), [Promises](https://github.com/Pr0mises)
