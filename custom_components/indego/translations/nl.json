@@ -14,10 +14,7 @@
                     "expose_vacuum": "Voeg de Indego robotmaaier toe als stofzuiger entiteit aan Home Assistant"
                 },
                 "data_description": {
-                    "user_agent": "Custom User-Agent header voor API-verzoeken naar Bosch Indego Cloud. Leeg laten om de standaardwaarde te gebruiken. Sommige gebruikers moeten mogelijk een aangepaste waarde instellen als hun account API-toegangsbeperkingen heeft."
-                },
-                "data_description": {
-                    "user_agent": "Bij HTTP 4XX-fouten (met name Reason: 403, message=‘Forbidden’) kan het helpen om de User Agent aan te passen. Deze mag geen Homeassistant of HA bevatten."
+                    "user_agent": "Bij HTTP 4XX-fouten (met name Reason: 403, message=’Forbidden’) kan het helpen om de User Agent aan te passen. Deze mag geen Homeassistant of HA bevatten."
                 },
                 "description": "Geavanceerde instellingen van het Bosch Indego component."
             },
@@ -112,7 +109,7 @@
                     "Docked - Software update": "Geparkeerd - Software update",
                     "Docked - Loading map": "Geparkeerd - Map laden",
                     "Docked - Saving map": "Geparkeerd - Map opslaan",
-                    "Docked - Leaving Dock": "Station verlaten",
+                    "Docked - Leaving dock": "Station verlaten",
                     "Mowing": "Maaien",
                     "Mowing - Relocalising": "Maaien - Herlokaliseren",
                     "Mowing - Learning Lawn": "Maaien - Gazon leren",
@@ -130,8 +127,8 @@
                     "Border cut": "Rand maaien",
                     "Idle in lawn": "Inactief op gazon",
                     "Stuck on lawn, help needed": "Vastgelopen op gazon, hulp nodig",
-                    "Returning to Dock": "Terugkeren naar basisstation",
-                    "Returning to Dock - Battery low": "Terugkeren naar basisstation - Batterij bijna leeg",
+                    "Returning to dock": "Terugkeren naar basisstation",
+                    "Returning to dock - Battery low": "Terugkeren naar basisstation - Batterij bijna leeg",
                     "Returning to dock - Calendar timeslot ended": "Terugkeren naar basisstation - Kalender tijdslot verstreken",
                     "Returning to dock - Battery temp range": "Terugkeren naar basisstation - Batterij temperatuur",
                     "Returning to dock - Lawn complete": "Terugkeren naar basisstation - Maaien voltooid",
@@ -155,7 +152,10 @@
                 "name": "Volgende maaien"
             },
             "mowing_mode": {
-                "name": "Maaimode"
+                "name": "Maaimode",
+                "state": {
+                    "calendar": "Handmatige kalender"
+                }
             },
             "runtime_total": {
                 "name": "Totale maaibedrijf"
@@ -195,6 +195,333 @@
             },
             "battery_discharge": {
                 "name": "Batterijontlading"
+            },
+            "calendar_slots": {
+                "state": {
+                    "smartmowing_active": "SmartMowing actief",
+                    "calendar_selection_required": "Kalenderselectie vereist",
+                    "off": "Uit"
+                },
+                "name": "Geplande maaitijden",
+                "state_attributes": {
+                    "today_slot_1": {
+                        "name": "Vandaag slot 1",
+                        "state": {
+                            "not_enabled": "Niet ingeschakeld",
+                            "not_configured": "Niet geconfigureerd"
+                        }
+                    },
+                    "today_slot_2": {
+                        "name": "Vandaag slot 2",
+                        "state": {
+                            "not_enabled": "Niet ingeschakeld",
+                            "not_configured": "Niet geconfigureerd"
+                        }
+                    },
+                    "monday_slot_1": {
+                        "name": "Maandag Slot 1",
+                        "state": {
+                            "not_enabled": "Niet ingeschakeld",
+                            "not_configured": "Niet geconfigureerd"
+                        }
+                    },
+                    "monday_slot_2": {
+                        "name": "Maandag Slot 2",
+                        "state": {
+                            "not_enabled": "Niet ingeschakeld",
+                            "not_configured": "Niet geconfigureerd"
+                        }
+                    },
+                    "tuesday_slot_1": {
+                        "name": "Dinsdag Slot 1",
+                        "state": {
+                            "not_enabled": "Niet ingeschakeld",
+                            "not_configured": "Niet geconfigureerd"
+                        }
+                    },
+                    "tuesday_slot_2": {
+                        "name": "Dinsdag Slot 2",
+                        "state": {
+                            "not_enabled": "Niet ingeschakeld",
+                            "not_configured": "Niet geconfigureerd"
+                        }
+                    },
+                    "wednesday_slot_1": {
+                        "name": "Woensdag Slot 1",
+                        "state": {
+                            "not_enabled": "Niet ingeschakeld",
+                            "not_configured": "Niet geconfigureerd"
+                        }
+                    },
+                    "wednesday_slot_2": {
+                        "name": "Woensdag Slot 2",
+                        "state": {
+                            "not_enabled": "Niet ingeschakeld",
+                            "not_configured": "Niet geconfigureerd"
+                        }
+                    },
+                    "thursday_slot_1": {
+                        "name": "Donderdag Slot 1",
+                        "state": {
+                            "not_enabled": "Niet ingeschakeld",
+                            "not_configured": "Niet geconfigureerd"
+                        }
+                    },
+                    "thursday_slot_2": {
+                        "name": "Donderdag Slot 2",
+                        "state": {
+                            "not_enabled": "Niet ingeschakeld",
+                            "not_configured": "Niet geconfigureerd"
+                        }
+                    },
+                    "friday_slot_1": {
+                        "name": "Vrijdag Slot 1",
+                        "state": {
+                            "not_enabled": "Niet ingeschakeld",
+                            "not_configured": "Niet geconfigureerd"
+                        }
+                    },
+                    "friday_slot_2": {
+                        "name": "Vrijdag Slot 2",
+                        "state": {
+                            "not_enabled": "Niet ingeschakeld",
+                            "not_configured": "Niet geconfigureerd"
+                        }
+                    },
+                    "saturday_slot_1": {
+                        "name": "Zaterdag Slot 1",
+                        "state": {
+                            "not_enabled": "Niet ingeschakeld",
+                            "not_configured": "Niet geconfigureerd"
+                        }
+                    },
+                    "saturday_slot_2": {
+                        "name": "Zaterdag Slot 2",
+                        "state": {
+                            "not_enabled": "Niet ingeschakeld",
+                            "not_configured": "Niet geconfigureerd"
+                        }
+                    },
+                    "sunday_slot_1": {
+                        "name": "Zondag Slot 1",
+                        "state": {
+                            "not_enabled": "Niet ingeschakeld",
+                            "not_configured": "Niet geconfigureerd"
+                        }
+                    },
+                    "sunday_slot_2": {
+                        "name": "Zondag Slot 2",
+                        "state": {
+                            "not_enabled": "Niet ingeschakeld",
+                            "not_configured": "Niet geconfigureerd"
+                        }
+                    }
+                }
+            },
+            "predictive_calendar_slots": {
+                "name": "SmartMowing-blokkeertijden",
+                "state": {
+                    "manual_calendar_active": "Handmatige kalender actief",
+                    "off": "Uit"
+                },
+                "state_attributes": {
+                    "last_updated": {
+                        "name": "Laatst bijgewerkt"
+                    },
+                    "smartmowing_enabled": {
+                        "name": "SmartMowing actief"
+                    },
+                    "mowing_mode": {
+                        "name": "Maaimodus"
+                    },
+                    "earliest_start": {
+                        "name": "Vroegste start",
+                        "state": {
+                            "not_enabled": "Niet ingeschakeld"
+                        }
+                    },
+                    "latest_end": {
+                        "name": "Laatste einde",
+                        "state": {
+                            "not_enabled": "Niet ingeschakeld"
+                        }
+                    },
+                    "blocked_before": {
+                        "name": "Geblokkeerd voor",
+                        "state": {
+                            "not_enabled": "Niet ingeschakeld"
+                        }
+                    },
+                    "blocked_after": {
+                        "name": "Geblokkeerd na",
+                        "state": {
+                            "not_enabled": "Niet ingeschakeld"
+                        }
+                    }
+                }
+            },
+            "predictive_schedule": {
+                "name": "SmartMowing-schema",
+                "state": {
+                    "manual_calendar_active": "Handmatige kalender actief",
+                    "none": "Geen"
+                },
+                "state_attributes": {
+                    "last_updated": {
+                        "name": "Laatst bijgewerkt"
+                    },
+                    "next_mow_slot": {
+                        "name": "Volgend gepland maaislot",
+                        "state": {
+                            "none": "Geen"
+                        }
+                    },
+                    "next_mow_day": {
+                        "name": "Volgende geplande maaidag",
+                        "state": {
+                            "none": "Geen",
+                            "monday": "Maandag",
+                            "tuesday": "Dinsdag",
+                            "wednesday": "Woensdag",
+                            "thursday": "Donderdag",
+                            "friday": "Vrijdag",
+                            "saturday": "Zaterdag",
+                            "sunday": "Zondag"
+                        }
+                    },
+                    "next_mow_time": {
+                        "name": "Volgende geplande maaitijd",
+                        "state": {
+                            "none": "Geen"
+                        }
+                    },
+                    "schedule_monday": {
+                        "name": "Schema Maandag",
+                        "state": {
+                            "not_scheduled": "Niet gepland"
+                        }
+                    },
+                    "exclusion_monday_user": {
+                        "name": "Blokkeertijd Maandag gebruiker",
+                        "state": {
+                            "none": "Geen"
+                        }
+                    },
+                    "exclusion_monday_weather": {
+                        "name": "Blokkeertijd Maandag weer",
+                        "state": {
+                            "none": "Geen"
+                        }
+                    },
+                    "schedule_tuesday": {
+                        "name": "Schema Dinsdag",
+                        "state": {
+                            "not_scheduled": "Niet gepland"
+                        }
+                    },
+                    "exclusion_tuesday_user": {
+                        "name": "Blokkeertijd Dinsdag gebruiker",
+                        "state": {
+                            "none": "Geen"
+                        }
+                    },
+                    "exclusion_tuesday_weather": {
+                        "name": "Blokkeertijd Dinsdag weer",
+                        "state": {
+                            "none": "Geen"
+                        }
+                    },
+                    "schedule_wednesday": {
+                        "name": "Schema Woensdag",
+                        "state": {
+                            "not_scheduled": "Niet gepland"
+                        }
+                    },
+                    "exclusion_wednesday_user": {
+                        "name": "Blokkeertijd Woensdag gebruiker",
+                        "state": {
+                            "none": "Geen"
+                        }
+                    },
+                    "exclusion_wednesday_weather": {
+                        "name": "Blokkeertijd Woensdag weer",
+                        "state": {
+                            "none": "Geen"
+                        }
+                    },
+                    "schedule_thursday": {
+                        "name": "Schema Donderdag",
+                        "state": {
+                            "not_scheduled": "Niet gepland"
+                        }
+                    },
+                    "exclusion_thursday_user": {
+                        "name": "Blokkeertijd Donderdag gebruiker",
+                        "state": {
+                            "none": "Geen"
+                        }
+                    },
+                    "exclusion_thursday_weather": {
+                        "name": "Blokkeertijd Donderdag weer",
+                        "state": {
+                            "none": "Geen"
+                        }
+                    },
+                    "schedule_friday": {
+                        "name": "Schema Vrijdag",
+                        "state": {
+                            "not_scheduled": "Niet gepland"
+                        }
+                    },
+                    "exclusion_friday_user": {
+                        "name": "Blokkeertijd Vrijdag gebruiker",
+                        "state": {
+                            "none": "Geen"
+                        }
+                    },
+                    "exclusion_friday_weather": {
+                        "name": "Blokkeertijd Vrijdag weer",
+                        "state": {
+                            "none": "Geen"
+                        }
+                    },
+                    "schedule_saturday": {
+                        "name": "Schema Zaterdag",
+                        "state": {
+                            "not_scheduled": "Niet gepland"
+                        }
+                    },
+                    "exclusion_saturday_user": {
+                        "name": "Blokkeertijd Zaterdag gebruiker",
+                        "state": {
+                            "none": "Geen"
+                        }
+                    },
+                    "exclusion_saturday_weather": {
+                        "name": "Blokkeertijd Zaterdag weer",
+                        "state": {
+                            "none": "Geen"
+                        }
+                    },
+                    "schedule_sunday": {
+                        "name": "Schema Zondag",
+                        "state": {
+                            "not_scheduled": "Niet gepland"
+                        }
+                    },
+                    "exclusion_sunday_user": {
+                        "name": "Blokkeertijd Zondag gebruiker",
+                        "state": {
+                            "none": "Geen"
+                        }
+                    },
+                    "exclusion_sunday_weather": {
+                        "name": "Blokkeertijd Zondag weer",
+                        "state": {
+                            "none": "Geen"
+                        }
+                    }
+                }
             }
         },
         "camera": {
@@ -298,6 +625,66 @@
                     "description": "Grasmaaier serienummer. Alleen nodig wanneer je meerdere grasmaaiers hebt geconfigureerd."
                 }
             }
+        },
+        "set_calendar_slot": {
+            "name": "Kalenderslot activeren/deactiveren",
+            "description": "Wijzig een kalenderslot (tijden wijzigen, activeren of deactiveren)",
+            "fields": {
+                "mower_serial": {
+                    "name": "Serienummer",
+                    "description": "Serienummer van de grasmaaier. Alleen nodig als er meerdere grasmaaiers zijn geconfigureerd."
+                },
+                "calendar_type": {
+                    "name": "Kalendertype",
+                    "description": "Selecteer de kalender ('calendar' voor de handmatige kalender of 'predictive' voor gedeactiveerde tijden in SmartMowing-modus)."
+                },
+                "day": {
+                    "name": "Dag",
+                    "description": "Naam van de weekdag die moet worden geconfigureerd."
+                },
+                "slot": {
+                    "name": "Tijdslot",
+                    "description": "Welk tijdslot moet worden gewijzigd (1 of 2)."
+                },
+                "enabled": {
+                    "name": "Activeren/deactiveren",
+                    "description": "Activeer of deactiveer de geselecteerde dag/het geselecteerde tijdslot."
+                },
+                "start": {
+                    "name": "Start",
+                    "description": "Starttijd van het geselecteerde tijdslot. Alleen nodig als het tijdslot geactiveerd moet worden. Alleen uren en minuten worden gebruikt."
+                },
+                "end": {
+                    "name": "Einde",
+                    "description": "Eindtijd van het geselecteerde tijdslot. Alleen nodig als het tijdslot geactiveerd moet worden. Alleen uren en minuten worden gebruikt."
+                }
+            }
+        }
+    },
+    "selector": {
+        "calendar_type_options": {
+            "options": {
+                "calendar": "Handmatige kalender",
+                "predictive": "SmartMowing-blokkeertijden"
+            }
+        },
+        "day_options": {
+            "options": {
+                "monday": "Maandag",
+                "tuesday": "Dinsdag",
+                "wednesday": "Woensdag",
+                "thursday": "Donderdag",
+                "friday": "Vrijdag",
+                "saturday": "Zaterdag",
+                "sunday": "Zondag"
+            }
+        },
+        "command_options": {
+            "options": {
+                "mow": "Maaien",
+                "returnToDock": "Terug naar het laadstation",
+                "pause": "Pauze"
+            }
         }
     },
     "issues": {
@@ -309,12 +696,5 @@
             "title": "Bosch Indego connection problems",
             "description": "Your mower has not responded to API requests for an extended period. This may indicate network issues, the Bosch service is experiencing problems, or your mower is offline. Please check your internet connection and mower status."
         }
-    },
-    "system_health": {
-        "can_reach_bosch_api": "Can reach Bosch Indego API",
-        "can_reach_auth_service": "Can reach Bosch authentication service",
-        "bosch_service_status": "Bosch service status",
-        "mower_online": "Mower online status",
-        "last_api_response": "Last successful API response"
     }
 }

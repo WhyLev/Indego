@@ -15,6 +15,7 @@ from homeassistant.helpers.entity import DeviceInfo
 from .mixins import IndegoEntity
 from .const import DATA_UPDATED, DOMAIN
 
+
 _LOGGER = logging.getLogger(__name__)
 
 
@@ -84,15 +85,18 @@ class IndegoSwitch(IndegoEntity, SwitchEntity):
     @property
     def is_on(self) -> bool:
         """Return true if switch is on."""
-        # Check if SmartMowing is enabled by parsing the mowing mode description
         try:
             mowing_mode = getattr(
-                self._indego_hub._indego_client.state, "mowing_mode_description", None
+                self._indego_hub._indego_client.generic_data,
+                "mowing_mode_description",
+                None,
             )
-            if mowing_mode:
-                # Check if mowing mode contains "Smart" (SmartMowing indicator)
-                self._is_on = "Smart" in str(mowing_mode)
+
+            if mowing_mode is not None:
+                self._is_on = str(mowing_mode).lower() == "smartmowing"
+
             return self._is_on
+
         except (AttributeError, TypeError):
             return self._is_on
 
@@ -106,16 +110,43 @@ class IndegoSwitch(IndegoEntity, SwitchEntity):
     async def async_turn_on(self, **kwargs) -> None:
         """Turn the switch on."""
         _LOGGER.debug("Turning on SmartMowing for mower %s", self._indego_hub.serial)
-        await self._indego_hub._indego_client.put_mow_mode("true")
-        await self._indego_hub._update_generic_data()
+
+        self._indego_hub._forced_mowing_mode = "SmartMowing"
+
+        await self._indego_hub._indego_client.put_mow_mode(True)
+
         self.is_on = True
+
+        await self._indego_hub._update_predictive_calendar()
+        await self._indego_hub._update_predictive_schedule()
+        await self._indego_hub._update_calendar()
+        await self._indego_hub._update_generic_data()
 
     async def async_turn_off(self, **kwargs) -> None:
         """Turn the switch off."""
         _LOGGER.debug("Turning off SmartMowing for mower %s", self._indego_hub.serial)
-        await self._indego_hub._indego_client.put_mow_mode("false")
-        await self._indego_hub._update_generic_data()
+
+        self._indego_hub._forced_mowing_mode = "Calendar"
+
+        await self._indego_hub._indego_client.put_mow_mode(False)
+
+        await self._indego_hub.async_select_manual_calendar()
+
         self.is_on = False
+
+        await self._indego_hub._update_predictive_calendar()
+        await self._indego_hub._update_predictive_schedule()
+        await self._indego_hub._update_calendar()
+        await self._indego_hub._update_generic_data()
+
+        mowing_mode = getattr(
+            self._indego_hub._indego_client.generic_data,
+            "mowing_mode_description",
+            None,
+        )
+
+        if str(mowing_mode).lower() == "calendar":
+            self._indego_hub._forced_mowing_mode = None
 
     @property
     def state(self) -> str:

@@ -14,9 +14,6 @@
                     "expose_vacuum": "Exposer la tondeuse Indego comme une entité aspirateur dans Home Assistant"
                 },
                 "data_description": {
-                    "user_agent": "En-tête User-Agent personnalisé pour les requêtes API vers Bosch Indego Cloud. Laisser vide pour utiliser la valeur par défaut. Certains utilisateurs devront peut-être définir une valeur personnalisée si leur compte a des restrictions d'accès à l'API."
-                },
-                "data_description": {
                     "user_agent": "En cas d'erreurs HTTP 4XX (notamment avec le code 403 et le message « Forbidden »), il peut être utile de modifier l'agent utilisateur. Celui-ci ne doit pas contenir les termes « Homeassistant » ou « HA »."
                 },
                 "description": "Réglages avancés du composant Bosch Indego. Peuvent être laissés inchangés pour la plupart des utilisateurs."
@@ -112,7 +109,7 @@
                     "Docked - Software update": "Dans station de charge - Mise à jour du logiciel",
                     "Docked - Loading map": "Dans station de charge - Chargement carte",
                     "Docked - Saving map": "Dans station de charge - Enregistrement carte",
-                    "Docked - Leaving Dock": "Dans station de charge - Quitte la station",
+                    "Docked - Leaving dock": "Dans station de charge - Quitte la station",
                     "Mowing": "Tonte en cours",
                     "Mowing - Relocalising": "Tonte en cours - Cherche position",
                     "Mowing - Learning Lawn": "Tonte en cours - Apprentissage de la pelouse",
@@ -130,8 +127,8 @@
                     "Border cut": "Tonte des bords",
                     "Idle in lawn": "Immobilisée sur pelouse",
                     "Stuck on lawn, help needed": "Bloquée sur pelouse, intervention nécessaire",
-                    "Returning to Dock": "Retour à la station",
-                    "Returning to Dock - Battery low": "Retour à la station - Batterie faible",
+                    "Returning to dock": "Retour à la station",
+                    "Returning to dock - Battery low": "Retour à la station - Batterie faible",
                     "Returning to dock - Calendar timeslot ended": "Retour à la station - Fin de créneau agenda",
                     "Returning to dock - Battery temp range": "Retour à la station - Température batterie hors tolérances",
                     "Returning to dock - Lawn complete": "Retour à la station - Pelouse terminée",
@@ -155,7 +152,10 @@
                 "name": "Prochain tontes"
             },
             "mowing_mode": {
-                "name": "Mode de tonte"
+                "name": "Mode de tonte",
+                "state": {
+                    "calendar": "Calendrier manuel"
+                }
             },
             "runtime_total": {
                 "name": "Temps de tontes total"
@@ -195,6 +195,333 @@
             },
             "battery_discharge": {
                 "name": "Décharge batterie"
+            },
+            "calendar_slots": {
+                "state": {
+                    "smartmowing_active": "SmartMowing actif",
+                    "calendar_selection_required": "Sélection du calendrier requise",
+                    "off": "Désactivé"
+                },
+                "name": "Horaires de tonte planifiés",
+                "state_attributes": {
+                    "today_slot_1": {
+                        "name": "Créneau aujourd'hui 1",
+                        "state": {
+                            "not_enabled": "Non activé",
+                            "not_configured": "Non configuré"
+                        }
+                    },
+                    "today_slot_2": {
+                        "name": "Créneau aujourd'hui 2",
+                        "state": {
+                            "not_enabled": "Non activé",
+                            "not_configured": "Non configuré"
+                        }
+                    },
+                    "monday_slot_1": {
+                        "name": "Lundi Slot 1",
+                        "state": {
+                            "not_enabled": "Non activé",
+                            "not_configured": "Non configuré"
+                        }
+                    },
+                    "monday_slot_2": {
+                        "name": "Lundi Slot 2",
+                        "state": {
+                            "not_enabled": "Non activé",
+                            "not_configured": "Non configuré"
+                        }
+                    },
+                    "tuesday_slot_1": {
+                        "name": "Mardi Slot 1",
+                        "state": {
+                            "not_enabled": "Non activé",
+                            "not_configured": "Non configuré"
+                        }
+                    },
+                    "tuesday_slot_2": {
+                        "name": "Mardi Slot 2",
+                        "state": {
+                            "not_enabled": "Non activé",
+                            "not_configured": "Non configuré"
+                        }
+                    },
+                    "wednesday_slot_1": {
+                        "name": "Mercredi Slot 1",
+                        "state": {
+                            "not_enabled": "Non activé",
+                            "not_configured": "Non configuré"
+                        }
+                    },
+                    "wednesday_slot_2": {
+                        "name": "Mercredi Slot 2",
+                        "state": {
+                            "not_enabled": "Non activé",
+                            "not_configured": "Non configuré"
+                        }
+                    },
+                    "thursday_slot_1": {
+                        "name": "Jeudi Slot 1",
+                        "state": {
+                            "not_enabled": "Non activé",
+                            "not_configured": "Non configuré"
+                        }
+                    },
+                    "thursday_slot_2": {
+                        "name": "Jeudi Slot 2",
+                        "state": {
+                            "not_enabled": "Non activé",
+                            "not_configured": "Non configuré"
+                        }
+                    },
+                    "friday_slot_1": {
+                        "name": "Vendredi Slot 1",
+                        "state": {
+                            "not_enabled": "Non activé",
+                            "not_configured": "Non configuré"
+                        }
+                    },
+                    "friday_slot_2": {
+                        "name": "Vendredi Slot 2",
+                        "state": {
+                            "not_enabled": "Non activé",
+                            "not_configured": "Non configuré"
+                        }
+                    },
+                    "saturday_slot_1": {
+                        "name": "Samedi Slot 1",
+                        "state": {
+                            "not_enabled": "Non activé",
+                            "not_configured": "Non configuré"
+                        }
+                    },
+                    "saturday_slot_2": {
+                        "name": "Samedi Slot 2",
+                        "state": {
+                            "not_enabled": "Non activé",
+                            "not_configured": "Non configuré"
+                        }
+                    },
+                    "sunday_slot_1": {
+                        "name": "Dimanche Slot 1",
+                        "state": {
+                            "not_enabled": "Non activé",
+                            "not_configured": "Non configuré"
+                        }
+                    },
+                    "sunday_slot_2": {
+                        "name": "Dimanche Slot 2",
+                        "state": {
+                            "not_enabled": "Non activé",
+                            "not_configured": "Non configuré"
+                        }
+                    }
+                }
+            },
+            "predictive_calendar_slots": {
+                "name": "Périodes bloquées SmartMowing",
+                "state": {
+                    "manual_calendar_active": "Calendrier manuel actif",
+                    "off": "Désactivé"
+                },
+                "state_attributes": {
+                    "last_updated": {
+                        "name": "Dernière mise à jour"
+                    },
+                    "smartmowing_enabled": {
+                        "name": "SmartMowing actif"
+                    },
+                    "mowing_mode": {
+                        "name": "Mode de tonte"
+                    },
+                    "earliest_start": {
+                        "name": "Début le plus tôt",
+                        "state": {
+                            "not_enabled": "Non activé"
+                        }
+                    },
+                    "latest_end": {
+                        "name": "Fin au plus tard",
+                        "state": {
+                            "not_enabled": "Non activé"
+                        }
+                    },
+                    "blocked_before": {
+                        "name": "Bloqué avant",
+                        "state": {
+                            "not_enabled": "Non activé"
+                        }
+                    },
+                    "blocked_after": {
+                        "name": "Bloqué après",
+                        "state": {
+                            "not_enabled": "Non activé"
+                        }
+                    }
+                }
+            },
+            "predictive_schedule": {
+                "name": "Programme SmartMowing",
+                "state": {
+                    "manual_calendar_active": "Calendrier manuel actif",
+                    "none": "Aucun"
+                },
+                "state_attributes": {
+                    "last_updated": {
+                        "name": "Dernière mise à jour"
+                    },
+                    "next_mow_slot": {
+                        "name": "Prochain créneau de tonte planifié",
+                        "state": {
+                            "none": "Aucun"
+                        }
+                    },
+                    "next_mow_day": {
+                        "name": "Prochain jour de tonte planifié",
+                        "state": {
+                            "none": "Aucun",
+                            "monday": "Lundi",
+                            "tuesday": "Mardi",
+                            "wednesday": "Mercredi",
+                            "thursday": "Jeudi",
+                            "friday": "Vendredi",
+                            "saturday": "Samedi",
+                            "sunday": "Dimanche"
+                        }
+                    },
+                    "next_mow_time": {
+                        "name": "Prochaine heure de tonte planifiée",
+                        "state": {
+                            "none": "Aucun"
+                        }
+                    },
+                    "schedule_monday": {
+                        "name": "Programme Lundi",
+                        "state": {
+                            "not_scheduled": "Non planifié"
+                        }
+                    },
+                    "exclusion_monday_user": {
+                        "name": "Période bloquée Lundi utilisateur",
+                        "state": {
+                            "none": "Aucun"
+                        }
+                    },
+                    "exclusion_monday_weather": {
+                        "name": "Période bloquée Lundi météo",
+                        "state": {
+                            "none": "Aucun"
+                        }
+                    },
+                    "schedule_tuesday": {
+                        "name": "Programme Mardi",
+                        "state": {
+                            "not_scheduled": "Non planifié"
+                        }
+                    },
+                    "exclusion_tuesday_user": {
+                        "name": "Période bloquée Mardi utilisateur",
+                        "state": {
+                            "none": "Aucun"
+                        }
+                    },
+                    "exclusion_tuesday_weather": {
+                        "name": "Période bloquée Mardi météo",
+                        "state": {
+                            "none": "Aucun"
+                        }
+                    },
+                    "schedule_wednesday": {
+                        "name": "Programme Mercredi",
+                        "state": {
+                            "not_scheduled": "Non planifié"
+                        }
+                    },
+                    "exclusion_wednesday_user": {
+                        "name": "Période bloquée Mercredi utilisateur",
+                        "state": {
+                            "none": "Aucun"
+                        }
+                    },
+                    "exclusion_wednesday_weather": {
+                        "name": "Période bloquée Mercredi météo",
+                        "state": {
+                            "none": "Aucun"
+                        }
+                    },
+                    "schedule_thursday": {
+                        "name": "Programme Jeudi",
+                        "state": {
+                            "not_scheduled": "Non planifié"
+                        }
+                    },
+                    "exclusion_thursday_user": {
+                        "name": "Période bloquée Jeudi utilisateur",
+                        "state": {
+                            "none": "Aucun"
+                        }
+                    },
+                    "exclusion_thursday_weather": {
+                        "name": "Période bloquée Jeudi météo",
+                        "state": {
+                            "none": "Aucun"
+                        }
+                    },
+                    "schedule_friday": {
+                        "name": "Programme Vendredi",
+                        "state": {
+                            "not_scheduled": "Non planifié"
+                        }
+                    },
+                    "exclusion_friday_user": {
+                        "name": "Période bloquée Vendredi utilisateur",
+                        "state": {
+                            "none": "Aucun"
+                        }
+                    },
+                    "exclusion_friday_weather": {
+                        "name": "Période bloquée Vendredi météo",
+                        "state": {
+                            "none": "Aucun"
+                        }
+                    },
+                    "schedule_saturday": {
+                        "name": "Programme Samedi",
+                        "state": {
+                            "not_scheduled": "Non planifié"
+                        }
+                    },
+                    "exclusion_saturday_user": {
+                        "name": "Période bloquée Samedi utilisateur",
+                        "state": {
+                            "none": "Aucun"
+                        }
+                    },
+                    "exclusion_saturday_weather": {
+                        "name": "Période bloquée Samedi météo",
+                        "state": {
+                            "none": "Aucun"
+                        }
+                    },
+                    "schedule_sunday": {
+                        "name": "Programme Dimanche",
+                        "state": {
+                            "not_scheduled": "Non planifié"
+                        }
+                    },
+                    "exclusion_sunday_user": {
+                        "name": "Période bloquée Dimanche utilisateur",
+                        "state": {
+                            "none": "Aucun"
+                        }
+                    },
+                    "exclusion_sunday_weather": {
+                        "name": "Période bloquée Dimanche météo",
+                        "state": {
+                            "none": "Aucun"
+                        }
+                    }
+                }
             }
         },
         "camera": {
@@ -298,6 +625,66 @@
                     "description": "Numéro de série de la tondeuse. Uniquement nécessaire si vous avez configuré plusieurs tondeuses."
                 }
             }
+        },
+        "set_calendar_slot": {
+            "name": "Activer/désactiver un créneau du calendrier",
+            "description": "Modifier un créneau du calendrier (changer les horaires, activer ou désactiver)",
+            "fields": {
+                "mower_serial": {
+                    "name": "Numéro de série",
+                    "description": "Numéro de série de la tondeuse. Nécessaire uniquement si plusieurs tondeuses sont configurées."
+                },
+                "calendar_type": {
+                    "name": "Type de calendrier",
+                    "description": "Sélectionnez le calendrier ('calendar' pour le calendrier manuel ou 'predictive' pour les périodes désactivées en mode SmartMowing)."
+                },
+                "day": {
+                    "name": "Jour",
+                    "description": "Nom du jour de la semaine à configurer."
+                },
+                "slot": {
+                    "name": "Créneau horaire",
+                    "description": "Créneau à modifier (1 ou 2)."
+                },
+                "enabled": {
+                    "name": "Activer/désactiver",
+                    "description": "Activer ou désactiver le jour/créneau sélectionné."
+                },
+                "start": {
+                    "name": "Début",
+                    "description": "Heure de début du créneau sélectionné. Requise uniquement lorsqu’un créneau doit être activé. Seules les heures et les minutes sont utilisées."
+                },
+                "end": {
+                    "name": "Fin",
+                    "description": "Heure de fin du créneau sélectionné. Requise uniquement lorsqu’un créneau doit être activé. Seules les heures et les minutes sont utilisées."
+                }
+            }
+        }
+    },
+    "selector": {
+        "calendar_type_options": {
+            "options": {
+                "calendar": "Calendrier manuel",
+                "predictive": "Périodes bloquées SmartMowing"
+            }
+        },
+        "day_options": {
+            "options": {
+                "monday": "Lundi",
+                "tuesday": "Mardi",
+                "wednesday": "Mercredi",
+                "thursday": "Jeudi",
+                "friday": "Vendredi",
+                "saturday": "Samedi",
+                "sunday": "Dimanche"
+            }
+        },
+        "command_options": {
+            "options": {
+                "mow": "Tondre",
+                "returnToDock": "Retour à la station de charge",
+                "pause": "Pause"
+            }
         }
     },
     "issues": {
@@ -309,12 +696,5 @@
             "title": "Bosch Indego connection problems",
             "description": "Your mower has not responded to API requests for an extended period. This may indicate network issues, the Bosch service is experiencing problems, or your mower is offline. Please check your internet connection and mower status."
         }
-    },
-    "system_health": {
-        "can_reach_bosch_api": "Can reach Bosch Indego API",
-        "can_reach_auth_service": "Can reach Bosch authentication service",
-        "bosch_service_status": "Bosch service status",
-        "mower_online": "Mower online status",
-        "last_api_response": "Last successful API response"
     }
 }

@@ -109,7 +109,7 @@
                     "Docked - Software update": "Angedockt - Software-Update",
                     "Docked - Loading map": "Angedockt - Karte laden",
                     "Docked - Saving map": "Angedockt - Karte speichern",
-                    "Docked - Leaving Dock": "Angedockt - Verlässt Ladestation",
+                    "Docked - Leaving dock": "Angedockt - Verlässt Ladestation",
                     "Mowing": "Mähen",
                     "Mowing - Relocalising": "Mähen - Position bestimmen",
                     "Mowing - Learning Lawn": "Mähen - Karte lernen",
@@ -127,8 +127,8 @@
                     "Border cut": "Kantenmähen",
                     "Idle in lawn": "Leerlauf",
                     "Stuck on lawn, help needed": "Festgefahren, Hilfe nötig",
-                    "Returning to Dock": "Zurück zur Ladestation",
-                    "Returning to Dock - Battery low": "Zurück zur Ladestation - Batteriestand niedrig",
+                    "Returning to dock": "Zurück zur Ladestation",
+                    "Returning to dock - Battery low": "Zurück zur Ladestation - Batteriestand niedrig",
                     "Returning to dock - Calendar timeslot ended": "Zurück zur Ladestation - Kalender-Zeitfenster zu Ende",
                     "Returning to dock - Battery temp range": "Zurück zur Ladestation - Batterie-Temperaturfenster",
                     "Returning to dock - Lawn complete": "Zurück zur Ladestation - Rasen vollständig gemäht",
@@ -152,7 +152,10 @@
                 "name": "Nächster Mähtermin"
             },
             "mowing_mode": {
-                "name": "Mähmodus"
+                "name": "Mähmodus",
+                "state": {
+                    "calendar": "Manueller Kalender"
+                }
             },
             "runtime_total": {
                 "name": "Gesamtmähzeit"
@@ -192,6 +195,333 @@
             },
             "battery_discharge": {
                 "name": "Batterieentladung"
+            },
+            "predictive_calendar_slots": {
+                "name": "SmartMowing Sperrzeiten",
+                "state": {
+                    "manual_calendar_active": "Manueller Kalender aktiv",
+                    "off": "Aus"
+                },
+                "state_attributes": {
+                    "last_updated": {
+                        "name": "Zuletzt aktualisiert"
+                    },
+                    "smartmowing_enabled": {
+                        "name": "SmartMowing aktiv"
+                    },
+                    "mowing_mode": {
+                        "name": "Mähmodus"
+                    },
+                    "earliest_start": {
+                        "name": "Frühester Start",
+                        "state": {
+                            "not_enabled": "Nicht aktiviert"
+                        }
+                    },
+                    "latest_end": {
+                        "name": "Spätestes Ende",
+                        "state": {
+                            "not_enabled": "Nicht aktiviert"
+                        }
+                    },
+                    "blocked_before": {
+                        "name": "Gesperrt vor",
+                        "state": {
+                            "not_enabled": "Nicht aktiviert"
+                        }
+                    },
+                    "blocked_after": {
+                        "name": "Gesperrt nach",
+                        "state": {
+                            "not_enabled": "Nicht aktiviert"
+                        }
+                    }
+                }
+            },
+            "predictive_schedule": {
+                "name": "SmartMowing Zeitplan",
+                "state": {
+                    "manual_calendar_active": "Manueller Kalender aktiv",
+                    "none": "Keine"
+                },
+                "state_attributes": {
+                    "last_updated": {
+                        "name": "Zuletzt aktualisiert"
+                    },
+                    "next_mow_slot": {
+                        "name": "Nächster geplanter Mähslot",
+                        "state": {
+                            "none": "Keine"
+                        }
+                    },
+                    "next_mow_day": {
+                        "name": "Nächster geplanter Mähtag",
+                        "state": {
+                            "none": "Keine",
+                            "monday": "Montag",
+                            "tuesday": "Dienstag",
+                            "wednesday": "Mittwoch",
+                            "thursday": "Donnerstag",
+                            "friday": "Freitag",
+                            "saturday": "Samstag",
+                            "sunday": "Sonntag"
+                        }
+                    },
+                    "next_mow_time": {
+                        "name": "Nächste geplante Mähzeit",
+                        "state": {
+                            "none": "Keine"
+                        }
+                    },
+                    "schedule_monday": {
+                        "name": "Zeitplan Montag",
+                        "state": {
+                            "not_scheduled": "Nicht geplant"
+                        }
+                    },
+                    "schedule_tuesday": {
+                        "name": "Zeitplan Dienstag",
+                        "state": {
+                            "not_scheduled": "Nicht geplant"
+                        }
+                    },
+                    "schedule_wednesday": {
+                        "name": "Zeitplan Mittwoch",
+                        "state": {
+                            "not_scheduled": "Nicht geplant"
+                        }
+                    },
+                    "schedule_thursday": {
+                        "name": "Zeitplan Donnerstag",
+                        "state": {
+                            "not_scheduled": "Nicht geplant"
+                        }
+                    },
+                    "schedule_friday": {
+                        "name": "Zeitplan Freitag",
+                        "state": {
+                            "not_scheduled": "Nicht geplant"
+                        }
+                    },
+                    "schedule_saturday": {
+                        "name": "Zeitplan Samstag",
+                        "state": {
+                            "not_scheduled": "Nicht geplant"
+                        }
+                    },
+                    "schedule_sunday": {
+                        "name": "Zeitplan Sonntag",
+                        "state": {
+                            "not_scheduled": "Nicht geplant"
+                        }
+                    },
+                    "exclusion_monday_user": {
+                        "name": "Sperrzeit Montag Benutzer",
+                        "state": {
+                            "none": "Keine"
+                        }
+                    },
+                    "exclusion_monday_weather": {
+                        "name": "Sperrzeit Montag Wetter",
+                        "state": {
+                            "none": "Keine"
+                        }
+                    },
+                    "exclusion_tuesday_user": {
+                        "name": "Sperrzeit Dienstag Benutzer",
+                        "state": {
+                            "none": "Keine"
+                        }
+                    },
+                    "exclusion_tuesday_weather": {
+                        "name": "Sperrzeit Dienstag Wetter",
+                        "state": {
+                            "none": "Keine"
+                        }
+                    },
+                    "exclusion_wednesday_user": {
+                        "name": "Sperrzeit Mittwoch Benutzer",
+                        "state": {
+                            "none": "Keine"
+                        }
+                    },
+                    "exclusion_wednesday_weather": {
+                        "name": "Sperrzeit Mittwoch Wetter",
+                        "state": {
+                            "none": "Keine"
+                        }
+                    },
+                    "exclusion_thursday_user": {
+                        "name": "Sperrzeit Donnerstag Benutzer",
+                        "state": {
+                            "none": "Keine"
+                        }
+                    },
+                    "exclusion_thursday_weather": {
+                        "name": "Sperrzeit Donnerstag Wetter",
+                        "state": {
+                            "none": "Keine"
+                        }
+                    },
+                    "exclusion_friday_user": {
+                        "name": "Sperrzeit Freitag Benutzer",
+                        "state": {
+                            "none": "Keine"
+                        }
+                    },
+                    "exclusion_friday_weather": {
+                        "name": "Sperrzeit Freitag Wetter",
+                        "state": {
+                            "none": "Keine"
+                        }
+                    },
+                    "exclusion_saturday_user": {
+                        "name": "Sperrzeit Samstag Benutzer",
+                        "state": {
+                            "none": "Keine"
+                        }
+                    },
+                    "exclusion_saturday_weather": {
+                        "name": "Sperrzeit Samstag Wetter",
+                        "state": {
+                            "none": "Keine"
+                        }
+                    },
+                    "exclusion_sunday_user": {
+                        "name": "Sperrzeit Sonntag Benutzer",
+                        "state": {
+                            "none": "Keine"
+                        }
+                    },
+                    "exclusion_sunday_weather": {
+                        "name": "Sperrzeit Sonntag Wetter",
+                        "state": {
+                            "none": "Keine"
+                        }
+                    }
+                }
+            },
+            "calendar_slots": {
+                "name": "Geplante Mähzeiten",
+                "state": {
+                    "smartmowing_active": "SmartMowing aktiv",
+                    "calendar_selection_required": "Kalenderauswahl erforderlich",
+                    "off": "Aus"
+                },
+                "state_attributes": {
+                    "today_slot_1": {
+                        "name": "Heute Slot 1",
+                        "state": {
+                            "not_enabled": "Nicht aktiviert",
+                            "not_configured": "Nicht konfiguriert"
+                        }
+                    },
+                    "today_slot_2": {
+                        "name": "Heute Slot 2",
+                        "state": {
+                            "not_enabled": "Nicht aktiviert",
+                            "not_configured": "Nicht konfiguriert"
+                        }
+                    },
+                    "monday_slot_1": {
+                        "name": "Montag Slot 1",
+                        "state": {
+                            "not_enabled": "Nicht aktiviert",
+                            "not_configured": "Nicht konfiguriert"
+                        }
+                    },
+                    "monday_slot_2": {
+                        "name": "Montag Slot 2",
+                        "state": {
+                            "not_enabled": "Nicht aktiviert",
+                            "not_configured": "Nicht konfiguriert"
+                        }
+                    },
+                    "tuesday_slot_1": {
+                        "name": "Dienstag Slot 1",
+                        "state": {
+                            "not_enabled": "Nicht aktiviert",
+                            "not_configured": "Nicht konfiguriert"
+                        }
+                    },
+                    "tuesday_slot_2": {
+                        "name": "Dienstag Slot 2",
+                        "state": {
+                            "not_enabled": "Nicht aktiviert",
+                            "not_configured": "Nicht konfiguriert"
+                        }
+                    },
+                    "wednesday_slot_1": {
+                        "name": "Mittwoch Slot 1",
+                        "state": {
+                            "not_enabled": "Nicht aktiviert",
+                            "not_configured": "Nicht konfiguriert"
+                        }
+                    },
+                    "wednesday_slot_2": {
+                        "name": "Mittwoch Slot 2",
+                        "state": {
+                            "not_enabled": "Nicht aktiviert",
+                            "not_configured": "Nicht konfiguriert"
+                        }
+                    },
+                    "thursday_slot_1": {
+                        "name": "Donnerstag Slot 1",
+                        "state": {
+                            "not_enabled": "Nicht aktiviert",
+                            "not_configured": "Nicht konfiguriert"
+                        }
+                    },
+                    "thursday_slot_2": {
+                        "name": "Donnerstag Slot 2",
+                        "state": {
+                            "not_enabled": "Nicht aktiviert",
+                            "not_configured": "Nicht konfiguriert"
+                        }
+                    },
+                    "friday_slot_1": {
+                        "name": "Freitag Slot 1",
+                        "state": {
+                            "not_enabled": "Nicht aktiviert",
+                            "not_configured": "Nicht konfiguriert"
+                        }
+                    },
+                    "friday_slot_2": {
+                        "name": "Freitag Slot 2",
+                        "state": {
+                            "not_enabled": "Nicht aktiviert",
+                            "not_configured": "Nicht konfiguriert"
+                        }
+                    },
+                    "saturday_slot_1": {
+                        "name": "Samstag Slot 1",
+                        "state": {
+                            "not_enabled": "Nicht aktiviert",
+                            "not_configured": "Nicht konfiguriert"
+                        }
+                    },
+                    "saturday_slot_2": {
+                        "name": "Samstag Slot 2",
+                        "state": {
+                            "not_enabled": "Nicht aktiviert",
+                            "not_configured": "Nicht konfiguriert"
+                        }
+                    },
+                    "sunday_slot_1": {
+                        "name": "Sonntag Slot 1",
+                        "state": {
+                            "not_enabled": "Nicht aktiviert",
+                            "not_configured": "Nicht konfiguriert"
+                        }
+                    },
+                    "sunday_slot_2": {
+                        "name": "Sonntag Slot 2",
+                        "state": {
+                            "not_enabled": "Nicht aktiviert",
+                            "not_configured": "Nicht konfiguriert"
+                        }
+                    }
+                }
             }
         },
         "camera": {
@@ -225,6 +555,7 @@
             "description": "Befehle an den Mähroboter senden. Wählen Sie einen Befehl aus.",
             "fields": {
                 "mower_serial": {
+                    "name": "Seriennummer",
                     "description": "Seriennummer des Mähroboters. Wird nur benötigt, wenn mehrere Mähroboter eingerichtet sind."
                 },
                 "command": {
@@ -238,9 +569,11 @@
             "description": "SmartMowing aktivieren oder deaktivieren. Mögliche Werte sind true oder false.",
             "fields": {
                 "mower_serial": {
+                    "name": "Seriennummer",
                     "description": "Seriennummer des Mähroboters. Wird nur benötigt, wenn mehrere Mähroboter eingerichtet sind."
                 },
                 "enable": {
+                    "name": "Aktivieren/Deaktivieren",
                     "description": "SmartMowing aktivieren."
                 }
             }
@@ -250,9 +583,11 @@
             "description": "Löscht den ausgewählten Fehler.",
             "fields": {
                 "mower_serial": {
+                    "name": "Seriennummer",
                     "description": "Seriennummer des Mähroboters. Wird nur benötigt, wenn mehrere Mähroboter eingerichtet sind."
                 },
                 "alert_index": {
+                    "name": "Fehler Index",
                     "description": "Den ausgewählten Fehler löschen. Mit 0 wird der letzte/aktuellste Fehler gelöscht."
                 }
             }
@@ -262,6 +597,7 @@
             "description": "Löscht alle Fehler.",
             "fields": {
                 "mower_serial": {
+                    "name": "Seriennummer",
                     "description": "Seriennummer des Mähroboters. Wird nur benötigt, wenn mehrere Mähroboter eingerichtet sind."
                 }
             }
@@ -271,9 +607,11 @@
             "description": "Markiert den ausgewählten Fehler als gelesen.",
             "fields": {
                 "mower_serial": {
+                    "name": "Seriennummer",
                     "description": "Seriennummer des Mähroboters. Wird nur benötigt, wenn mehrere Mähroboter eingerichtet sind."
                 },
                 "alert_index": {
+                    "name": "Fehler Index",
                     "description": "Den ausgewählten Fehler als gelesen markieren. Mit 0 wird der letzte/aktuellste Fehler ausgewählt."
                 }
             }
@@ -283,6 +621,7 @@
             "description": "Markiert alle Fehler als gelesen.",
             "fields": {
                 "mower_serial": {
+                    "name": "Seriennummer",
                     "description": "Seriennummer des Mähroboters. Wird nur benötigt, wenn mehrere Mähroboter eingerichtet sind."
                 }
             }
@@ -292,8 +631,87 @@
             "description": "Lädt die aktuelle Mähkarte von der Bosch Cloud API herunter und speichert diese lokal unter \"www/indego_map_base.svg\". Die Karte zeigt die zuletzt aufgezeichnete Mähroute.",
             "fields": {
                 "mower_serial": {
+                    "name": "Seriennummer",
                     "description": "Seriennummer des Mähroboters. Wird nur benötigt, wenn mehrere Mähroboter eingerichtet sind."
                 }
+            }
+        },
+        "set_calendar_slot": {
+            "name": "Kalender Slot aktivieren/deaktivieren",
+            "description": "Einen Kalender Slot verändern (Zeiten ändern, aktivieren oder deaktivieren)",
+            "fields": {
+                "mower_serial": {
+                    "name": "Seriennummer",
+                    "description": "Seriennummer des Mähroboters. Wird nur benötigt, wenn mehrere Mähroboter eingerichtet sind."
+                },
+                "calendar_type": {
+                    "name": "Kalender Typ",
+                    "description": "Kalender auswählen ('calendar' für manuellen Kalender oder 'predictive' für deaktivierte Zeiten im SmartMowing Modus)."
+                },
+                "day": {
+                    "name": "Tag",
+                    "description": "Name des Wochentags der konfiguriert werden soll"
+                },
+                "slot": {
+                    "name": "Zeitfenster",
+                    "description": "Welcher Zeitslot soll geändert werden (1 oder 2)"
+                },
+                "enabled": {
+                    "name": "Aktivieren/Deaktivieren",
+                    "description": "Gewhälten Tag/Slot aktivieren/deaktivieren"
+                },
+                "start": {
+                    "name": "Start",
+                    "description": "Startzeit des gewählten Slots. Wird nur benötigt wenn ein Zeitslot aktiviert werden soll. Nur Stunden und Minuten werden übernommen."
+                },
+                "end": {
+                    "name": "Ende",
+                    "description": "Endzeit des gewählten Slots. Wird nur benötigt wenn ein Zeitslot aktiviert werden soll. Nur Stunden und Minuten werden übernommen."
+                }
+            }
+        },
+        "set_predictive_mowing_window": {
+            "name": "Zeitfenster für SmartMowing Zeiten setzen",
+            "description": "Das Zeitfenster in dem der Mäher im SmartMowing Modus mähen darf.",
+            "fields": {
+                "mower_serial": {
+                    "name": "Seriennummer",
+                    "description": "Seriennummer des Mähroboters. Wird nur benötigt, wenn mehrere Mähroboter eingerichtet sind."
+                },
+                "earliest_start": {
+                    "name": "Frühester Start",
+                    "description": "Um wie viel Uhr soll der Mäher frühestens beginnen."
+                },
+                "latest_end": {
+                    "name": "Spätestes Ende",
+                    "description": "Um wie viel uhr soll der Mäher spätestens beenden."
+                }
+            }
+        }
+    },
+    "selector": {
+        "calendar_type_options": {
+            "options": {
+                "calendar": "Manueller Kalender",
+                "predictive": "SmartMowing Sperrzeiten"
+            }
+        },
+        "day_options": {
+            "options": {
+                "monday": "Montag",
+                "tuesday": "Dienstag",
+                "wednesday": "Mittwoch",
+                "thursday": "Donnerstag",
+                "friday": "Freitag",
+                "saturday": "Samstag",
+                "sunday": "Sonntag"
+            }
+        },
+        "command_options": {
+            "options": {
+                "mow": "Mähen",
+                "returnToDock": "Zurück zur Docking Station",
+                "pause": "Pause"
             }
         }
     },
@@ -306,12 +724,5 @@
             "title": "Bosch Indego Verbindungsprobleme",
             "description": "Ihr Mähroboter reagiert über einen längeren Zeitraum nicht auf API-Anfragen. Dies kann auf Netzwerkprobleme, Serviceprobleme bei Bosch oder einen Offline-Mähroboter hindeuten. Bitte überprüfen Sie Ihre Internetverbindung und den Status des Mähroboters."
         }
-    },
-    "system_health": {
-        "can_reach_bosch_api": "Kann Bosch Indego API erreichen",
-        "can_reach_auth_service": "Kann Bosch Authentifizierungsdienst erreichen",
-        "bosch_service_status": "Bosch-Dienststatus",
-        "mower_online": "Mähroboter Online-Status",
-        "last_api_response": "Letzte erfolgreiche API-Antwort"
     }
 }

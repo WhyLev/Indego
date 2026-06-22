@@ -14,10 +14,7 @@
                     "expose_vacuum": "Zobraziť kosačku Indego ako entitu vysávača v Home Assistant"
                 },
                 "data_description": {
-                    "user_agent": "Vlastná hlavička User-Agent pre požiadavky API na Bosch Indego Cloud. Nechajte prázdne na použitie štandardnej hodnoty. Niektorí používatelia budú musieť nastaviť vlastnú hodnotu, ak má ich účet obmedzenia prístupu k API."
-                },
-                "data_description": {
-                    "user_agent": "V prípade chýb HTTP 4XX (najmä Reason: 403, message=‚Forbidden‘) môže pomôcť zmena User Agent. Nemal by obsahovať Homeassistant ani HA."
+                    "user_agent": "V prípade chýb HTTP 4XX (najmä Reason: 403, message=‚Forbidden’) môže pomôcť zmena User Agent. Nemal by obsahovať Homeassistant ani HA."
                 },
                 "description": "Rozšírené nastavenia komponentu Bosch Indego."
             },
@@ -112,7 +109,7 @@
                     "Docked - Software update": "Zaparkované - Softvérová aktualizácia",
                     "Docked - Loading map": "Zaparkované - Načítavanie mapy",
                     "Docked - Saving map": "Zaparkované - Ukladanie mapy",
-                    "Docked - Leaving Dock": "Zaparkované - Opúšťa stanicu",
+                    "Docked - Leaving dock": "Zaparkované - Opúšťa stanicu",
                     "Mowing": "Kosenie",
                     "Mowing - Relocalising": "Kosenie - Presunutie",
                     "Mowing - Learning Lawn": "Kosenie - Učenie sa záhrady",
@@ -130,8 +127,8 @@
                     "Border cut": "Косenie okrajov",
                     "Idle in lawn": "Nečinnosť na trávniku",
                     "Stuck on lawn, help needed": "Uviaznuté na trávniku, potrebná pomoc",
-                    "Returning to Dock": "Návrat do stanice",
-                    "Returning to Dock - Battery low": "Návrat do stanice - Nízka batéria",
+                    "Returning to dock": "Návrat do stanice",
+                    "Returning to dock - Battery low": "Návrat do stanice - Nízka batéria",
                     "Returning to dock - Calendar timeslot ended": "Návrat do stanice - Kalendárny časový úsek skončil",
                     "Returning to dock - Battery temp range": "Návrat do stanice - Teplota batérie",
                     "Returning to dock - Lawn complete": "Návrat do stanice - Trávnik dokončený",
@@ -155,7 +152,10 @@
                 "name": "Budúce kosenie"
             },
             "mowing_mode": {
-                "name": "Režim kosenia"
+                "name": "Režim kosenia",
+                "state": {
+                    "calendar": "Manuálny kalendár"
+                }
             },
             "runtime_total": {
                 "name": "Celkový čas kosenia"
@@ -195,6 +195,333 @@
             },
             "battery_discharge": {
                 "name": "Vybíjanie batérie"
+            },
+            "calendar_slots": {
+                "state": {
+                    "smartmowing_active": "SmartMowing aktívny",
+                    "calendar_selection_required": "Vyžaduje sa výber kalendára",
+                    "off": "Vypnuté"
+                },
+                "name": "Naplánované časy kosenia",
+                "state_attributes": {
+                    "today_slot_1": {
+                        "name": "Dnešný slot 1",
+                        "state": {
+                            "not_enabled": "Neaktivované",
+                            "not_configured": "Nenakonfigurované"
+                        }
+                    },
+                    "today_slot_2": {
+                        "name": "Dnešný slot 2",
+                        "state": {
+                            "not_enabled": "Neaktivované",
+                            "not_configured": "Nenakonfigurované"
+                        }
+                    },
+                    "monday_slot_1": {
+                        "name": "Pondelok Slot 1",
+                        "state": {
+                            "not_enabled": "Neaktivované",
+                            "not_configured": "Nenakonfigurované"
+                        }
+                    },
+                    "monday_slot_2": {
+                        "name": "Pondelok Slot 2",
+                        "state": {
+                            "not_enabled": "Neaktivované",
+                            "not_configured": "Nenakonfigurované"
+                        }
+                    },
+                    "tuesday_slot_1": {
+                        "name": "Utorok Slot 1",
+                        "state": {
+                            "not_enabled": "Neaktivované",
+                            "not_configured": "Nenakonfigurované"
+                        }
+                    },
+                    "tuesday_slot_2": {
+                        "name": "Utorok Slot 2",
+                        "state": {
+                            "not_enabled": "Neaktivované",
+                            "not_configured": "Nenakonfigurované"
+                        }
+                    },
+                    "wednesday_slot_1": {
+                        "name": "Streda Slot 1",
+                        "state": {
+                            "not_enabled": "Neaktivované",
+                            "not_configured": "Nenakonfigurované"
+                        }
+                    },
+                    "wednesday_slot_2": {
+                        "name": "Streda Slot 2",
+                        "state": {
+                            "not_enabled": "Neaktivované",
+                            "not_configured": "Nenakonfigurované"
+                        }
+                    },
+                    "thursday_slot_1": {
+                        "name": "Štvrtok Slot 1",
+                        "state": {
+                            "not_enabled": "Neaktivované",
+                            "not_configured": "Nenakonfigurované"
+                        }
+                    },
+                    "thursday_slot_2": {
+                        "name": "Štvrtok Slot 2",
+                        "state": {
+                            "not_enabled": "Neaktivované",
+                            "not_configured": "Nenakonfigurované"
+                        }
+                    },
+                    "friday_slot_1": {
+                        "name": "Piatok Slot 1",
+                        "state": {
+                            "not_enabled": "Neaktivované",
+                            "not_configured": "Nenakonfigurované"
+                        }
+                    },
+                    "friday_slot_2": {
+                        "name": "Piatok Slot 2",
+                        "state": {
+                            "not_enabled": "Neaktivované",
+                            "not_configured": "Nenakonfigurované"
+                        }
+                    },
+                    "saturday_slot_1": {
+                        "name": "Sobota Slot 1",
+                        "state": {
+                            "not_enabled": "Neaktivované",
+                            "not_configured": "Nenakonfigurované"
+                        }
+                    },
+                    "saturday_slot_2": {
+                        "name": "Sobota Slot 2",
+                        "state": {
+                            "not_enabled": "Neaktivované",
+                            "not_configured": "Nenakonfigurované"
+                        }
+                    },
+                    "sunday_slot_1": {
+                        "name": "Nedeľa Slot 1",
+                        "state": {
+                            "not_enabled": "Neaktivované",
+                            "not_configured": "Nenakonfigurované"
+                        }
+                    },
+                    "sunday_slot_2": {
+                        "name": "Nedeľa Slot 2",
+                        "state": {
+                            "not_enabled": "Neaktivované",
+                            "not_configured": "Nenakonfigurované"
+                        }
+                    }
+                }
+            },
+            "predictive_calendar_slots": {
+                "name": "Blokované časy SmartMowing",
+                "state": {
+                    "manual_calendar_active": "Manuálny kalendár aktívny",
+                    "off": "Vypnuté"
+                },
+                "state_attributes": {
+                    "last_updated": {
+                        "name": "Naposledy aktualizované"
+                    },
+                    "smartmowing_enabled": {
+                        "name": "SmartMowing aktívny"
+                    },
+                    "mowing_mode": {
+                        "name": "Režim kosenia"
+                    },
+                    "earliest_start": {
+                        "name": "Najskorší začiatok",
+                        "state": {
+                            "not_enabled": "Neaktivované"
+                        }
+                    },
+                    "latest_end": {
+                        "name": "Najneskorší koniec",
+                        "state": {
+                            "not_enabled": "Neaktivované"
+                        }
+                    },
+                    "blocked_before": {
+                        "name": "Blokované pred",
+                        "state": {
+                            "not_enabled": "Neaktivované"
+                        }
+                    },
+                    "blocked_after": {
+                        "name": "Blokované po",
+                        "state": {
+                            "not_enabled": "Neaktivované"
+                        }
+                    }
+                }
+            },
+            "predictive_schedule": {
+                "name": "Plán SmartMowing",
+                "state": {
+                    "manual_calendar_active": "Manuálny kalendár aktívny",
+                    "none": "Žiadne"
+                },
+                "state_attributes": {
+                    "last_updated": {
+                        "name": "Naposledy aktualizované"
+                    },
+                    "next_mow_slot": {
+                        "name": "Ďalší naplánovaný časový slot kosenia",
+                        "state": {
+                            "none": "Žiadne"
+                        }
+                    },
+                    "next_mow_day": {
+                        "name": "Ďalší naplánovaný deň kosenia",
+                        "state": {
+                            "none": "Žiadne",
+                            "monday": "Pondelok",
+                            "tuesday": "Utorok",
+                            "wednesday": "Streda",
+                            "thursday": "Štvrtok",
+                            "friday": "Piatok",
+                            "saturday": "Sobota",
+                            "sunday": "Nedeľa"
+                        }
+                    },
+                    "next_mow_time": {
+                        "name": "Ďalší naplánovaný čas kosenia",
+                        "state": {
+                            "none": "Žiadne"
+                        }
+                    },
+                    "schedule_monday": {
+                        "name": "Plán Pondelok",
+                        "state": {
+                            "not_scheduled": "Nenaplánované"
+                        }
+                    },
+                    "exclusion_monday_user": {
+                        "name": "Blokovaný čas Pondelok používateľ",
+                        "state": {
+                            "none": "Žiadne"
+                        }
+                    },
+                    "exclusion_monday_weather": {
+                        "name": "Blokovaný čas Pondelok počasie",
+                        "state": {
+                            "none": "Žiadne"
+                        }
+                    },
+                    "schedule_tuesday": {
+                        "name": "Plán Utorok",
+                        "state": {
+                            "not_scheduled": "Nenaplánované"
+                        }
+                    },
+                    "exclusion_tuesday_user": {
+                        "name": "Blokovaný čas Utorok používateľ",
+                        "state": {
+                            "none": "Žiadne"
+                        }
+                    },
+                    "exclusion_tuesday_weather": {
+                        "name": "Blokovaný čas Utorok počasie",
+                        "state": {
+                            "none": "Žiadne"
+                        }
+                    },
+                    "schedule_wednesday": {
+                        "name": "Plán Streda",
+                        "state": {
+                            "not_scheduled": "Nenaplánované"
+                        }
+                    },
+                    "exclusion_wednesday_user": {
+                        "name": "Blokovaný čas Streda používateľ",
+                        "state": {
+                            "none": "Žiadne"
+                        }
+                    },
+                    "exclusion_wednesday_weather": {
+                        "name": "Blokovaný čas Streda počasie",
+                        "state": {
+                            "none": "Žiadne"
+                        }
+                    },
+                    "schedule_thursday": {
+                        "name": "Plán Štvrtok",
+                        "state": {
+                            "not_scheduled": "Nenaplánované"
+                        }
+                    },
+                    "exclusion_thursday_user": {
+                        "name": "Blokovaný čas Štvrtok používateľ",
+                        "state": {
+                            "none": "Žiadne"
+                        }
+                    },
+                    "exclusion_thursday_weather": {
+                        "name": "Blokovaný čas Štvrtok počasie",
+                        "state": {
+                            "none": "Žiadne"
+                        }
+                    },
+                    "schedule_friday": {
+                        "name": "Plán Piatok",
+                        "state": {
+                            "not_scheduled": "Nenaplánované"
+                        }
+                    },
+                    "exclusion_friday_user": {
+                        "name": "Blokovaný čas Piatok používateľ",
+                        "state": {
+                            "none": "Žiadne"
+                        }
+                    },
+                    "exclusion_friday_weather": {
+                        "name": "Blokovaný čas Piatok počasie",
+                        "state": {
+                            "none": "Žiadne"
+                        }
+                    },
+                    "schedule_saturday": {
+                        "name": "Plán Sobota",
+                        "state": {
+                            "not_scheduled": "Nenaplánované"
+                        }
+                    },
+                    "exclusion_saturday_user": {
+                        "name": "Blokovaný čas Sobota používateľ",
+                        "state": {
+                            "none": "Žiadne"
+                        }
+                    },
+                    "exclusion_saturday_weather": {
+                        "name": "Blokovaný čas Sobota počasie",
+                        "state": {
+                            "none": "Žiadne"
+                        }
+                    },
+                    "schedule_sunday": {
+                        "name": "Plán Nedeľa",
+                        "state": {
+                            "not_scheduled": "Nenaplánované"
+                        }
+                    },
+                    "exclusion_sunday_user": {
+                        "name": "Blokovaný čas Nedeľa používateľ",
+                        "state": {
+                            "none": "Žiadne"
+                        }
+                    },
+                    "exclusion_sunday_weather": {
+                        "name": "Blokovaný čas Nedeľa počasie",
+                        "state": {
+                            "none": "Žiadne"
+                        }
+                    }
+                }
             }
         },
         "camera": {
@@ -298,6 +625,66 @@
                     "description": "Sériové číslo kosačky. Potrebné iba vtedy, keď máte nakonfigurovaných viacero kosačiek."
                 }
             }
+        },
+        "set_calendar_slot": {
+            "name": "Aktivovať/deaktivovať časový slot kalendára",
+            "description": "Upraviť časový slot kalendára (zmeniť časy, aktivovať alebo deaktivovať)",
+            "fields": {
+                "mower_serial": {
+                    "name": "Sériové číslo",
+                    "description": "Sériové číslo kosačky. Vyžaduje sa iba v prípade, že je nakonfigurovaných viac kosačiek."
+                },
+                "calendar_type": {
+                    "name": "Typ kalendára",
+                    "description": "Vyberte kalendár ('calendar' pre manuálny kalendár alebo 'predictive' pre deaktivované časové obdobia v režime SmartMowing)."
+                },
+                "day": {
+                    "name": "Deň",
+                    "description": "Názov dňa v týždni, ktorý sa má nakonfigurovať."
+                },
+                "slot": {
+                    "name": "Časový slot",
+                    "description": "Ktorý časový slot sa má zmeniť (1 alebo 2)."
+                },
+                "enabled": {
+                    "name": "Aktivovať/deaktivovať",
+                    "description": "Aktivovať alebo deaktivovať vybraný deň/časový slot."
+                },
+                "start": {
+                    "name": "Začiatok",
+                    "description": "Čas začiatku vybraného slotu. Vyžaduje sa iba v prípade, že sa má slot aktivovať. Použijú sa iba hodiny a minúty."
+                },
+                "end": {
+                    "name": "Koniec",
+                    "description": "Čas ukončenia vybraného slotu. Vyžaduje sa iba v prípade, že sa má slot aktivovať. Použijú sa iba hodiny a minúty."
+                }
+            }
+        }
+    },
+    "selector": {
+        "calendar_type_options": {
+            "options": {
+                "calendar": "Manuálny kalendár",
+                "predictive": "Blokované časy SmartMowing"
+            }
+        },
+        "day_options": {
+            "options": {
+                "monday": "Pondelok",
+                "tuesday": "Utorok",
+                "wednesday": "Streda",
+                "thursday": "Štvrtok",
+                "friday": "Piatok",
+                "saturday": "Sobota",
+                "sunday": "Nedeľa"
+            }
+        },
+        "command_options": {
+            "options": {
+                "mow": "Kosiť",
+                "returnToDock": "Návrat do dokovacej stanice",
+                "pause": "Pauza"
+            }
         }
     },
     "issues": {
@@ -309,12 +696,5 @@
             "title": "Bosch Indego connection problems",
             "description": "Your mower has not responded to API requests for an extended period. This may indicate network issues, the Bosch service is experiencing problems, or your mower is offline. Please check your internet connection and mower status."
         }
-    },
-    "system_health": {
-        "can_reach_bosch_api": "Can reach Bosch Indego API",
-        "can_reach_auth_service": "Can reach Bosch authentication service",
-        "bosch_service_status": "Bosch service status",
-        "mower_online": "Mower online status",
-        "last_api_response": "Last successful API response"
     }
 }

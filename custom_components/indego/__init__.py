@@ -48,10 +48,17 @@ from .lawn_mower import IndegoLawnMower
 from .const import *
 from .sensor import IndegoSensor
 from .camera import IndegoCamera
-from .error_codes import ERROR_CODE_MAP, get_error_description
+from .error_codes import (
+    ERROR_CODE_MAP,
+    get_error_description,
+    get_error_severity,
+    parse_composite_error,
+    format_error_message,
+    ErrorSeverity,
+)
 from .button import IndegoAlertButton
 from .switch import IndegoSwitch
-from . import diagnostics, system_health, repairs
+from . import diagnostics, repairs
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -62,7 +69,7 @@ SERVICE_SCHEMA_COMMAND = vol.Schema({
 
 SERVICE_SCHEMA_SMARTMOWING = vol.Schema({
     vol.Optional(CONF_MOWER_SERIAL): cv.string,
-    vol.Required(CONF_SMARTMOWING): cv.string
+    vol.Required(CONF_SMARTMOWING): cv.boolean
 })
 
 SERVICE_SCHEMA_DELETE_ALERT = vol.Schema({
@@ -85,6 +92,27 @@ SERVICE_SCHEMA_READ_ALERT_ALL = vol.Schema({
 
 SERVICE_SCHEMA_DOWNLOAD_MAP = vol.Schema({
     vol.Optional(CONF_MOWER_SERIAL): cv.string
+})
+
+SERVICE_SCHEMA_SET_CALENDAR_SLOT = vol.Schema({
+    vol.Optional(CONF_MOWER_SERIAL): cv.string,
+    vol.Required(CONF_DAYS): vol.All(
+        cv.ensure_list,
+        [vol.In([
+            "monday", "tuesday", "wednesday", "thursday",
+            "friday", "saturday", "sunday",
+        ])],
+    ),
+    vol.Required(CONF_SLOT): vol.In([1, 2]),
+    vol.Optional(CONF_ENABLED, default=True): cv.boolean,
+    vol.Optional(CONF_START): cv.string,
+    vol.Optional(CONF_END): cv.string,
+})
+
+SERVICE_SCHEMA_SET_PREDICTIVE_MOWING_WINDOW = vol.Schema({
+    vol.Optional(CONF_MOWER_SERIAL): cv.string,
+    vol.Required(CONF_EARLIEST_START): cv.string,
+    vol.Required(CONF_LATEST_END): cv.string,
 })
 
 
@@ -347,11 +375,12 @@ ENTITY_DEFINITIONS = {
     ENTITY_BATTERY_DISCHARGE: {
         CONF_TYPE: SENSOR_TYPE,
         CONF_ICON: "mdi:battery-minus",
-        CONF_DEVICE_CLASS: None,
-        CONF_UNIT_OF_MEASUREMENT: "Ah",
+        CONF_DEVICE_CLASS: SensorDeviceClass.ENERGY,
+        CONF_UNIT_OF_MEASUREMENT: "Wh",
         CONF_ATTR: [],
         CONF_ENABLED_BY_DEFAULT: False,
         CONF_ENTITY_CATEGORY: EntityCategory.DIAGNOSTIC,
+        CONF_STATE_CLASS: SensorStateClass.TOTAL_INCREASING,
         CONF_TRANSLATION_KEY: "battery_discharge",
     },
     ENTITY_BATTERY_CHARGING: {
@@ -410,6 +439,84 @@ ENTITY_DEFINITIONS = {
         CONF_TRANSLATION_KEY: "indego_smartmowing",
         CONF_ENTITY_CATEGORY: EntityCategory.CONFIG,
     },
+    ENTITY_PREDICTIVE_CALENDAR_SLOTS: {
+        CONF_TYPE: SENSOR_TYPE,
+        CONF_ICON: "mdi:calendar-remove",
+        CONF_DEVICE_CLASS: None,
+        CONF_UNIT_OF_MEASUREMENT: None,
+        CONF_ATTR: [
+            "last_updated",
+            "smartmowing_enabled",
+            "mowing_mode",
+            "allowed_mowing_time",
+            "earliest_start",
+            "latest_end",
+            "blocked_time",
+            "blocked_before",
+            "blocked_after",
+        ],
+        CONF_TRANSLATION_KEY: "predictive_calendar_slots",
+    },
+    ENTITY_CALENDAR_SLOTS: {
+        CONF_TYPE: SENSOR_TYPE,
+        CONF_ICON: "mdi:calendar-clock",
+        CONF_DEVICE_CLASS: None,
+        CONF_UNIT_OF_MEASUREMENT: None,
+        CONF_ATTR: [
+            "last_updated",
+            "today_slot_1",
+            "today_slot_2",
+            "monday_slot_1",
+            "monday_slot_2",
+            "tuesday_slot_1",
+            "tuesday_slot_2",
+            "wednesday_slot_1",
+            "wednesday_slot_2",
+            "thursday_slot_1",
+            "thursday_slot_2",
+            "friday_slot_1",
+            "friday_slot_2",
+            "saturday_slot_1",
+            "saturday_slot_2",
+            "sunday_slot_1",
+            "sunday_slot_2",
+        ],
+        CONF_TRANSLATION_KEY: "calendar_slots",
+    },
+    ENTITY_PREDICTIVE_SCHEDULE: {
+        CONF_TYPE: SENSOR_TYPE,
+        CONF_ICON: "mdi:calendar-search",
+        CONF_DEVICE_CLASS: None,
+        CONF_UNIT_OF_MEASUREMENT: None,
+        CONF_ATTR: [
+            "last_updated",
+            "next_mow_slot",
+            "next_mow_day",
+            "next_mow_time",
+            "schedule_monday",
+            "schedule_tuesday",
+            "schedule_wednesday",
+            "schedule_thursday",
+            "schedule_friday",
+            "schedule_saturday",
+            "schedule_sunday",
+            "exclusion_monday_user",
+            "exclusion_monday_weather",
+            "exclusion_tuesday_user",
+            "exclusion_tuesday_weather",
+            "exclusion_wednesday_user",
+            "exclusion_wednesday_weather",
+            "exclusion_thursday_user",
+            "exclusion_thursday_weather",
+            "exclusion_friday_user",
+            "exclusion_friday_weather",
+            "exclusion_saturday_user",
+            "exclusion_saturday_weather",
+            "exclusion_sunday_user",
+            "exclusion_sunday_weather",
+        ],
+        CONF_TRANSLATION_KEY: "predictive_schedule",
+    },
 }
 
 
@@ -422,6 +529,478 @@ def last_updated_now() -> str:
         "%Y-%m-%d %H:%M:%S"
     )
 
+def _format_calendar_slot(slot) -> str:
+    return (
+        f"{slot.StHr:02d}:{slot.StMin:02d}-"
+        f"{slot.EnHr:02d}:{slot.EnMin:02d}"
+    )
+
+
+def _calendar_slots_by_day(calendar) -> dict:
+    result = {}
+
+    day_names = [
+        "monday",
+        "tuesday",
+        "wednesday",
+        "thursday",
+        "friday",
+        "saturday",
+        "sunday",
+    ]
+
+    for day_name in day_names:
+        result[f"{day_name}_slot_1"] = "not_enabled"
+        result[f"{day_name}_slot_2"] = "not_enabled"
+
+    if calendar is None or not getattr(calendar, "days", None):
+        return result
+
+    for day in calendar.days:
+        day_name = getattr(day, "day_name", None)
+        if day_name not in day_names:
+            continue
+
+        slots = getattr(day, "slots", [])
+
+        for index in range(2):
+            attr_name = f"{day_name}_slot_{index + 1}"
+
+            if index >= len(slots):
+                result[attr_name] = "not_configured"
+                continue
+
+            slot = slots[index]
+
+            if getattr(slot, "En", False):
+                result[attr_name] = _format_calendar_slot(slot)
+            else:
+                result[attr_name] = "not_enabled"
+
+    return result
+
+def _today_calendar_slots(slots_by_day: dict) -> list:
+    today_name = _today_calendar_day_name()
+
+    return [
+        slot
+        for slot in [
+            slots_by_day.get(f"{today_name}_slot_1"),
+            slots_by_day.get(f"{today_name}_slot_2"),
+        ]
+        if slot not in (None, "not_enabled", "not_configured")
+    ]
+
+def _today_calendar_day_name() -> str:
+    return datetime.now().strftime("%A").lower()
+
+DAY_NAME_TO_INDEX = {
+    "monday": 0,
+    "tuesday": 1,
+    "wednesday": 2,
+    "thursday": 3,
+    "friday": 4,
+    "saturday": 5,
+    "sunday": 6,
+}
+
+
+def _parse_slot_time(value: str) -> tuple[int, int]:
+    parts = str(value).split(":")
+
+    if len(parts) not in (2, 3):
+        raise ValueError("Time must be in HH:MM or HH:MM:SS format")
+
+    hour = int(parts[0])
+    minute = int(parts[1])
+
+    if len(parts) == 3 and int(parts[2]) != 0:
+        raise ValueError("Seconds must be 00")
+
+    if hour < 0 or hour > 23 or minute < 0 or minute > 59:
+        raise ValueError("Time must be between 00:00 and 23:59")
+
+    return hour, minute
+
+
+def _calendar_to_payload(calendar, selected_cal: int = 1) -> dict:
+    days = []
+
+    for day_index in range(7):
+        days.append({
+            "day": day_index,
+            "slots": [
+                {"En": False, "StHr": None, "StMin": None, "EnHr": None, "EnMin": None},
+                {"En": False, "StHr": None, "StMin": None, "EnHr": None, "EnMin": None},
+            ],
+        })
+
+    if calendar is not None and getattr(calendar, "days", None):
+        for day in calendar.days:
+            day_index = getattr(day, "day", None)
+            if day_index is None or day_index < 0 or day_index > 6:
+                continue
+
+            slots = getattr(day, "slots", [])
+            for slot_index in range(min(len(slots), 2)):
+                slot = slots[slot_index]
+                days[day_index]["slots"][slot_index] = {
+                    "En": bool(getattr(slot, "En", False)),
+                    "StHr": getattr(slot, "StHr", None),
+                    "StMin": getattr(slot, "StMin", None),
+                    "EnHr": getattr(slot, "EnHr", None),
+                    "EnMin": getattr(slot, "EnMin", None),
+                }
+
+    return {
+        "sel_cal": selected_cal,
+        "cals": [
+            {
+                "cal": getattr(calendar, "cal", selected_cal) if calendar else selected_cal,
+                "days": days,
+            }
+        ],
+    }
+
+def _predictive_calendar_payload(earliest_start: str, latest_end: str) -> dict:
+    start_hour, start_minute = _parse_slot_time(earliest_start)
+    end_hour, end_minute = _parse_slot_time(latest_end)
+
+    days = []
+
+    for day_index in range(7):
+        days.append({
+            "day": day_index,
+            "slots": [
+                {
+                    "En": True,
+                    "StHr": 0,
+                    "StMin": 0,
+                    "EnHr": start_hour,
+                    "EnMin": start_minute,
+                },
+                {
+                    "En": True,
+                    "StHr": end_hour,
+                    "StMin": end_minute,
+                    "EnHr": 23,
+                    "EnMin": 59,
+                },
+            ],
+        })
+
+    return {
+        "sel_cal": 1,
+        "cals": [
+            {
+                "cal": 1,
+                "days": days,
+            }
+        ],
+    }
+
+def _predictive_calendar_window(calendar, hass) -> dict:
+    result = {
+        "earliest_start": "not_enabled",
+        "latest_end": "not_enabled",
+        "blocked_before": "not_enabled",
+        "blocked_after": "not_enabled",
+        "allowed_mowing_time": "not_enabled",
+        "blocked_time": "not_enabled",
+    }
+
+    if calendar is None or not getattr(calendar, "days", None):
+        return result
+
+    first_day = calendar.days[0]
+    slots = getattr(first_day, "slots", [])
+
+    if len(slots) > 0 and getattr(slots[0], "En", False):
+        result["blocked_before"] = _format_calendar_slot(slots[0])
+        result["earliest_start"] = f"{slots[0].EnHr:02d}:{slots[0].EnMin:02d}"
+
+    if len(slots) > 1 and getattr(slots[1], "En", False):
+        result["blocked_after"] = _format_calendar_slot(slots[1])
+        result["latest_end"] = f"{slots[1].StHr:02d}:{slots[1].StMin:02d}"
+
+    if (
+        result["earliest_start"] != "not_enabled"
+        and result["latest_end"] != "not_enabled"
+    ):
+        result["allowed_mowing_time"] = (
+            f"{_localized_text(hass, 'allowed_mowing_time')} "
+            f"{result['earliest_start']}-{result['latest_end']}"
+        )
+        result["blocked_time"] = (
+            f"{result['latest_end']}-{result['earliest_start']}"
+        )
+
+    return result
+
+def _set_payload_slot(payload: dict, day_name: str, slot_number: int, enabled: bool, start: str | None, end: str | None) -> dict:
+    day_index = DAY_NAME_TO_INDEX[day_name]
+    slot_index = slot_number - 1
+
+    slot = payload["cals"][0]["days"][day_index]["slots"][slot_index]
+
+    if not enabled:
+        slot.update({
+            "En": False,
+            "StHr": None,
+            "StMin": None,
+            "EnHr": None,
+            "EnMin": None,
+        })
+        return payload
+
+    if not start or not end:
+        raise ValueError("start and end are required when enabled is true")
+
+    start_hour, start_minute = _parse_slot_time(start)
+    end_hour, end_minute = _parse_slot_time(end)
+
+    slot.update({
+        "En": True,
+        "StHr": start_hour,
+        "StMin": start_minute,
+        "EnHr": end_hour,
+        "EnMin": end_minute,
+    })
+
+    return payload
+
+def _schedule_slot_to_text(slot) -> str:
+    return (
+        f"{slot.StHr:02d}:{slot.StMin:02d}-"
+        f"{slot.EnHr:02d}:{slot.EnMin:02d}"
+    )
+
+
+def _predictive_schedule_attributes(schedule, hass) -> dict:
+    day_names = [
+        "monday",
+        "tuesday",
+        "wednesday",
+        "thursday",
+        "friday",
+        "saturday",
+        "sunday",
+    ]
+
+    attrs = {
+        "next_mow_slot": "none",
+        "next_mow_day": "none",
+        "next_mow_time": "none",
+    }
+
+    for day_name in day_names:
+        attrs[f"schedule_{day_name}"] = "not_scheduled"
+        attrs[f"exclusion_{day_name}_user"] = "none"
+        attrs[f"exclusion_{day_name}_weather"] = "none"
+
+    if schedule is None:
+        return attrs
+
+    schedule_days = getattr(schedule, "schedule_days", None) or []
+    exclusion_days = getattr(schedule, "exclusion_days", None) or []
+
+    for day in schedule_days:
+        day_name = getattr(day, "day_name", None)
+        if day_name not in day_names:
+            continue
+
+        slots = getattr(day, "slots", []) or []
+        slot_texts = [
+            _schedule_slot_to_text(slot)
+            for slot in slots
+            if getattr(slot, "En", True)
+        ]
+
+        if slot_texts:
+            attrs[f"schedule_{day_name}"] = ", ".join(slot_texts)
+
+            if attrs["next_mow_slot"] == "none":
+                attrs["next_mow_slot"] = (
+                    f"{_localized_text(hass, day_name)} {slot_texts[0]}"
+                )
+                attrs["next_mow_day"] = day_name
+                attrs["next_mow_time"] = slot_texts[0]
+
+    for day in exclusion_days:
+        day_name = getattr(day, "day_name", None)
+        if day_name not in day_names:
+            continue
+
+        user_slots = []
+        weather_slots = []
+
+        for slot in getattr(day, "slots", []) or []:
+            text = _schedule_slot_to_text(slot)
+            attr = getattr(slot, "Attr", None)
+
+            if attr == "C":
+                user_slots.append(text)
+            else:
+                weather_slots.append(text)
+
+        if user_slots:
+            attrs[f"exclusion_{day_name}_user"] = ", ".join(user_slots)
+
+        if weather_slots:
+            attrs[f"exclusion_{day_name}_weather"] = ", ".join(weather_slots)
+
+    return attrs
+
+def _is_smartmowing_active(generic_data, forced_mowing_mode=None) -> bool:
+    mowing_mode = forced_mowing_mode or getattr(
+        generic_data,
+        "mowing_mode_description",
+        None,
+    )
+    return str(mowing_mode).lower() == "smartmowing"
+
+def _is_calendar_selection_required(generic_data) -> bool:
+    mowing_mode = getattr(
+        generic_data,
+        "mowing_mode_description",
+        None,
+    )
+    alm_mode = getattr(
+        generic_data,
+        "alm_mode",
+        None,
+    )
+
+    return (
+        str(mowing_mode).lower() == "manual"
+        or str(alm_mode).lower() == "manual"
+    )
+
+LOCALIZED_TEXTS = {
+    "de": {
+        "allowed_mowing_time": "Erlaubte Mähzeit",
+        "monday": "Montag",
+        "tuesday": "Dienstag",
+        "wednesday": "Mittwoch",
+        "thursday": "Donnerstag",
+        "friday": "Freitag",
+        "saturday": "Samstag",
+        "sunday": "Sonntag",
+    },
+    "en": {
+        "allowed_mowing_time": "Allowed mowing time",
+        "monday": "Monday",
+        "tuesday": "Tuesday",
+        "wednesday": "Wednesday",
+        "thursday": "Thursday",
+        "friday": "Friday",
+        "saturday": "Saturday",
+        "sunday": "Sunday",
+    },
+    "da": {
+        "allowed_mowing_time": "Tilladt klippetid",
+        "monday": "Mandag",
+        "tuesday": "Tirsdag",
+        "wednesday": "Onsdag",
+        "thursday": "Torsdag",
+        "friday": "Fredag",
+        "saturday": "Lørdag",
+        "sunday": "Søndag",
+    },
+    "es": {
+        "allowed_mowing_time": "Tiempo de corte permitido",
+        "monday": "Lunes",
+        "tuesday": "Martes",
+        "wednesday": "Miércoles",
+        "thursday": "Jueves",
+        "friday": "Viernes",
+        "saturday": "Sábado",
+        "sunday": "Domingo",
+    },
+    "fr": {
+        "allowed_mowing_time": "Heure de tonte autorisée",
+        "monday": "Lundi",
+        "tuesday": "Mardi",
+        "wednesday": "Mercredi",
+        "thursday": "Jeudi",
+        "friday": "Vendredi",
+        "saturday": "Samedi",
+        "sunday": "Dimanche",
+    },
+    "it": {
+        "allowed_mowing_time": "Orario di taglio consentito",
+        "monday": "Lunedì",
+        "tuesday": "Martedì",
+        "wednesday": "Mercoledì",
+        "thursday": "Giovedì",
+        "friday": "Venerdì",
+        "saturday": "Sabato",
+        "sunday": "Domenica",
+    },
+    "nl": {
+        "allowed_mowing_time": "Toegestane maaitijd",
+        "monday": "Maandag",
+        "tuesday": "Dinsdag",
+        "wednesday": "Woensdag",
+        "thursday": "Donderdag",
+        "friday": "Vrijdag",
+        "saturday": "Zaterdag",
+        "sunday": "Zondag",
+    },
+    "no": {
+        "allowed_mowing_time": "Tillatt klippetid",
+        "monday": "Mandag",
+        "tuesday": "Tirsdag",
+        "wednesday": "Onsdag",
+        "thursday": "Torsdag",
+        "friday": "Fredag",
+        "saturday": "Lørdag",
+        "sunday": "Søndag",
+    },
+    "pl": {
+        "allowed_mowing_time": "Dozwolony czas koszenia",
+        "monday": "Poniedziałek",
+        "tuesday": "Wtorek",
+        "wednesday": "Środa",
+        "thursday": "Czwartek",
+        "friday": "Piątek",
+        "saturday": "Sobota",
+        "sunday": "Niedziela",
+    },
+    "sk": {
+        "allowed_mowing_time": "Povolený čas kosenia",
+        "monday": "Pondelok",
+        "tuesday": "Utorok",
+        "wednesday": "Streda",
+        "thursday": "Štvrtok",
+        "friday": "Piatok",
+        "saturday": "Sobota",
+        "sunday": "Nedeľa",
+    },
+    "sv": {
+        "allowed_mowing_time": "Tillåten klipptid",
+        "monday": "Måndag",
+        "tuesday": "Tisdag",
+        "wednesday": "Onsdag",
+        "thursday": "Torsdag",
+        "friday": "Fredag",
+        "saturday": "Lördag",
+        "sunday": "Söndag",
+    },
+}
+
+
+def _language_code(hass) -> str:
+    language = getattr(hass.config, "language", None) or "en"
+    return language.split("-")[0].lower()
+
+
+def _localized_text(hass, key: str) -> str:
+    language = _language_code(hass)
+    return LOCALIZED_TEXTS.get(
+        language,
+        LOCALIZED_TEXTS["en"],
+    ).get(key, key)
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Load a config entry."""
@@ -444,16 +1023,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         hass,
         entry.options.get(CONF_USER_AGENT)
     )
-
-    await indego_hub.start_periodic_position_update()
-
+    
     async def load_platforms():
         _LOGGER.debug("Loading Home Assistant platforms: %s", INDEGO_PLATFORMS)
         await hass.config_entries.async_forward_entry_setups(entry, INDEGO_PLATFORMS)
 
     try:
         await indego_hub.update_generic_data_and_load_platforms(load_platforms)
-        _LOGGER.info("Successfully set up Indego integration for: %s", entry.data[CONF_MOWER_NAME])
 
     except ClientResponseError as exc:
         if 400 <= exc.status < 500:
@@ -480,8 +1056,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # Register repairs and initialize diagnostics/system health
     try:
         # Diagnostics are automatically discovered by HA - no manual registration needed
-        # System health is automatically discovered by HA when system_health.py exists
-
         # Register repairs flow
         from .repairs import async_create_fix_flow
 
@@ -517,9 +1091,28 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         """Handle the smartmowing service call."""
         instance = find_instance_for_mower_service_call(call)
         enable = call.data.get(CONF_SMARTMOWING, DEFAULT_NAME_COMMANDS)
-        _LOGGER.info("Setting smart mowing mode to: %s (Mower: %s)", enable, instance._serial)
+        enable_bool = enable is True
 
-        await instance._indego_client.put_mow_mode(enable)
+        _LOGGER.info("Setting smart mowing mode to: %s (Mower: %s)", enable_bool, instance._serial)
+
+
+        await instance._indego_client.put_mow_mode(enable_bool)
+
+        instance._forced_mowing_mode = "SmartMowing" if enable_bool else "Calendar"
+
+        if ENTITY_SMARTMOWING_SWITCH in instance.entities:
+            instance.entities[ENTITY_SMARTMOWING_SWITCH].is_on = enable_bool
+
+        if ENTITY_MOWING_MODE in instance.entities:
+            instance.entities[ENTITY_MOWING_MODE].state = (
+                "SmartMowing" if enable_bool else "Calendar"
+            )
+
+        await asyncio.sleep(3)
+
+        await instance._update_predictive_calendar()
+        await instance._update_predictive_schedule()
+        await instance._update_calendar()
         await instance._update_generic_data()
 
     async def async_delete_alert(call):
@@ -537,8 +1130,38 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         instance = find_instance_for_mower_service_call(call)
         _LOGGER.info("Deleting all alerts from mower: %s", instance._serial)
 
-        await instance._update_alerts()
-        await instance._indego_client.delete_all_alerts()
+        max_rounds = 30
+
+        for round_num in range(1, max_rounds + 1):
+            await instance._update_alerts()
+
+            loaded_alerts = len(instance._indego_client.alerts or [])
+            total_alerts = getattr(instance._indego_client, "alerts_count", loaded_alerts)
+
+            _LOGGER.info(
+                "Delete-all round %d/%d for mower %s: loaded=%d total=%s",
+                round_num,
+                max_rounds,
+                instance._serial,
+                loaded_alerts,
+                total_alerts,
+            )
+
+            if loaded_alerts == 0 and total_alerts == 0:
+                _LOGGER.info("All alerts deleted for mower: %s", instance._serial)
+                break
+
+            if loaded_alerts == 0:
+                _LOGGER.warning(
+                    "Alert count is %s but no alerts are loaded for mower %s; stopping delete loop",
+                    total_alerts,
+                    instance._serial,
+                )
+                break
+
+            await instance._indego_client.delete_all_alerts()
+            await asyncio.sleep(5)
+
         await instance._update_alerts()
 
     async def async_read_alert(call):
@@ -565,6 +1188,33 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         instance = find_instance_for_mower_service_call(call)
         _LOGGER.info("Downloading lawn map for mower: %s", instance._serial)
         await instance.download_and_store_map()
+
+    async def async_set_calendar_slot(call):
+        """Handle set_calendar_slot service call."""
+        instance = find_instance_for_mower_service_call(call)
+
+        days = call.data[CONF_DAYS]
+        slot = call.data[CONF_SLOT]
+        enabled = call.data[CONF_ENABLED]
+        start = call.data.get(CONF_START)
+        end = call.data.get(CONF_END)
+
+        await instance.async_set_calendar_slot(
+            days=days,
+            slot=slot,
+            enabled=enabled,
+            start=start,
+            end=end,
+        )
+
+    async def async_set_predictive_mowing_window(call):
+        """Handle set_predictive_mowing_window service call."""
+        instance = find_instance_for_mower_service_call(call)
+
+        await instance.async_set_predictive_mowing_window(
+            earliest_start=call.data[CONF_EARLIEST_START],
+            latest_end=call.data[CONF_LATEST_END],
+        )
 
     # In HASS we can have multiple Indego component instances as long as the mower serial is unique.
     # So the mower services should only need to be registered for the first instance.
@@ -614,6 +1264,19 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             async_download_map,
             schema=SERVICE_SCHEMA_DOWNLOAD_MAP
         )
+        hass.services.async_register(
+            DOMAIN,
+            SERVICE_NAME_SET_CALENDAR_SLOT,
+            async_set_calendar_slot,
+            schema=SERVICE_SCHEMA_SET_CALENDAR_SLOT,
+        )
+
+        hass.services.async_register(
+            DOMAIN,
+            SERVICE_NAME_SET_PREDICTIVE_MOWING_WINDOW,
+            async_set_predictive_mowing_window,
+            schema=SERVICE_SCHEMA_SET_PREDICTIVE_MOWING_WINDOW,
+        )
 
         hass.data[DOMAIN][CONF_SERVICES_REGISTERED] = entry.entry_id
         _LOGGER.info("Successfully registered all Indego services")
@@ -643,6 +1306,45 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 class IndegoHub:
     """Class for the IndegoHub, which controls the sensors and binary sensors."""
 
+    # State-specific stuck detection timeouts (in seconds)
+    # Maps mower state codes to how long to wait before marking as stuck
+    STUCK_DETECTION_TIMEOUTS = {
+        513: 60,
+        518: 70,
+        521: 70,
+        523: 120,
+        524: 120,
+        768: 120,
+        769: 120,
+        770: 120,
+        771: 120,
+        772: 120,
+        773: 120,
+        774: 120,
+        775: 120,
+        776: 120,
+    }
+
+    STUCK_IGNORED_STATES = {
+        266,  # Leaving Dock
+        514,  # Relocalising
+        515,  # Loading map
+        516,  # Learning lawn / calibrating-like
+        517,  # Paused (intentional stand-still)
+        519,  # Idle in lawn (intentional stand-still)
+        520,  # Mapping paused
+        525,  # Spot mowing complete
+        526,  # Random mowing complete
+        # Additional states that may occur immediately after undocking
+        518,  # (Undefined but observed)
+        521,  # (Undefined but observed)
+        523,  # (Undefined but observed)
+        524,  # (Undefined but observed)
+    }
+
+    # Grace period after mowing session starts (in seconds)
+    MOWING_SESSION_GRACE_PERIOD = 90
+
     def __init__(self, name: str, session: IndegoOAuth2Session, serial: str, features: dict, hass: HomeAssistant, user_agent: Optional[str] = None):
         """Initialize the IndegoHub.
 
@@ -670,6 +1372,7 @@ class IndegoHub:
         self._last_position = (None, None)
         self._last_state = None
         self._last_position_change_time = None
+        self._mowing_session_start_time = None  # Track when mowing session starts (for grace period)
         self._last_svg_x = None
         self._last_svg_y = None
         self._map_svg = None
@@ -682,6 +1385,7 @@ class IndegoHub:
         self._last_service_error = None  # Track last Bosch service error (5xx)
         self._consecutive_timeouts = 0  # Track consecutive position update timeouts
         self._last_timeout_warning_time = None  # Prevent timeout spam
+        self._forced_mowing_mode = None # force mowing mode and calendar sensors to update
 
         async def async_token_refresh() -> str:
             await session.async_ensure_token_valid()
@@ -695,6 +1399,116 @@ class IndegoHub:
             raise_request_exceptions=True
         )
         self._indego_client.set_default_header(HTTP_HEADER_USER_AGENT, user_agent)
+
+    async def async_set_calendar_slot(
+        self,
+        days: list[str],
+        slot: int,
+        enabled: bool,
+        start: str | None = None,
+        end: str | None = None,
+    ):
+        """Set one calendar slot."""
+        _LOGGER.info(
+            "Setting calendar slot: days=%s slot=%s enabled=%s start=%s end=%s mower=%s",
+            days,
+            slot,
+            enabled,
+            start,
+            end,
+            self._serial,
+        )
+
+        # Validierung der Zeiten, falls enabled
+        if enabled:
+            if not start or not end:
+                raise ValueError("start and end are required when enabled is true")
+            try:
+                _parse_slot_time(start)
+                _parse_slot_time(end)
+            except ValueError as e:
+                _LOGGER.error("Invalid time format for slot: %s", e)
+                raise HomeAssistantError(f"Invalid time format: {e}") from e
+
+        await self._indego_client.update_calendar()
+        calendar = getattr(self._indego_client, "calendar", None)
+
+        payload = _calendar_to_payload(calendar, selected_cal=1)
+        for day in days:
+            payload = _set_payload_slot(payload, day, slot, enabled, start, end)
+
+        # Experimental: pyIndego documents GET /calendar, but not PUT /calendar.
+        result = await self._indego_client.put(
+            f"alms/{self._serial}/calendar",
+            payload,
+        )
+
+        _LOGGER.warning("SET CALENDAR SLOT RESULT = %r", result)
+
+        await self._update_calendar()
+
+    async def async_select_manual_calendar(self):
+        """Try to select the manual calendar after SmartMowing was disabled."""
+        await self._indego_client.update_calendar()
+        calendar = getattr(self._indego_client, "calendar", None)
+
+        payload = _calendar_to_payload(calendar, selected_cal=2)
+
+        result = await self._indego_client.put(
+            f"alms/{self._serial}/calendar",
+            payload,
+        )
+
+    async def async_set_predictive_mowing_window(
+        self,
+        earliest_start: str,
+        latest_end: str,
+    ):
+        """Set SmartMowing allowed mowing window."""
+        _LOGGER.info(
+            "Setting predictive mowing window: earliest_start=%s latest_end=%s mower=%s",
+            earliest_start,
+            latest_end,
+            self._serial,
+        )
+
+        payload = _predictive_calendar_payload(earliest_start, latest_end)
+
+        result = await self._indego_client.put_predictive_cal(payload)
+
+        _LOGGER.debug("Set predictive mowing window result: %r", result)
+
+        await self._update_predictive_calendar()
+
+    async def _update_predictive_schedule(self):
+        """Update SmartMowing predictive schedule."""
+        _LOGGER.debug("Fetching predictive schedule from Bosch API")
+
+        await self._indego_client.update_predictive_schedule()
+
+        schedule = getattr(self._indego_client, "predictive_schedule", None)
+
+        if ENTITY_PREDICTIVE_SCHEDULE not in self.entities:
+            return
+
+        attrs = _predictive_schedule_attributes(schedule, self._hass)
+
+        sensor = self.entities[ENTITY_PREDICTIVE_SCHEDULE]
+
+        if not _is_smartmowing_active(
+            self._indego_client.generic_data,
+            self._forced_mowing_mode,
+        ):
+            sensor.state = "manual_calendar_active"
+        else:
+            sensor.state = attrs["next_mow_slot"]
+
+        sensor.set_attributes(
+            {
+                "last_updated": last_updated_now(),
+                **attrs,
+            }
+        )
 
     async def async_send_command_to_client(self, command: str):
         """Send a mower command to the Indego client."""
@@ -738,7 +1552,7 @@ class IndegoHub:
                 if self._features[CONF_EXPOSE_INDEGO_AS_MOWER]:
                     self.entities[entity_key] = IndegoLawnMower(
                         f"indego_{self._serial}",
-                        self._mower_name,
+                        None,
                         device_info,
                         self
                     )
@@ -802,6 +1616,8 @@ class IndegoHub:
         self._create_entities(device_info)
         await load_platforms()
 
+        await self.start_periodic_position_update()
+
         if self._hass.state == CoreState.running:
             # HA has already been started (this probably an integration reload).
             # Perform initial update right away...
@@ -818,16 +1634,26 @@ class IndegoHub:
     async def _initial_update(self, _=None):
         """Do the initial update and create all entities."""
         _LOGGER.info("Starting initial state synchronization for: %s", self._serial)
-
-        self.set_online_state(False)
+        # Don't set offline during startup - let the first successful API call set the state
         self.set_service_status(True)  # Service is up by default until we detect an error
+
+        # Restore session count from persisted entity state
+        if ENTITY_SESSION_COUNT in self.entities:
+            entity = self.entities[ENTITY_SESSION_COUNT]
+            restored_state = entity.state
+            if restored_state is not None:
+                try:
+                    self._session_count = int(float(restored_state))
+                    _LOGGER.debug("Restored session count: %d", self._session_count)
+                except (ValueError, TypeError):
+                    pass
+
         await self._create_refresh_state_task()
         await asyncio.gather(*[self.refresh_10m(), self.refresh_24h()])
 
         try:
             _LOGGER.debug("Fetching initial operating data (battery, garden size, etc.)")
             await self._update_operating_data()
-
         except Exception as exc:
             _LOGGER.warning("Error during initial operating data update: %s", str(exc))
 
@@ -911,7 +1737,7 @@ class IndegoHub:
             _LOGGER.info("Connection restored - clearing repair issue")
             try:
                 issue_registry = ir.async_get(self._hass)
-                issue_registry.async_delete(f"{DOMAIN}/connection_failure")
+                issue_registry.async_delete(DOMAIN, "connection_failure")
                 self._hass.data[DOMAIN]["connection_issue_reported"] = False
             except Exception as err:
                 _LOGGER.warning("Error deleting connection issue: %s", err)
@@ -972,6 +1798,9 @@ class IndegoHub:
                 self._update_alerts(),
                 self._update_last_completed_mow(),
                 self._update_next_mow(),
+                self._update_predictive_calendar(),
+                self._update_predictive_schedule(),
+                self._update_calendar(),
             ],
             return_exceptions=True,
         )
@@ -1122,7 +1951,12 @@ class IndegoHub:
                         self.entities[ENTITY_BATTERY_VOLTAGE].state = voltage if voltage is not None else STATE_UNKNOWN
 
                     if ENTITY_BATTERY_DISCHARGE in self.entities:
-                        self.entities[ENTITY_BATTERY_DISCHARGE].state = discharge if discharge is not None else STATE_UNKNOWN
+                        if discharge is not None and voltage is not None:
+                            # Convert Ah to Wh (Watt-hours) and make absolute
+                            discharge_wh = abs(discharge) * voltage
+                            self.entities[ENTITY_BATTERY_DISCHARGE].state = round(discharge_wh, 2)
+                        else:
+                            self.entities[ENTITY_BATTERY_DISCHARGE].state = STATE_UNKNOWN
 
                     if ENTITY_BATTERY_CYCLES in self.entities:
                         self.entities[ENTITY_BATTERY_CYCLES].state = cycles if cycles is not None else STATE_UNKNOWN
@@ -1169,6 +2003,93 @@ class IndegoHub:
         except Exception as exc:
             _LOGGER.error("Unexpected error while updating operating data: %s", str(exc))
 
+    async def _update_predictive_calendar(self):
+        """Update predictive calendar data / SmartMowing allowed mowing window."""
+        _LOGGER.debug("Fetching predictive calendar from Bosch API")
+
+        await self._indego_client.update_predictive_calendar()
+
+        calendar = getattr(self._indego_client, "predictive_calendar", None)
+
+
+        if ENTITY_PREDICTIVE_CALENDAR_SLOTS not in self.entities:
+            return
+
+        mowing_mode = getattr(
+            self._indego_client.generic_data,
+            "mowing_mode_description",
+            None,
+        )
+
+        smartmowing_enabled = _is_smartmowing_active(
+            self._indego_client.generic_data,
+            self._forced_mowing_mode,
+        )
+
+        window = _predictive_calendar_window(calendar, self._hass)
+
+        sensor = self.entities[ENTITY_PREDICTIVE_CALENDAR_SLOTS]
+
+        if not _is_smartmowing_active(
+            self._indego_client.generic_data,
+            self._forced_mowing_mode,
+        ):
+            sensor.state = "manual_calendar_active"
+        elif window["allowed_mowing_time"] != "not_enabled":
+            sensor.state = window["allowed_mowing_time"]
+        else:
+            sensor.state = "off"
+
+        sensor.set_attributes(
+            {
+                "last_updated": last_updated_now(),
+                "smartmowing_enabled": smartmowing_enabled,
+                "mowing_mode": self._forced_mowing_mode or mowing_mode,
+                **window,
+            }
+        )
+
+    async def _update_calendar(self):
+        """Update calendar data / planned mowing slots."""
+        _LOGGER.debug("Fetching calendar from Bosch API")
+
+        await self._indego_client.update_calendar()
+
+        calendar = getattr(self._indego_client, "calendar", None)
+
+        if ENTITY_CALENDAR_SLOTS not in self.entities:
+            return
+
+        slots_by_day = _calendar_slots_by_day(calendar)
+        today_name = _today_calendar_day_name()
+        today_slots = _today_calendar_slots(slots_by_day)
+
+        sensor = self.entities[ENTITY_CALENDAR_SLOTS]
+
+        if _is_smartmowing_active(
+            self._indego_client.generic_data,
+            self._forced_mowing_mode,
+        ):
+            sensor.state = "smartmowing_active"
+
+        elif today_slots:
+            sensor.state = ", ".join(today_slots)
+
+        elif _is_calendar_selection_required(self._indego_client.generic_data):
+            sensor.state = "calendar_selection_required"
+
+        else:
+            sensor.state = "off"
+
+        sensor.set_attributes(
+            {
+                "last_updated": last_updated_now(),
+                "today_slot_1": slots_by_day.get(f"{today_name}_slot_1"),
+                "today_slot_2": slots_by_day.get(f"{today_name}_slot_2"),
+                **slots_by_day,
+            }
+        )
+
     def set_online_state(self, online: bool):
         current_is_online = self.entities[ENTITY_ONLINE].state
         if current_is_online != online:
@@ -1214,6 +2135,22 @@ class IndegoHub:
             _LOGGER.warning("Timeout while fetching mower state - mower may be offline or API is slow")
             self.set_online_state(False)
             return
+        except ClientResponseError as exc:
+            # Enhanced error handling with specific error code information
+            error_code = str(exc.status)
+            error_desc = get_error_description(f"{error_code}_timeout")
+            error_severity = get_error_severity(f"{error_code}_timeout")
+
+            log_msg = f"Failed to fetch mower state from Bosch API: {error_desc} (HTTP {exc.status})"
+            if error_severity == ErrorSeverity.ERROR:
+                _LOGGER.error(log_msg)
+            elif error_severity == ErrorSeverity.WARNING:
+                _LOGGER.warning(log_msg)
+            else:
+                _LOGGER.debug(log_msg)
+
+            self.set_online_state(False)
+            return
         except Exception as exc:
             _LOGGER.error("Failed to fetch mower state from Bosch API: %s", str(exc))
             self.set_online_state(False)
@@ -1232,6 +2169,10 @@ class IndegoHub:
             self._last_successful_update = time.time()
             # Mark service as UP on successful response
             self.set_service_status(True)
+
+            self._update_alert_state()
+
+            await self._update_alerts()
 
             # Check for offline error codes (WiFi lost, API error, No connection to server)
             state_code = getattr(self._indego_client.state, 'state', None)
@@ -1303,27 +2244,41 @@ class IndegoHub:
                 runtime = getattr(self._indego_client.state, 'runtime', None)
                 if runtime and hasattr(runtime, 'total'):
                     cut_time = getattr(runtime.total, 'cut', None)
-                    self.entities[ENTITY_RUNTIME].state = cut_time if cut_time is not None else STATE_UNKNOWN
-                    _LOGGER.debug("Total mowing time: %d hours", cut_time if cut_time is not None else 0)
+
+                    # Ensure runtime never decreases (TOTAL_INCREASING constraint)
+                    current_state = self.entities[ENTITY_RUNTIME].state
+                    if cut_time is not None:
+                        # Convert current state to number if possible
+                        try:
+                            current_value = float(current_state) if current_state and current_state != STATE_UNKNOWN else 0
+                        except (ValueError, TypeError):
+                            current_value = 0
+
+                        # Only update if new value is >= current value or current is unknown
+                        if cut_time >= current_value:
+                            self.entities[ENTITY_RUNTIME].state = cut_time
+                            _LOGGER.debug("Total mowing time: %s hours", cut_time)
+                        else:
+                            _LOGGER.debug("Ignoring runtime decrease from %s to %s hours (API inconsistency)",
+                                          current_value, cut_time)
+                    else:
+                        self.entities[ENTITY_RUNTIME].state = STATE_UNKNOWN
                 else:
                     self.entities[ENTITY_RUNTIME].state = STATE_UNKNOWN
             except Exception as exc:
                 _LOGGER.error("Failed to update runtime data: %s", str(exc))
                 self.entities[ENTITY_RUNTIME].state = STATE_UNKNOWN
 
-            # Update battery charging state
+            
+            # Update battery charging state - use separate binary sensor only
             try:
-                self.entities[ENTITY_BATTERY].charging = (
-                    self._indego_client.state_description_detail == "Charging"
-                )
-                # Also update battery charging binary sensor if it exists
+                is_charging = (self._indego_client.state_description_detail == "Charging")
+                # Update battery charging binary sensor
                 if ENTITY_BATTERY_CHARGING in self.entities:
-                    self.entities[ENTITY_BATTERY_CHARGING].state = (
-                        self._indego_client.state_description_detail == "Charging"
-                    )
+                    self.entities[ENTITY_BATTERY_CHARGING].state = is_charging
+                # Note: ENTITY_BATTERY does NOT have a 'charging' attribute; only use binary sensor
             except Exception as exc:
                 _LOGGER.error("Failed to update battery charging state: %s", str(exc))
-                self.entities[ENTITY_BATTERY].charging = False
                 if ENTITY_BATTERY_CHARGING in self.entities:
                     self.entities[ENTITY_BATTERY_CHARGING].state = False
 
@@ -1396,9 +2351,35 @@ class IndegoHub:
                     if ENTITY_MOWER_SVG_Y in self.entities:
                         self.entities[ENTITY_MOWER_SVG_Y].state = svg_y
 
-                    is_mowing = 500 <= self._indego_client.state.state <= 799
+
+#                    current_state_code = self._indego_client.state.state
+#                    is_mowing = 500 <= current_state_code <= 799
+#                    now = datetime.now()
+
+                    current_state_code = self._indego_client.state.state
+                    stuck_detection_allowed = current_state_code not in self.STUCK_IGNORED_STATES
+                    is_mowing = stuck_detection_allowed and (
+                        500 <= current_state_code <= 799
+                        or current_state_code in {768, 769, 770, 771, 772, 773, 774, 775, 776}
+                    )
                     now = datetime.now()
 
+                    if not stuck_detection_allowed:
+                        _LOGGER.debug(
+                            "Stuck detection: state=%s detail=%s allowed=%s",
+                            current_state_code,
+                            self._indego_client.state_description_detail,
+                            stuck_detection_allowed,
+                        )
+
+                    # Track mowing session start
+                    if is_mowing and self._mowing_session_start_time is None:
+                        self._mowing_session_start_time = now
+                        _LOGGER.debug("Mowing session started - activating stuck detection after grace period")
+                    elif not is_mowing and self._mowing_session_start_time is not None:
+                        self._mowing_session_start_time = None
+
+                    # Detect position movement (5px threshold)
                     moved = self._last_svg_x is None or math.sqrt(
                         (svg_x - self._last_svg_x) ** 2 + (svg_y - self._last_svg_y) ** 2
                     ) > 5
@@ -1408,16 +2389,34 @@ class IndegoHub:
                         self._last_svg_y = svg_y
                         self._last_position_change_time = now
 
-                    stuck = (
-                        is_mowing
-                        and self._last_position_change_time is not None
-                        and (now - self._last_position_change_time).total_seconds() > 60
-                    )
+                    # Determine stuck status with adaptive timeout
+                    stuck = False
+                    if is_mowing and self._last_position_change_time is not None:
+                        # Get timeout for current state (default 60s if state not in map)
+                        timeout_seconds = self.STUCK_DETECTION_TIMEOUTS.get(current_state_code, 60)
+
+                        # Check if grace period is active (first 60s of session)
+                        grace_period_active = False
+                        if self._mowing_session_start_time is not None:
+                            session_duration = (now - self._mowing_session_start_time).total_seconds()
+                            grace_period_active = session_duration < self.MOWING_SESSION_GRACE_PERIOD
+
+                        # Only check for stuck after grace period ends
+                        if not grace_period_active:
+                            stuck = (now - self._last_position_change_time).total_seconds() > timeout_seconds
 
                     if ENTITY_MOWER_STUCK in self.entities:
                         self.entities[ENTITY_MOWER_STUCK].state = stuck
                         if stuck:
-                            _LOGGER.warning("Mower appears to be stuck - no movement detected for > 60 seconds")
+                            timeout_seconds = self.STUCK_DETECTION_TIMEOUTS.get(current_state_code, 60)
+                            state_detail = self._indego_client.state_description_detail or "unknown"
+                            _LOGGER.warning(
+                                "Mower appears to be stuck - no movement detected for > %d seconds "
+                                "(state: %d, detail: %s)",
+                                timeout_seconds,
+                                current_state_code,
+                                state_detail,
+                            )
                             self.entities[ENTITY_MOWER_STUCK].add_attributes({
                                 "stuck_since": self._last_position_change_time.strftime("%Y-%m-%d %H:%M:%S"),
                                 "stuck_x": svg_x,
@@ -1462,80 +2461,110 @@ class IndegoHub:
 
         try:
             if self._indego_client.generic_data:
+                mowing_mode = getattr(
+                    self._indego_client.generic_data,
+                    "mowing_mode_description",
+                    STATE_UNKNOWN,
+                    
+                )
+
+                effective_mowing_mode = self._forced_mowing_mode or mowing_mode
+
                 if ENTITY_MOWING_MODE in self.entities:
-                    mowing_mode = getattr(
-                        self._indego_client.generic_data,
-                        'mowing_mode_description',
-                        STATE_UNKNOWN
-                    )
-                    self.entities[ENTITY_MOWING_MODE].state = mowing_mode
+                    self.entities[ENTITY_MOWING_MODE].state = effective_mowing_mode
                     _LOGGER.debug("Mowing mode: %s", mowing_mode)
+
+                if ENTITY_SMARTMOWING_SWITCH in self.entities:
+                    self.entities[ENTITY_SMARTMOWING_SWITCH].is_on = (
+                        str(effective_mowing_mode).lower() == "smartmowing"
+                    )
+
             else:
                 _LOGGER.debug("Generic data is empty from API")
+
                 if ENTITY_MOWING_MODE in self.entities:
                     self.entities[ENTITY_MOWING_MODE].state = STATE_UNKNOWN
+
+                if ENTITY_SMARTMOWING_SWITCH in self.entities:
+                    self.entities[ENTITY_SMARTMOWING_SWITCH].is_on = False
+
         except Exception as exc:
             _LOGGER.error("Error processing generic data: %s", str(exc))
+
             if ENTITY_MOWING_MODE in self.entities:
                 self.entities[ENTITY_MOWING_MODE].state = STATE_UNKNOWN
+
+            if ENTITY_SMARTMOWING_SWITCH in self.entities:
+                self.entities[ENTITY_SMARTMOWING_SWITCH].is_on = False
+
+        try:
+            if ENTITY_PREDICTIVE_CALENDAR_SLOTS in self.entities:
+                await self._update_predictive_calendar()
+        except Exception as exc:
+            _LOGGER.debug(
+                "Could not refresh predictive calendar after generic data update: %s",
+                exc,
+            )
+
 
         return self._indego_client.generic_data
 
     async def _update_alerts(self):
         await self._indego_client.update_alerts()
 
-        # Show "Problem" only if there are unread alerts
-        unread_count = sum(1 for alert in self._indego_client.alerts if not alert.read_status)
+        alerts = self._indego_client.alerts or []
+
+        unread_count = sum(
+            1 for alert in alerts
+            if str(alert.read_status).strip().lower() == "unread"
+        )
+
+        # Explicitly always set state - never rely on restored state
         self.entities[ENTITY_ALERT].state = unread_count > 0
 
-        if self._indego_client.alerts:
-            # Build complete alert attributes
+        if alerts:
             alert_attributes = {
                 "alerts_count": self._indego_client.alerts_count,
-                "last_alert_error_code": self._indego_client.alerts[0].error_code,
-                "last_alert_message": self._indego_client.alerts[0].message,
-                "last_alert_date": format_indego_date(self._indego_client.alerts[0].date),
-                "last_alert_read": self._indego_client.alerts[0].read_status,
+                "last_alert_error_code": alerts[0].error_code,
+                "last_alert_message": alerts[0].message,
+                "last_alert_date": format_indego_date(alerts[0].date),
+                "last_alert_read": alerts[0].read_status,
             }
 
-            # Always store all alerts as individual attributes for easy extraction in automations
-            for index, alert in enumerate(self._indego_client.alerts):
+            for index, alert in enumerate(alerts):
                 error_code = str(alert.error_code)
                 error_desc = get_error_description(error_code)
+                error_severity = get_error_severity(error_code)
                 alert_time = format_indego_date(alert.date)
 
-                # Format: "ERROR_CODE: Error Description - 2024-01-01 12:34:56"
-                alert_attributes[f"error_{index}"] = f"{error_code}: {error_desc} - {alert_time}"
-
-                # Also store individual components for advanced use cases
+                alert_attributes[f"error_{index}"] = f"{error_code}: {error_desc} - {alert_time} [{error_severity.name}]"
                 alert_attributes[f"error_{index}_code"] = error_code
                 alert_attributes[f"error_{index}_description"] = error_desc
+                alert_attributes[f"error_{index}_severity"] = error_severity.name
                 alert_attributes[f"error_{index}_timestamp"] = alert_time
                 alert_attributes[f"error_{index}_message"] = alert.message
                 alert_attributes[f"error_{index}_read"] = alert.read_status
 
             self.entities[ENTITY_ALERT].add_attributes(alert_attributes, False)
 
-            # Clear any other alerts that no longer exist
-            alert_index = len(self._indego_client.alerts)
+            alert_index = len(alerts)
             while self.entities[ENTITY_ALERT].clear_attribute(f"error_{alert_index}", False):
                 alert_index += 1
 
-            # Also clear individual components if alerts were removed
-            error_index = len(self._indego_client.alerts)
+            error_index = len(alerts)
             while self.entities[ENTITY_ALERT].clear_attribute(f"error_{error_index}_code", False):
+                error_index += 1
+            while self.entities[ENTITY_ALERT].clear_attribute(f"error_{error_index}_severity", False):
                 error_index += 1
 
             self.entities[ENTITY_ALERT].async_schedule_update_ha_state()
 
         else:
-            self.entities[ENTITY_ALERT].set_attributes(
-                {
-                    "alerts_count": self._indego_client.alerts_count
-                }
-            )
+            # No alerts - explicitly clear everything
+            self.entities[ENTITY_ALERT].set_attributes({
+                "alerts_count": self._indego_client.alerts_count or 0,
+            })
 
-            # Clear all error attributes when no alerts
             error_index = 0
             while self.entities[ENTITY_ALERT].clear_attribute(f"error_{error_index}", False):
                 error_index += 1
@@ -1543,6 +2572,25 @@ class IndegoHub:
             error_index = 0
             while self.entities[ENTITY_ALERT].clear_attribute(f"error_{error_index}_code", False):
                 error_index += 1
+
+    def _update_alert_state(self):
+        """Set alert sensor state based on active alerts and current error."""
+        if ENTITY_ALERT not in self.entities:
+            return
+
+        alerts = self._indego_client.alerts or []
+        unread_count = sum(
+            1 for a in alerts
+            if str(a.read_status).strip().lower() == "unread"
+        )
+        current_error = getattr(self._indego_client.state, "error", 0)
+
+        # If there are no alerts at all, the problem is considered resolved.
+        if self._indego_client.alerts_count == 0:
+            self.entities[ENTITY_ALERT].state = False
+        else:
+            # Problem exists if there are unread alerts OR an active error code.
+            self.entities[ENTITY_ALERT].state = (unread_count > 0) or (current_error != 0)
 
     async def _update_updates_available(self):
         await self._indego_client.update_updates_available()
@@ -1633,7 +2681,10 @@ class IndegoHub:
             if self._indego_client.alerts and len(self._indego_client.alerts) > 0:
                 latest_alert = self._indego_client.alerts[0]
                 error_code = str(latest_alert.error_code)
+
+                # Use new comprehensive error description
                 error_description = get_error_description(error_code)
+                error_severity = get_error_severity(error_code)
 
                 self._last_error_code = error_code
                 self._last_error_time = latest_alert.date
@@ -1642,13 +2693,24 @@ class IndegoHub:
                 self.entities[ENTITY_LAST_ERROR_CODE].add_attributes({
                     "error_code": error_code,
                     "error_time": format_indego_date(latest_alert.date),
+                    "error_severity": error_severity.name,
                 })
-                _LOGGER.warning("Latest mower error: %s (Code: %s)", error_description, error_code)
+
+                # Log with appropriate level based on severity
+                if error_severity == ErrorSeverity.CRITICAL:
+                    _LOGGER.critical("CRITICAL mower error: %s (Code: %s)", error_description, error_code)
+                elif error_severity == ErrorSeverity.ERROR:
+                    _LOGGER.error("Mower error: %s (Code: %s)", error_description, error_code)
+                elif error_severity == ErrorSeverity.WARNING:
+                    _LOGGER.warning("Mower warning: %s (Code: %s)", error_description, error_code)
+                else:
+                    _LOGGER.info("Mower info: %s (Code: %s)", error_description, error_code)
             else:
                 self.entities[ENTITY_LAST_ERROR_CODE].state = "No errors"
                 self.entities[ENTITY_LAST_ERROR_CODE].add_attributes({
                     "error_code": "0",
                     "error_time": "N/A",
+                    "error_severity": ErrorSeverity.INFO.name,
                 })
         except Exception as exc:
             _LOGGER.error("Failed to process error tracking: %s", str(exc))

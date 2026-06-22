@@ -2,7 +2,7 @@
     "config": {
         "abort": {
             "already_configured": "This Bosch Indego mower has already been configured!",
-            "connection_error": "The connection to the Bosch Indego API failed! Please use the known issues page (https://github.com/sander1988/Indego?tab=readme-ov-file#known-issues) for possible solutions.",
+            "connection_error": "The connection to the Bosch Indego API failed! Please check the documentation for known issues and possible solutions.",
             "no_mowers_found": "No mowers found in this Bosch Indego account!",
             "reauth_successful": "Re-authentication was successful. Access to the Bosch API has been restored."
         },
@@ -12,9 +12,6 @@
                     "user_agent": "User-Agent",
                     "expose_mower": "Expose Indego mower as mower entity in Home Assistant",
                     "expose_vacuum": "Expose Indego mower as vacuum entity in Home Assistant"
-                },
-                "data_description": {
-                    "user_agent": "Custom User-Agent header for API requests to Bosch Indego Cloud. Leave empty to use default. Some users may need to set a custom value if their account has API access restrictions."
                 },
                 "data_description": {
                     "user_agent": "In case of HTTP 4XX errors (especially Reason: 403, message='Forbidden') it might help to change the User Agent. Should not contain Homeassistant or HA."
@@ -96,47 +93,47 @@
             "mower_state": {
                 "name": "Mower State",
                 "state": {
-                    "Mowing": "Mowing",
-                    "Docked": "Docked",
-                    "Sleeping": "Sleeping",
-                    "Paused": "Paused"
+                    "mowing": "Mowing",
+                    "docked": "Docked",
+                    "sleeping": "Sleeping",
+                    "paused": "Paused"
                 }
             },
             "mower_state_detail": {
                 "name": "Mower State Detail",
                 "state": {
-                    "Reading status": "Reading status",
-                    "Charging": "Charging",
-                    "Docked": "Docked",
-                    "Sleeping": "Sleeping",
-                    "Docked - Software update": "Docked - Software update",
-                    "Docked - Loading map": "Docked - Loading map",
-                    "Docked - Saving map": "Docked - Saving map",
-                    "Docked - Leaving Dock": "Docked - Leaving Dock",
-                    "Mowing": "Mowing",
-                    "Mowing - Relocalising": "Mowing - Relocating",
-                    "Mowing - Learning Lawn": "Mowing - Learning Lawn",
-                    "Mowing - Learning Lawn paused": "Mowing - Learning Lawn paused",
-                    "SpotMow": "SpotMow",
-                    "Mowing randomly": "Mowing randomly",
-                    "Diagnostic mode": "Diagnostic mode",
-                    "End of life": "End of life",
-                    "Software update": "Software update",
-                    "Energy save mode": "Energy save mode",
-                    "Relocalising": "Relocating",
-                    "Loading map": "Loading map",
-                    "Learning lawn": "Learning lawn",
-                    "Paused": "Paused",
-                    "Border cut": "Border cut",
-                    "Idle in lawn": "Idle in lawn",
-                    "Stuck on lawn, help needed": "Stuck on lawn, help needed",
-                    "Returning to Dock": "Returning to Dock",
-                    "Returning to Dock - Battery low": "Returning to Dock - Battery low",
-                    "Returning to dock - Calendar timeslot ended": "Returning to Dock - Calendar timeslot ended",
-                    "Returning to dock - Battery temp range": "Returning to Dock - Battery temp range",
-                    "Returning to dock - Lawn complete": "Returning to Dock - Lawn complete",
-                    "Returning to dock - Relocalising": "Returning to Dock - Relocating",
-                    "Returning to dock - requested by user/app": "Returning to Dock - requested by user/app"
+                    "reading_status": "Reading status",
+                    "charging": "Charging",
+                    "docked": "Docked",
+                    "sleeping": "Sleeping",
+                    "docked_software_update": "Docked - Software update",
+                    "docked_loading_map": "Docked - Loading map",
+                    "docked_saving_map": "Docked - Saving map",
+                    "docked_leaving_dock": "Docked - Leaving dock",
+                    "mowing": "Mowing",
+                    "mowing_relocalising": "Mowing - Relocating",
+                    "mowing_learning_lawn": "Mowing - Learning Lawn",
+                    "mowing_learning_lawn_paused": "Mowing - Learning Lawn paused",
+                    "spotmow": "SpotMow",
+                    "mowing_randomly": "Mowing randomly",
+                    "diagnostic_mode": "Diagnostic mode",
+                    "end_of_life": "End of life",
+                    "software_update": "Software update",
+                    "energy_save_mode": "Energy save mode",
+                    "relocalising": "Relocating",
+                    "loading_map": "Loading map",
+                    "learning_lawn": "Learning lawn",
+                    "paused": "Paused",
+                    "border_cut": "Border cut",
+                    "idle_in_lawn": "Idle in lawn",
+                    "stuck_on_lawn_help_needed": "Stuck on lawn, help needed",
+                    "returning_to_dock": "Returning to dock",
+                    "returning_to_dock_battery_low": "Returning to dock - Battery low",
+                    "returning_to_dock_calendar_timeslot_ended": "Returning to Dock - Calendar timeslot ended",
+                    "returning_to_dock_battery_temp_range": "Returning to Dock - Battery temp range",
+                    "returning_to_dock_lawn_complete": "Returning to Dock - Lawn complete",
+                    "returning_to_dock_relocalising": "Returning to Dock - Relocating",
+                    "returning_to_dock_requested_by_user_app": "Returning to Dock - requested by user/app"
                 }
             },
             "battery_percentage": {
@@ -155,7 +152,10 @@
                 "name": "Next Mow"
             },
             "mowing_mode": {
-                "name": "Mowing Mode"
+                "name": "Mowing Mode",
+                "state": {
+                    "calendar": "Manual Calendar"
+                }
             },
             "runtime_total": {
                 "name": "Mow Time Total"
@@ -195,6 +195,333 @@
             },
             "battery_discharge": {
                 "name": "Battery Discharge"
+            },
+            "calendar_slots": {
+                "state": {
+                    "smartmowing_active": "SmartMowing active",
+                    "calendar_selection_required": "Kalenderauswahl erforderlich",
+                    "off": "Off"
+                },
+                "name": "Planned mowing times",
+                "state_attributes": {
+                    "today_slot_1": {
+                        "name": "Today slot 1",
+                        "state": {
+                            "not_enabled": "Not enabled",
+                            "not_configured": "Not configured"
+                        }
+                    },
+                    "today_slot_2": {
+                        "name": "Today slot 2",
+                        "state": {
+                            "not_enabled": "Not enabled",
+                            "not_configured": "Not configured"
+                        }
+                    },
+                    "monday_slot_1": {
+                        "name": "Monday Slot 1",
+                        "state": {
+                            "not_enabled": "Not enabled",
+                            "not_configured": "Not configured"
+                        }
+                    },
+                    "monday_slot_2": {
+                        "name": "Monday Slot 2",
+                        "state": {
+                            "not_enabled": "Not enabled",
+                            "not_configured": "Not configured"
+                        }
+                    },
+                    "tuesday_slot_1": {
+                        "name": "Tuesday Slot 1",
+                        "state": {
+                            "not_enabled": "Not enabled",
+                            "not_configured": "Not configured"
+                        }
+                    },
+                    "tuesday_slot_2": {
+                        "name": "Tuesday Slot 2",
+                        "state": {
+                            "not_enabled": "Not enabled",
+                            "not_configured": "Not configured"
+                        }
+                    },
+                    "wednesday_slot_1": {
+                        "name": "Wednesday Slot 1",
+                        "state": {
+                            "not_enabled": "Not enabled",
+                            "not_configured": "Not configured"
+                        }
+                    },
+                    "wednesday_slot_2": {
+                        "name": "Wednesday Slot 2",
+                        "state": {
+                            "not_enabled": "Not enabled",
+                            "not_configured": "Not configured"
+                        }
+                    },
+                    "thursday_slot_1": {
+                        "name": "Thursday Slot 1",
+                        "state": {
+                            "not_enabled": "Not enabled",
+                            "not_configured": "Not configured"
+                        }
+                    },
+                    "thursday_slot_2": {
+                        "name": "Thursday Slot 2",
+                        "state": {
+                            "not_enabled": "Not enabled",
+                            "not_configured": "Not configured"
+                        }
+                    },
+                    "friday_slot_1": {
+                        "name": "Friday Slot 1",
+                        "state": {
+                            "not_enabled": "Not enabled",
+                            "not_configured": "Not configured"
+                        }
+                    },
+                    "friday_slot_2": {
+                        "name": "Friday Slot 2",
+                        "state": {
+                            "not_enabled": "Not enabled",
+                            "not_configured": "Not configured"
+                        }
+                    },
+                    "saturday_slot_1": {
+                        "name": "Saturday Slot 1",
+                        "state": {
+                            "not_enabled": "Not enabled",
+                            "not_configured": "Not configured"
+                        }
+                    },
+                    "saturday_slot_2": {
+                        "name": "Saturday Slot 2",
+                        "state": {
+                            "not_enabled": "Not enabled",
+                            "not_configured": "Not configured"
+                        }
+                    },
+                    "sunday_slot_1": {
+                        "name": "Sunday Slot 1",
+                        "state": {
+                            "not_enabled": "Not enabled",
+                            "not_configured": "Not configured"
+                        }
+                    },
+                    "sunday_slot_2": {
+                        "name": "Sunday Slot 2",
+                        "state": {
+                            "not_enabled": "Not enabled",
+                            "not_configured": "Not configured"
+                        }
+                    }
+                }
+            },
+            "predictive_calendar_slots": {
+                "name": "SmartMowing blocked times",
+                "state": {
+                    "manual_calendar_active": "Manual calendar active",
+                    "off": "Off"
+                },
+                "state_attributes": {
+                    "last_updated": {
+                        "name": "Last updated"
+                    },
+                    "smartmowing_enabled": {
+                        "name": "SmartMowing active"
+                    },
+                    "mowing_mode": {
+                        "name": "Mowing mode"
+                    },
+                    "earliest_start": {
+                        "name": "Earliest start",
+                        "state": {
+                            "not_enabled": "Not enabled"
+                        }
+                    },
+                    "latest_end": {
+                        "name": "Latest end",
+                        "state": {
+                            "not_enabled": "Not enabled"
+                        }
+                    },
+                    "blocked_before": {
+                        "name": "Blocked before",
+                        "state": {
+                            "not_enabled": "Not enabled"
+                        }
+                    },
+                    "blocked_after": {
+                        "name": "Blocked after",
+                        "state": {
+                            "not_enabled": "Not enabled"
+                        }
+                    }
+                }
+            },
+            "predictive_schedule": {
+                "name": "SmartMowing schedule",
+                "state": {
+                    "manual_calendar_active": "Manual calendar active",
+                    "none": "None"
+                },
+                "state_attributes": {
+                    "last_updated": {
+                        "name": "Last updated"
+                    },
+                    "next_mow_slot": {
+                        "name": "Next planned mowing slot",
+                        "state": {
+                            "none": "None"
+                        }
+                    },
+                    "next_mow_day": {
+                        "name": "Next planned mowing day",
+                        "state": {
+                            "none": "None",
+                            "monday": "Monday",
+                            "tuesday": "Tuesday",
+                            "wednesday": "Wednesday",
+                            "thursday": "Thursday",
+                            "friday": "Friday",
+                            "saturday": "Saturday",
+                            "sunday": "Sunday"
+                        }
+                    },
+                    "next_mow_time": {
+                        "name": "Next planned mowing time",
+                        "state": {
+                            "none": "None"
+                        }
+                    },
+                    "schedule_monday": {
+                        "name": "Schedule Monday",
+                        "state": {
+                            "not_scheduled": "Not scheduled"
+                        }
+                    },
+                    "exclusion_monday_user": {
+                        "name": "Blocked time Monday user",
+                        "state": {
+                            "none": "None"
+                        }
+                    },
+                    "exclusion_monday_weather": {
+                        "name": "Blocked time Monday weather",
+                        "state": {
+                            "none": "None"
+                        }
+                    },
+                    "schedule_tuesday": {
+                        "name": "Schedule Tuesday",
+                        "state": {
+                            "not_scheduled": "Not scheduled"
+                        }
+                    },
+                    "exclusion_tuesday_user": {
+                        "name": "Blocked time Tuesday user",
+                        "state": {
+                            "none": "None"
+                        }
+                    },
+                    "exclusion_tuesday_weather": {
+                        "name": "Blocked time Tuesday weather",
+                        "state": {
+                            "none": "None"
+                        }
+                    },
+                    "schedule_wednesday": {
+                        "name": "Schedule Wednesday",
+                        "state": {
+                            "not_scheduled": "Not scheduled"
+                        }
+                    },
+                    "exclusion_wednesday_user": {
+                        "name": "Blocked time Wednesday user",
+                        "state": {
+                            "none": "None"
+                        }
+                    },
+                    "exclusion_wednesday_weather": {
+                        "name": "Blocked time Wednesday weather",
+                        "state": {
+                            "none": "None"
+                        }
+                    },
+                    "schedule_thursday": {
+                        "name": "Schedule Thursday",
+                        "state": {
+                            "not_scheduled": "Not scheduled"
+                        }
+                    },
+                    "exclusion_thursday_user": {
+                        "name": "Blocked time Thursday user",
+                        "state": {
+                            "none": "None"
+                        }
+                    },
+                    "exclusion_thursday_weather": {
+                        "name": "Blocked time Thursday weather",
+                        "state": {
+                            "none": "None"
+                        }
+                    },
+                    "schedule_friday": {
+                        "name": "Schedule Friday",
+                        "state": {
+                            "not_scheduled": "Not scheduled"
+                        }
+                    },
+                    "exclusion_friday_user": {
+                        "name": "Blocked time Friday user",
+                        "state": {
+                            "none": "None"
+                        }
+                    },
+                    "exclusion_friday_weather": {
+                        "name": "Blocked time Friday weather",
+                        "state": {
+                            "none": "None"
+                        }
+                    },
+                    "schedule_saturday": {
+                        "name": "Schedule Saturday",
+                        "state": {
+                            "not_scheduled": "Not scheduled"
+                        }
+                    },
+                    "exclusion_saturday_user": {
+                        "name": "Blocked time Saturday user",
+                        "state": {
+                            "none": "None"
+                        }
+                    },
+                    "exclusion_saturday_weather": {
+                        "name": "Blocked time Saturday weather",
+                        "state": {
+                            "none": "None"
+                        }
+                    },
+                    "schedule_sunday": {
+                        "name": "Schedule Sunday",
+                        "state": {
+                            "not_scheduled": "Not scheduled"
+                        }
+                    },
+                    "exclusion_sunday_user": {
+                        "name": "Blocked time Sunday user",
+                        "state": {
+                            "none": "None"
+                        }
+                    },
+                    "exclusion_sunday_weather": {
+                        "name": "Blocked time Sunday weather",
+                        "state": {
+                            "none": "None"
+                        }
+                    }
+                }
             }
         },
         "camera": {
@@ -228,6 +555,7 @@
             "description": "Send commands to the mower. Allowed commands are mow, returnToDock, and pause.",
             "fields": {
                 "mower_serial": {
+                    "name": "Mower Serial",
                     "description": "Mower serial. Only needed when you have configured multiple mowers."
                 },
                 "command": {
@@ -241,9 +569,11 @@
             "description": "Enable or disable SmartMowing. Allowed values are true or false.",
             "fields": {
                 "mower_serial": {
+                    "name": "Mower Serial",
                     "description": "Mower serial. Only needed when you have configured multiple mowers."
                 },
                 "enable": {
+                    "name": "Enable",
                     "description": "Enable SmartMowing."
                 }
             }
@@ -253,9 +583,11 @@
             "description": "Delete the selected alert.",
             "fields": {
                 "mower_serial": {
+                    "name": "Mower Serial",
                     "description": "Mower serial. Only needed when you have configured multiple mowers."
                 },
                 "alert_index": {
+                    "name": "Alert Index",
                     "description": "Delete the selected alert. 0 for the latest alert."
                 }
             }
@@ -265,6 +597,7 @@
             "description": "Delete all alerts.",
             "fields": {
                 "mower_serial": {
+                    "name": "Mower Serial",
                     "description": "Mower serial. Only needed when you have configured multiple mowers."
                 }
             }
@@ -274,9 +607,11 @@
             "description": "Mark the selected alert as read.",
             "fields": {
                 "mower_serial": {
+                    "name": "Mower Serial",
                     "description": "Mower serial. Only needed when you have configured multiple mowers."
                 },
                 "alert_index": {
+                    "name": "Alert Index",
                     "description": "Mark the selected alert as read. 0 for the latest alert."
                 }
             }
@@ -286,6 +621,7 @@
             "description": "Mark all alerts as read.",
             "fields": {
                 "mower_serial": {
+                    "name": "Mower Serial",
                     "description": "Mower serial. Only needed when you have configured multiple mowers."
                 }
             }
@@ -295,8 +631,70 @@
             "description": "Downloads the current mowing map from the Bosch Cloud API and saves it locally as \"www/indego_map_base.svg\". The map reflects the most recently recorded mowing route.",
             "fields": {
                 "mower_serial": {
+                    "name": "Mower Serial",
                     "description": "Mower serial. Only needed when you have configured multiple mowers."
                 }
+            }
+        },
+        "set_calendar_slot": {
+            "name": "Activate/Deactivate calendar slot",
+            "description": "Set a calender slot when you use the manual calendar instead of SmartMowing.",
+            "fields": {
+                "mower_serial": {
+                    "name": "Serialnumber",
+                    "description": "Serial number of the mower. Only required if multiple mowers are configured."
+                },
+                "calendar_type": {
+                    "name": "Calendar Type",
+                    "description": "Type of calendar to use. Use 'calendar' for manual calendar or 'predictive' for the forbidden time slots in SmartMowing mode."
+                },
+                "day": {
+                    "name": "Day",
+                    "description": "Which day to configure.",
+                    "example": "Montag"
+                },
+                "slot": {
+                    "name": "Time slot",
+                    "description": "Which Slot of the selected day should be configured (1 or 2)."
+                },
+                "enabled": {
+                    "name": "Activate/Deactivate",
+                    "description": "Should the selected slot be enabled or disabled."
+                },
+                "start": {
+                    "name": "Start",
+                    "description": "Set Start Time of the selected slot and day. Only needed if you want to enable a slot."
+                },
+                "end": {
+                    "name": "End",
+                    "description": "Set End Time of the selected slot and day. Only needed if you want to enable a slot."
+                }
+            }
+        }
+    },
+    "selector": {
+        "calendar_type_options": {
+            "options": {
+                "calendar": "Manual Calendar",
+                "predictive": "SmartMowing predicted slots"
+            }
+        },
+        "day_options": {
+            "options": {
+                "monday": "Monday",
+                "tuesday": "Tuesday",
+                "wednesday": "Wednesday",
+                "thursday": "Thursday",
+                "friday": "Friday",
+                "saturday": "Saturday",
+                "sunday": "Sunday"
+            }
+        },
+        "command_options": {
+            "options": {
+                "mow": "Mow",
+                "return_to_dock": "Return to dock",
+                "pause": "Pause"
             }
         }
     },
@@ -309,12 +707,5 @@
             "title": "Bosch Indego connection problems",
             "description": "Your mower has not responded to API requests for an extended period. This may indicate network issues, the Bosch service is experiencing problems, or your mower is offline. Please check your internet connection and mower status."
         }
-    },
-    "system_health": {
-        "can_reach_bosch_api": "Can reach Bosch Indego API",
-        "can_reach_auth_service": "Can reach Bosch authentication service",
-        "bosch_service_status": "Bosch service status",
-        "mower_online": "Mower online status",
-        "last_api_response": "Last successful API response"
     }
 }

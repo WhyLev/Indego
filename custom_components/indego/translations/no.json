@@ -109,7 +109,7 @@
                     "Docked - Software update": "Docket - Programvareoppdatering",
                     "Docked - Loading map": "Docket - Laster kart",
                     "Docked - Saving map": "Docket - Lagrer kart",
-                    "Docked - Leaving Dock": "Docket - Forlater dockingstasjon",
+                    "Docked - Leaving dock": "Docket - Forlater dockingstasjon",
                     "Mowing": "Klipper",
                     "Mowing - Relocalising": "Klipper - Omposisjonering",
                     "Mowing - Learning Lawn": "Klipper - Lærer gressplenen",
@@ -127,8 +127,8 @@
                     "Border cut": "Kantklipp",
                     "Idle in lawn": "Inaktiv på gressplenen",
                     "Stuck on lawn, help needed": "Stukket fast på gressplenen, hjelp trengs",
-                    "Returning to Dock": "Returnerer til dockingstasjon",
-                    "Returning to Dock - Battery low": "Returnerer til dockingstasjon - Batteri lavt",
+                    "Returning to dock": "Returnerer til dockingstasjon",
+                    "Returning to dock - Battery low": "Returnerer til dockingstasjon - Batteri lavt",
                     "Returning to dock - Calendar timeslot ended": "Returnerer til dockingstasjon - Kalender-tidsrom endt",
                     "Returning to dock - Battery temp range": "Returnerer til dockingstasjon - Batteritemperaturbereich",
                     "Returning to dock - Lawn complete": "Returnerer til dockingstasjon - Gressplenen helt klippet",
@@ -152,7 +152,10 @@
                 "name": "Neste klipping"
             },
             "mowing_mode": {
-                "name": "Klippemodus"
+                "name": "Klippemodus",
+                "state": {
+                    "calendar": "Manuell kalender"
+                }
             },
             "runtime_total": {
                 "name": "Total klippetid"
@@ -192,6 +195,333 @@
             },
             "battery_discharge": {
                 "name": "Batteriutladning"
+            },
+            "calendar_slots": {
+                "state": {
+                    "smartmowing_active": "SmartMowing aktiv",
+                    "calendar_selection_required": "Kalendervalg kreves",
+                    "off": "Av"
+                },
+                "name": "Planlagte klippetider",
+                "state_attributes": {
+                    "today_slot_1": {
+                        "name": "I dag tidsrom 1",
+                        "state": {
+                            "not_enabled": "Ikke aktivert",
+                            "not_configured": "Ikke konfigurert"
+                        }
+                    },
+                    "today_slot_2": {
+                        "name": "I dag tidsrom 2",
+                        "state": {
+                            "not_enabled": "Ikke aktivert",
+                            "not_configured": "Ikke konfigurert"
+                        }
+                    },
+                    "monday_slot_1": {
+                        "name": "Mandag Slot 1",
+                        "state": {
+                            "not_enabled": "Ikke aktivert",
+                            "not_configured": "Ikke konfigurert"
+                        }
+                    },
+                    "monday_slot_2": {
+                        "name": "Mandag Slot 2",
+                        "state": {
+                            "not_enabled": "Ikke aktivert",
+                            "not_configured": "Ikke konfigurert"
+                        }
+                    },
+                    "tuesday_slot_1": {
+                        "name": "Tirsdag Slot 1",
+                        "state": {
+                            "not_enabled": "Ikke aktivert",
+                            "not_configured": "Ikke konfigurert"
+                        }
+                    },
+                    "tuesday_slot_2": {
+                        "name": "Tirsdag Slot 2",
+                        "state": {
+                            "not_enabled": "Ikke aktivert",
+                            "not_configured": "Ikke konfigurert"
+                        }
+                    },
+                    "wednesday_slot_1": {
+                        "name": "Onsdag Slot 1",
+                        "state": {
+                            "not_enabled": "Ikke aktivert",
+                            "not_configured": "Ikke konfigurert"
+                        }
+                    },
+                    "wednesday_slot_2": {
+                        "name": "Onsdag Slot 2",
+                        "state": {
+                            "not_enabled": "Ikke aktivert",
+                            "not_configured": "Ikke konfigurert"
+                        }
+                    },
+                    "thursday_slot_1": {
+                        "name": "Torsdag Slot 1",
+                        "state": {
+                            "not_enabled": "Ikke aktivert",
+                            "not_configured": "Ikke konfigurert"
+                        }
+                    },
+                    "thursday_slot_2": {
+                        "name": "Torsdag Slot 2",
+                        "state": {
+                            "not_enabled": "Ikke aktivert",
+                            "not_configured": "Ikke konfigurert"
+                        }
+                    },
+                    "friday_slot_1": {
+                        "name": "Fredag Slot 1",
+                        "state": {
+                            "not_enabled": "Ikke aktivert",
+                            "not_configured": "Ikke konfigurert"
+                        }
+                    },
+                    "friday_slot_2": {
+                        "name": "Fredag Slot 2",
+                        "state": {
+                            "not_enabled": "Ikke aktivert",
+                            "not_configured": "Ikke konfigurert"
+                        }
+                    },
+                    "saturday_slot_1": {
+                        "name": "Lørdag Slot 1",
+                        "state": {
+                            "not_enabled": "Ikke aktivert",
+                            "not_configured": "Ikke konfigurert"
+                        }
+                    },
+                    "saturday_slot_2": {
+                        "name": "Lørdag Slot 2",
+                        "state": {
+                            "not_enabled": "Ikke aktivert",
+                            "not_configured": "Ikke konfigurert"
+                        }
+                    },
+                    "sunday_slot_1": {
+                        "name": "Søndag Slot 1",
+                        "state": {
+                            "not_enabled": "Ikke aktivert",
+                            "not_configured": "Ikke konfigurert"
+                        }
+                    },
+                    "sunday_slot_2": {
+                        "name": "Søndag Slot 2",
+                        "state": {
+                            "not_enabled": "Ikke aktivert",
+                            "not_configured": "Ikke konfigurert"
+                        }
+                    }
+                }
+            },
+            "predictive_calendar_slots": {
+                "name": "SmartMowing-blokkerte tider",
+                "state": {
+                    "manual_calendar_active": "Manuell kalender aktiv",
+                    "off": "Av"
+                },
+                "state_attributes": {
+                    "last_updated": {
+                        "name": "Sist oppdatert"
+                    },
+                    "smartmowing_enabled": {
+                        "name": "SmartMowing aktiv"
+                    },
+                    "mowing_mode": {
+                        "name": "Klippemodus"
+                    },
+                    "earliest_start": {
+                        "name": "Tidligste start",
+                        "state": {
+                            "not_enabled": "Ikke aktivert"
+                        }
+                    },
+                    "latest_end": {
+                        "name": "Seneste slutt",
+                        "state": {
+                            "not_enabled": "Ikke aktivert"
+                        }
+                    },
+                    "blocked_before": {
+                        "name": "Blokkert før",
+                        "state": {
+                            "not_enabled": "Ikke aktivert"
+                        }
+                    },
+                    "blocked_after": {
+                        "name": "Blokkert etter",
+                        "state": {
+                            "not_enabled": "Ikke aktivert"
+                        }
+                    }
+                }
+            },
+            "predictive_schedule": {
+                "name": "SmartMowing-tidsplan",
+                "state": {
+                    "manual_calendar_active": "Manuell kalender aktiv",
+                    "none": "Ingen"
+                },
+                "state_attributes": {
+                    "last_updated": {
+                        "name": "Sist oppdatert"
+                    },
+                    "next_mow_slot": {
+                        "name": "Neste planlagte klippetidsrom",
+                        "state": {
+                            "none": "Ingen"
+                        }
+                    },
+                    "next_mow_day": {
+                        "name": "Neste planlagte klippedag",
+                        "state": {
+                            "none": "Ingen",
+                            "monday": "Mandag",
+                            "tuesday": "Tirsdag",
+                            "wednesday": "Onsdag",
+                            "thursday": "Torsdag",
+                            "friday": "Fredag",
+                            "saturday": "Lørdag",
+                            "sunday": "Søndag"
+                        }
+                    },
+                    "next_mow_time": {
+                        "name": "Neste planlagte klippetid",
+                        "state": {
+                            "none": "Ingen"
+                        }
+                    },
+                    "schedule_monday": {
+                        "name": "Tidsplan Mandag",
+                        "state": {
+                            "not_scheduled": "Ikke planlagt"
+                        }
+                    },
+                    "exclusion_monday_user": {
+                        "name": "Blokkert tid Mandag bruker",
+                        "state": {
+                            "none": "Ingen"
+                        }
+                    },
+                    "exclusion_monday_weather": {
+                        "name": "Blokkert tid Mandag vær",
+                        "state": {
+                            "none": "Ingen"
+                        }
+                    },
+                    "schedule_tuesday": {
+                        "name": "Tidsplan Tirsdag",
+                        "state": {
+                            "not_scheduled": "Ikke planlagt"
+                        }
+                    },
+                    "exclusion_tuesday_user": {
+                        "name": "Blokkert tid Tirsdag bruker",
+                        "state": {
+                            "none": "Ingen"
+                        }
+                    },
+                    "exclusion_tuesday_weather": {
+                        "name": "Blokkert tid Tirsdag vær",
+                        "state": {
+                            "none": "Ingen"
+                        }
+                    },
+                    "schedule_wednesday": {
+                        "name": "Tidsplan Onsdag",
+                        "state": {
+                            "not_scheduled": "Ikke planlagt"
+                        }
+                    },
+                    "exclusion_wednesday_user": {
+                        "name": "Blokkert tid Onsdag bruker",
+                        "state": {
+                            "none": "Ingen"
+                        }
+                    },
+                    "exclusion_wednesday_weather": {
+                        "name": "Blokkert tid Onsdag vær",
+                        "state": {
+                            "none": "Ingen"
+                        }
+                    },
+                    "schedule_thursday": {
+                        "name": "Tidsplan Torsdag",
+                        "state": {
+                            "not_scheduled": "Ikke planlagt"
+                        }
+                    },
+                    "exclusion_thursday_user": {
+                        "name": "Blokkert tid Torsdag bruker",
+                        "state": {
+                            "none": "Ingen"
+                        }
+                    },
+                    "exclusion_thursday_weather": {
+                        "name": "Blokkert tid Torsdag vær",
+                        "state": {
+                            "none": "Ingen"
+                        }
+                    },
+                    "schedule_friday": {
+                        "name": "Tidsplan Fredag",
+                        "state": {
+                            "not_scheduled": "Ikke planlagt"
+                        }
+                    },
+                    "exclusion_friday_user": {
+                        "name": "Blokkert tid Fredag bruker",
+                        "state": {
+                            "none": "Ingen"
+                        }
+                    },
+                    "exclusion_friday_weather": {
+                        "name": "Blokkert tid Fredag vær",
+                        "state": {
+                            "none": "Ingen"
+                        }
+                    },
+                    "schedule_saturday": {
+                        "name": "Tidsplan Lørdag",
+                        "state": {
+                            "not_scheduled": "Ikke planlagt"
+                        }
+                    },
+                    "exclusion_saturday_user": {
+                        "name": "Blokkert tid Lørdag bruker",
+                        "state": {
+                            "none": "Ingen"
+                        }
+                    },
+                    "exclusion_saturday_weather": {
+                        "name": "Blokkert tid Lørdag vær",
+                        "state": {
+                            "none": "Ingen"
+                        }
+                    },
+                    "schedule_sunday": {
+                        "name": "Tidsplan Søndag",
+                        "state": {
+                            "not_scheduled": "Ikke planlagt"
+                        }
+                    },
+                    "exclusion_sunday_user": {
+                        "name": "Blokkert tid Søndag bruker",
+                        "state": {
+                            "none": "Ingen"
+                        }
+                    },
+                    "exclusion_sunday_weather": {
+                        "name": "Blokkert tid Søndag vær",
+                        "state": {
+                            "none": "Ingen"
+                        }
+                    }
+                }
             }
         },
         "camera": {
@@ -295,6 +625,66 @@
                     "description": "Gressklipperens serienummer. Bare nødvendig hvis du har konfigurert flere gressklippere."
                 }
             }
+        },
+        "set_calendar_slot": {
+            "name": "Aktiver/deaktiver kalenderspor",
+            "description": "Endre et kalenderspor (endre tider, aktiver eller deaktiver)",
+            "fields": {
+                "mower_serial": {
+                    "name": "Serienummer",
+                    "description": "Serienummeret til gressklipperen. Kun nødvendig hvis flere gressklippere er konfigurert."
+                },
+                "calendar_type": {
+                    "name": "Kalendertype",
+                    "description": "Velg kalender ('calendar' for manuell kalender eller 'predictive' for deaktiverte tidsrom i SmartMowing-modus)."
+                },
+                "day": {
+                    "name": "Dag",
+                    "description": "Navnet på ukedagen som skal konfigureres."
+                },
+                "slot": {
+                    "name": "Tidsrom",
+                    "description": "Hvilket tidsrom som skal endres (1 eller 2)."
+                },
+                "enabled": {
+                    "name": "Aktiver/deaktiver",
+                    "description": "Aktiver eller deaktiver valgt dag/tidsrom."
+                },
+                "start": {
+                    "name": "Start",
+                    "description": "Starttid for valgt tidsrom. Kun nødvendig hvis tidsrommet skal aktiveres. Kun timer og minutter brukes."
+                },
+                "end": {
+                    "name": "Slutt",
+                    "description": "Sluttid for valgt tidsrom. Kun nødvendig hvis tidsrommet skal aktiveres. Kun timer og minutter brukes."
+                }
+            }
+        }
+    },
+    "selector": {
+        "calendar_type_options": {
+            "options": {
+                "calendar": "Manuell kalender",
+                "predictive": "SmartMowing-blokkerte tider"
+            }
+        },
+        "day_options": {
+            "options": {
+                "monday": "Mandag",
+                "tuesday": "Tirsdag",
+                "wednesday": "Onsdag",
+                "thursday": "Torsdag",
+                "friday": "Fredag",
+                "saturday": "Lørdag",
+                "sunday": "Søndag"
+            }
+        },
+        "command_options": {
+            "options": {
+                "mow": "Klipp gress",
+                "returnToDock": "Tilbake til ladestasjonen",
+                "pause": "Pause"
+            }
         }
     },
     "issues": {
@@ -306,12 +696,5 @@
             "title": "Bosch Indego connection problems",
             "description": "Your mower has not responded to API requests for an extended period. This may indicate network issues, the Bosch service is experiencing problems, or your mower is offline. Please check your internet connection and mower status."
         }
-    },
-    "system_health": {
-        "can_reach_bosch_api": "Can reach Bosch Indego API",
-        "can_reach_auth_service": "Can reach Bosch authentication service",
-        "bosch_service_status": "Bosch service status",
-        "mower_online": "Mower online status",
-        "last_api_response": "Last successful API response"
     }
 }
