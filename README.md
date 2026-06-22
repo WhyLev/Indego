@@ -793,7 +793,7 @@ _Not seeing your model? Please [open an issue](https://github.com/sander1988/Ind
 ## ⚠️ Known Issues
 
 1. **Chrome Extension Required**
-   - A [Chrome extension](/chrome-extension.zip) is required to complete the authentication setup (Bosch SingleKey ID OAuth flow)
+   - A [Chrome extension](https://github.com/sander1988/Indego/releases/latest/download/chrome-extension.zip) is required to complete the authentication setup (Bosch SingleKey ID OAuth flow)
    - Can be disabled/removed after initial setup
 
 2. **Bosch Cloud API Issues**
