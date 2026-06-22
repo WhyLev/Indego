@@ -8,9 +8,9 @@
     "application_credentials"
   ],
   "codeowners": [
+    "@sander1988",
     "@whylev",
-    "@kimzeuner",
-    "@sander1988"
+    "@kimzeuner"
   ],
   "requirements": [
     "pyIndego==3.2.2"

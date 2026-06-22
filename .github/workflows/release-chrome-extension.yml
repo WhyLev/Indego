@@ -1,0 +1,44 @@
+name: Upload Chrome extension ZIP on release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build-and-upload:
+    name: Build ZIP and upload to release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Ensure chrome_extension folder exists
+        run: |
+          if [ ! -d "chrome_extension" ]; then
+            echo "Folder chrome_extension/ not found in repository root" >&2
+            exit 1
+          fi
+
+      - name: Create chrome-extension.zip
+        run: |
+          rm -f chrome-extension.zip
+          # Create zip from the contents of chrome_extension/ (not the parent folder)
+          cd chrome_extension
+          zip -r ../chrome-extension.zip .
+          cd -
+
+      - name: List generated artifact
+        run: |
+          ls -lh chrome-extension.zip || true
+
+      - name: Upload ZIP as release asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./chrome-extension.zip
+          asset_name: chrome-extension.zip
+          asset_content_type: application/zip
+

@@ -1,13 +1,20 @@
 {
-    "name": "HomeAssistant Indego authentication helper",
-    "version": "1.0",
-    "description": "Handles the Bosch SingleKey ID OAuth response when adding the Indego component to HomeAssistant.",
     "manifest_version": 3,
+    "name": "HomeAssistant Indego Authentication Helper",
+    "version": "1.1",
+    "description": "Assists Bosch SingleKey ID authentication for the Indego integration in Home Assistant",
+    "icons": {
+        "16": "icons/icon.png",
+        "48": "icons/icon.png",
+        "128": "icons/icon.png"
+    },
     "action": {
-        "default_popup": "popup.html"
+        "default_popup": "popup.html",
+        "default_title": "Indego Auth Helper"
     },
     "permissions": [
-        "declarativeNetRequest"
+        "declarativeNetRequest",
+        "storage"
     ],
     "host_permissions": [
         "https://prodindego.b2clogin.com/*"
@@ -15,8 +22,17 @@
     "background": {
         "service_worker": "background.js"
     },
-    "content_scripts": [ {
-        "matches": ["https://prodindego.b2clogin.com/prodindego.onmicrosoft.com/oauth2/authresp"],
-        "js": ["content-script.js"]
-    } ]
+    "content_scripts": [
+        {
+            "matches": ["https://prodindego.b2clogin.com/prodindego.onmicrosoft.com/oauth2/authresp"],
+            "js": ["content-script.js"],
+            "run_at": "document_end"
+        }
+    ],
+    "browser_specific_settings": {
+        "gecko": {
+            "id": "indego-auth-helper@example.com",
+            "strict_min_version": "109.0"
+        }
+    }
 }

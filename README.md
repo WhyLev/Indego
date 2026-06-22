@@ -1,4 +1,4 @@
-[![GitHub Release](https://img.shields.io/github/v/release/whylev/Indego?style=for-the-badge&logo=github&color=41BDF5)](https://github.com/whylev/Indego/releases)
+[![GitHub Release](https://img.shields.io/github/v/release/sander1988/Indego?style=for-the-badge&logo=github&color=41BDF5)](https://github.com/sander1988/Indego/releases)
 [![HACS Default](https://img.shields.io/badge/HACS-Default-41BDF5?style=for-the-badge&logo=homeassistant)](https://github.com/custom-components/hacs)
 
 # Bosch Indego Mower
@@ -111,13 +111,13 @@ If you want to use HACS but the integration is not yet in the default store, you
 1. Open **HACS** in your Home Assistant dashboard.
 2. Click the **three dots** in the top right corner.
 3. Select **Custom repositories**.
-4. Add the GitHub link: `https://github.com/whylev/Indego`
+4. Add the GitHub link: `https://github.com/sander1988/Indego`
 5. Select **Integration** from the category dropdown menu.
 6. Click **Add**, then search for **"Bosch Indego Lawnmower"** in HACS and click install.
 
 ### Option 3: Manual Installation
 
-1. Copy the `boschindego` folder from `custom_components` to your Home Assistant `custom_components` folder
+1. Copy the `indego` folder from `custom_components` to your Home Assistant `custom_components` folder
 2. Restart Home Assistant
 
 ## Getting Started
@@ -344,7 +344,7 @@ The `binary_sensor.indego_<SERIAL>_alert` sensor stores all active mower alerts 
 
 #### Error Code Reference
 
-Over 90 error codes are mapped in the integration. See error list in **Developer Tools → Services → search "indego"** or check [error_codes.py](custom_components/boschindego/error_codes.py) for complete reference.
+Over 90 error codes are mapped in the integration. See error list in **Developer Tools → Services → search "indego"** or check [error_codes.py](custom_components/indego/error_codes.py) for complete reference.
 
 ### 💻 Service Monitoring
 
@@ -770,7 +770,7 @@ To enable debug logging for troubleshooting, add this to your Home Assistant con
 ```yaml
 logger:
   logs:
-    custom_components.boschindego: debug
+    custom_components.indego: debug
     pyIndego: debug
 ```
 
@@ -788,7 +788,7 @@ The integration supports the following Bosch Indego models:
 - Indego S+ 500
 - Indego M+ 700 (1st & 2nd Gen)
 
-_Not seeing your model? Please [open an issue](https://github.com/whylev/Indego/issues) to request support._
+_Not seeing your model? Please [open an issue](https://github.com/sander1988/Indego/issues) to request support._
 
 ## ⚠️ Known Issues
 
@@ -811,8 +811,8 @@ _Not seeing your model? Please [open an issue](https://github.com/whylev/Indego/
 
 ### Found a Bug or Have a Suggestion?
 
-1. Check [existing issues](https://github.com/whylev/Indego/issues) first
-2. Open a [new issue](https://github.com/whylev/Indego/issues/new) with:
+1. Check [existing issues](https://github.com/sander1988/Indego/issues) first
+2. Open a [new issue](https://github.com/sander1988/Indego/issues/new) with:
    - Your mower model and firmware version
    - Steps to reproduce
    - Relevant logs (with debug enabled)
@@ -820,13 +820,13 @@ _Not seeing your model? Please [open an issue](https://github.com/whylev/Indego/
 
 ### Getting Help
 
-- 📚 [Documentation & Issues](https://github.com/whylev/Indego/issues)
+- 📚 [Documentation & Issues](https://github.com/sander1988/Indego/issues)
 - 💬 [Discord Community](https://discord.gg/aD33GsP)
 - 📋 Services reference: **Developer Tools → Services** (search "Bosch Indego")
 
 ## 🙏 Credits
 
-**Maintainers:** [@whylev](https://github.com/whylev), [@kimzeuner](https://github.com/kimzeuner)
+**Maintainers:** [@sander1988](https://github.com/sander1988), [@kimzeuner](https://github.com/kimzeuner)
 
 **Contributors:**
 [@sander1988](https://github.com/sander1988), [Eduard](https://github.com/eavanvalkenburg), [Jumper78](https://github.com/Jumper78), [dykandDK](https://github.com/dykandDK), [ultrasub](https://github.com/UltraSub), [Gnol86](https://github.com/Gnol86), naethan, bekkm, onkelfarmor, ltjessem, nsimb, jjandersson, [Shamshala](https://github.com/Shamshala), nath, [urbatecte](https://github.com/urbatecte), [Windmelodie](https://github.com/Windmelodie), [Fuempel](https://github.com/Fuempel), [MagaliDB](https://github.com/MagaliDB), [mhosse](https://github.com/mhosse), [Promises](https://github.com/Pr0mises)

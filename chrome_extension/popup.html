@@ -1,6 +1,62 @@
 <!DOCTYPE html>
 <html>
-  <body>
-     <p>HomeAssistant Bosch Indego authentication helper.</p>
-  </body>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body {
+            font-family: system-ui, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            width: 300px;
+            padding: 12px;
+            background: #f9f9f9;
+        }
+        h3 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        .status {
+            background: #ecf0f1;
+            border-left: 4px solid #3498db;
+            padding: 8px;
+            margin: 10px 0;
+            font-size: 0.9em;
+        }
+        .error {
+            border-left-color: #e74c3c;
+            background: #fdecea;
+            color: #c0392b;
+        }
+        .success {
+            border-left-color: #2ecc71;
+            background: #e9f7ef;
+        }
+        button {
+            background: #2c3e50;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 8px;
+        }
+        a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        hr {
+            margin: 12px 0;
+        }
+    </style>
+</head>
+<body>
+    <h3>🔧 Indego Auth Helper</h3>
+    <div id="message" class="status">
+        Loading status...
+    </div>
+    <p>✅ This extension helps with Bosch SingleKey ID authentication for the <strong>Indego</strong> integration in Home Assistant.</p>
+    <p>📦 <strong>GitHub:</strong> <a href="https://github.com/sander1988/indego" target="_blank">sander1988/indego</a></p>
+    <hr>
+    <button id="githubBtn">🐙 Help / Report issue on GitHub</button>
+    <script src="popup.js"></script>
+</body>
 </html>
