@@ -1,24 +1,24 @@
 {
   "domain": "indego",
   "name": "Bosch Indego Mower",
-  "config_flow": true,
-  "documentation": "https://github.com/sander1988/Indego",
-  "issue_tracker": "https://github.com/sander1988/Indego/issues",
-  "dependencies": [
-    "application_credentials"
-  ],
   "codeowners": [
     "@sander1988",
     "@whylev",
     "@kimzeuner"
   ],
-  "requirements": [
-    "pyIndego==3.2.2"
+  "config_flow": true,
+  "dependencies": [
+    "application_credentials"
   ],
+  "documentation": "https://github.com/sander1988/Indego",
   "iot_class": "cloud_polling",
-  "version": "6.0.0",
+  "issue_tracker": "https://github.com/sander1988/Indego/issues",
   "loggers": [
     "custom_components.indego",
     "pyIndego"
-  ]
+  ],
+  "requirements": [
+    "pyIndego==3.2.2"
+  ],
+  "version": "6.0.0"
 }
