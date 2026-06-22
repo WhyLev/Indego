@@ -2,9 +2,7 @@
   "domain": "indego",
   "name": "Bosch Indego Mower",
   "codeowners": [
-    "@sander1988",
-    "@whylev",
-    "@kimzeuner"
+    "@sander1988"
   ],
   "config_flow": true,
   "dependencies": [
