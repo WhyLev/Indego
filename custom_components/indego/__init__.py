@@ -1792,28 +1792,30 @@ class IndegoHub:
         """Refresh Indego sensors every 10m."""
         _LOGGER.debug("Performing 10-minute refresh - fetching generic data, alerts, last completed/next mow")
 
-        results = await asyncio.gather(
-            *[
-                self._update_generic_data(),
-                self._update_alerts(),
-                self._update_last_completed_mow(),
-                self._update_next_mow(),
-                self._update_predictive_calendar(),
-                self._update_predictive_schedule(),
-                self._update_calendar(),
-            ],
-            return_exceptions=True,
-        )
+        update_tasks = [
+            ("generic_data", self._update_generic_data()),
+            ("alerts", self._update_alerts()),
+            ("last_completed_mow", self._update_last_completed_mow()),
+            ("next_mow", self._update_next_mow()),
+            ("predictive_calendar", self._update_predictive_calendar()),
+            ("predictive_schedule", self._update_predictive_schedule()),
+            ("calendar", self._update_calendar()),
+        ]
+
+        coros = [coro for (_name, coro) in update_tasks]
+        results = await asyncio.gather(*coros, return_exceptions=True)
 
         next_refresh = 600
-        index = 0
-        for res in results:
+        for idx, (name) in enumerate([n for (n, _c) in update_tasks]):
+            res = results[idx]
             if res and isinstance(res, BaseException):
-                try:
-                    raise res
-                except Exception as exc:
-                    _LOGGER.warning("Update %d failed during 10-minute refresh: %s", index, str(exc))
-            index += 1
+                exc_info_tuple = (type(res), res, getattr(res, "__traceback__", None))
+                _LOGGER.warning(
+                    "Update '%s' failed during 10-minute refresh: %s",
+                    name,
+                    str(res),
+                    exc_info=exc_info_tuple,
+                )
 
         self._refresh_10m_remover = async_call_later(
             self._hass, next_refresh, self.refresh_10m
