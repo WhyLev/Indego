@@ -517,6 +517,38 @@ ENTITY_DEFINITIONS = {
         ],
         CONF_TRANSLATION_KEY: "predictive_schedule",
     },
+    ENTITY_NETWORK_SIGNAL: {
+        CONF_TYPE: SENSOR_TYPE,
+        CONF_ICON: "mdi:signal-cellular-outline",
+        CONF_DEVICE_CLASS: None,
+        CONF_UNIT_OF_MEASUREMENT: "dBm",
+        CONF_ATTR: ["last_updated"],
+        CONF_TRANSLATION_KEY: "network_signal",
+        CONF_ENTITY_CATEGORY: EntityCategory.DIAGNOSTIC,
+        CONF_ENABLED_BY_DEFAULT: False,
+    },
+
+    ENTITY_NETWORK_OPERATOR: {
+        CONF_TYPE: SENSOR_TYPE,
+        CONF_ICON: "mdi:access-point-network",
+        CONF_DEVICE_CLASS: None,
+        CONF_UNIT_OF_MEASUREMENT: None,
+        CONF_ATTR: ["last_updated"],
+        CONF_TRANSLATION_KEY: "network_operator",
+        CONF_ENTITY_CATEGORY: EntityCategory.DIAGNOSTIC,
+        CONF_ENABLED_BY_DEFAULT: False,
+    },
+
+    ENTITY_NETWORK_MODE: {
+        CONF_TYPE: SENSOR_TYPE,
+        CONF_ICON: "mdi:network-outline",
+        CONF_DEVICE_CLASS: None,
+        CONF_UNIT_OF_MEASUREMENT: None,
+        CONF_ATTR: ["last_updated"],
+        CONF_TRANSLATION_KEY: "network_mode",
+        CONF_ENTITY_CATEGORY: EntityCategory.DIAGNOSTIC,
+        CONF_ENABLED_BY_DEFAULT: False,
+    },
 }
 
 
@@ -989,6 +1021,12 @@ LOCALIZED_TEXTS = {
     },
 }
 
+NETWORK_OPERATORS = {
+    (262, 1): "Telekom",
+    (262, 2): "Vodafone",
+    (262, 3): "O2",
+    (262, 7): "O2",
+}
 
 def _language_code(hass) -> str:
     language = getattr(hass.config, "language", None) or "en"
@@ -1001,6 +1039,24 @@ def _localized_text(hass, key: str) -> str:
         language,
         LOCALIZED_TEXTS["en"],
     ).get(key, key)
+
+def _network_operator_name(value):
+    """Return readable network operator name."""
+    if value is None:
+        return None
+
+    try:
+        value = int(value)
+    except (TypeError, ValueError):
+        return str(value)
+
+    mcc = value // 100
+    mnc = value % 100
+
+    return NETWORK_OPERATORS.get(
+        (mcc, mnc),
+        f"{mcc}-{mnc}",
+    )
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Load a config entry."""
@@ -1510,6 +1566,60 @@ class IndegoHub:
             }
         )
 
+    async def _update_network(self):
+        """Update mower network data."""
+        try:
+            network = await self._indego_client.get(
+                f"alms/{self._serial}/network"
+            )
+        except Exception as exc:
+            _LOGGER.warning("Failed to fetch network data: %s", exc)
+            return None
+
+        if ENTITY_NETWORK_SIGNAL in self.entities:
+            self.entities[ENTITY_NETWORK_SIGNAL].state = network.get("rssi")
+            self.entities[ENTITY_NETWORK_SIGNAL].set_attributes(
+                {
+                    "last_updated": last_updated_now(),
+                    "steered_rssi": network.get("steeredRssi"),
+                }
+            )
+
+        if ENTITY_NETWORK_OPERATOR in self.entities:
+            
+            operator_name = NETWORK_OPERATORS.get(
+                (network.get("mcc"), network.get("mnc")),
+                f"{network.get('mcc')}-{network.get('mnc')}",
+            )
+
+            self.entities[ENTITY_NETWORK_OPERATOR].state = operator_name
+
+            self.entities[ENTITY_NETWORK_OPERATOR].set_attributes(
+                {
+                    "last_updated": last_updated_now(),
+                    "mcc": network.get("mcc"),
+                    "mnc": network.get("mnc"),
+                    "available_networks": [
+                        _network_operator_name(item)
+                        for item in network.get("networks", [])
+                    ],
+                    "available_network_codes": network.get("networks"),
+                    "network_count": network.get("networkCount"),
+                }
+            )
+
+        if ENTITY_NETWORK_MODE in self.entities:
+            self.entities[ENTITY_NETWORK_MODE].state = network.get("currMode")
+            self.entities[ENTITY_NETWORK_MODE].set_attributes(
+                {
+                    "last_updated": last_updated_now(),
+                    "configured_mode": network.get("configMode"),
+                    "rat": network.get("rat"),
+                }
+            )
+
+        return network
+
     async def async_send_command_to_client(self, command: str):
         """Send a mower command to the Indego client."""
         _LOGGER.debug("Sending command to mower (%s): '%s'", self._serial, command)
@@ -1792,30 +1902,29 @@ class IndegoHub:
         """Refresh Indego sensors every 10m."""
         _LOGGER.debug("Performing 10-minute refresh - fetching generic data, alerts, last completed/next mow")
 
-        update_tasks = [
-            ("generic_data", self._update_generic_data()),
-            ("alerts", self._update_alerts()),
-            ("last_completed_mow", self._update_last_completed_mow()),
-            ("next_mow", self._update_next_mow()),
-            ("predictive_calendar", self._update_predictive_calendar()),
-            ("predictive_schedule", self._update_predictive_schedule()),
-            ("calendar", self._update_calendar()),
-        ]
-
-        coros = [coro for (_name, coro) in update_tasks]
-        results = await asyncio.gather(*coros, return_exceptions=True)
+        results = await asyncio.gather(
+            *[
+                self._update_generic_data(),
+                self._update_alerts(),
+                self._update_last_completed_mow(),
+                self._update_next_mow(),
+                self._update_predictive_calendar(),
+                self._update_predictive_schedule(),
+                self._update_calendar(),
+                self._update_network()
+            ],
+            return_exceptions=True,
+        )
 
         next_refresh = 600
-        for idx, (name) in enumerate([n for (n, _c) in update_tasks]):
-            res = results[idx]
+        index = 0
+        for res in results:
             if res and isinstance(res, BaseException):
-                exc_info_tuple = (type(res), res, getattr(res, "__traceback__", None))
-                _LOGGER.warning(
-                    "Update '%s' failed during 10-minute refresh: %s",
-                    name,
-                    str(res),
-                    exc_info=exc_info_tuple,
-                )
+                try:
+                    raise res
+                except Exception as exc:
+                    _LOGGER.warning("Update %d failed during 10-minute refresh: %s", index, str(exc))
+            index += 1
 
         self._refresh_10m_remover = async_call_later(
             self._hass, next_refresh, self.refresh_10m
