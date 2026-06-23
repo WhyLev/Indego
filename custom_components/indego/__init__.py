@@ -58,6 +58,7 @@ from .error_codes import (
 )
 from .button import IndegoAlertButton
 from .switch import IndegoSwitch
+from .weather import IndegoWeather
 from . import diagnostics, repairs
 
 _LOGGER = logging.getLogger(__name__)
@@ -516,6 +517,11 @@ ENTITY_DEFINITIONS = {
             "exclusion_sunday_weather",
         ],
         CONF_TRANSLATION_KEY: "predictive_schedule",
+    },
+    ENTITY_PREDICTIVE_WEATHER: {
+        CONF_TYPE: WEATHER_TYPE,
+        CONF_ICON: "mdi:weather-partly-cloudy",
+        CONF_TRANSLATION_KEY: "predictive_weather",
     },
 }
 
@@ -1600,6 +1606,16 @@ class IndegoHub:
                     entity_category=entity[CONF_ENTITY_CATEGORY] if CONF_ENTITY_CATEGORY in entity else None,
                 )
 
+            elif entity[CONF_TYPE] == WEATHER_TYPE:
+                self.entities[entity_key] = IndegoWeather(
+                    entity_id=f"indego_{self._serial}_{entity_key}",
+                    name=None,
+                    device_info=device_info,
+                    indego_hub=self,
+                    translation_key=entity[CONF_TRANSLATION_KEY] if CONF_TRANSLATION_KEY in entity else None,
+                    entity_category=entity[CONF_ENTITY_CATEGORY] if CONF_ENTITY_CATEGORY in entity else None,
+                )
+
     async def update_generic_data_and_load_platforms(self, load_platforms):
         """Update the generic mower data, so we can create the HA platforms for the Indego component."""
         _LOGGER.debug("Fetching generic data for device info from Bosch API")
@@ -1792,30 +1808,29 @@ class IndegoHub:
         """Refresh Indego sensors every 10m."""
         _LOGGER.debug("Performing 10-minute refresh - fetching generic data, alerts, last completed/next mow")
 
-        update_tasks = [
-            ("generic_data", self._update_generic_data()),
-            ("alerts", self._update_alerts()),
-            ("last_completed_mow", self._update_last_completed_mow()),
-            ("next_mow", self._update_next_mow()),
-            ("predictive_calendar", self._update_predictive_calendar()),
-            ("predictive_schedule", self._update_predictive_schedule()),
-            ("calendar", self._update_calendar()),
-        ]
-
-        coros = [coro for (_name, coro) in update_tasks]
-        results = await asyncio.gather(*coros, return_exceptions=True)
+        results = await asyncio.gather(
+            *[
+                self._update_generic_data(),
+                self._update_alerts(),
+                self._update_last_completed_mow(),
+                self._update_next_mow(),
+                self._update_predictive_calendar(),
+                self._update_predictive_schedule(),
+                self._update_calendar(),
+                self._update_predictive_weather()
+            ],
+            return_exceptions=True,
+        )
 
         next_refresh = 600
-        for idx, (name) in enumerate([n for (n, _c) in update_tasks]):
-            res = results[idx]
+        index = 0
+        for res in results:
             if res and isinstance(res, BaseException):
-                exc_info_tuple = (type(res), res, getattr(res, "__traceback__", None))
-                _LOGGER.warning(
-                    "Update '%s' failed during 10-minute refresh: %s",
-                    name,
-                    str(res),
-                    exc_info=exc_info_tuple,
-                )
+                try:
+                    raise res
+                except Exception as exc:
+                    _LOGGER.warning("Update %d failed during 10-minute refresh: %s", index, str(exc))
+            index += 1
 
         self._refresh_10m_remover = async_call_later(
             self._hass, next_refresh, self.refresh_10m
@@ -2050,6 +2065,18 @@ class IndegoHub:
                 **window,
             }
         )
+
+    async def _update_predictive_weather(self):
+        weather = await self._indego_client.get(
+            f"alms/{self._serial}/predictive/weather"
+        )
+
+        self._predictive_weather = weather
+
+        if ENTITY_PREDICTIVE_WEATHER in self.entities:
+            self.entities[ENTITY_PREDICTIVE_WEATHER].weather_data = weather
+
+        return weather
 
     async def _update_calendar(self):
         """Update calendar data / planned mowing slots."""
