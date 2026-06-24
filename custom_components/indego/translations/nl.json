@@ -638,7 +638,7 @@
                     "name": "Kalendertype",
                     "description": "Selecteer de kalender ('calendar' voor de handmatige kalender of 'predictive' voor gedeactiveerde tijden in SmartMowing-modus)."
                 },
-                "day": {
+                "days": {
                     "name": "Dag",
                     "description": "Naam van de weekdag die moet worden geconfigureerd."
                 },
