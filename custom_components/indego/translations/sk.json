@@ -638,7 +638,7 @@
                     "name": "Typ kalendára",
                     "description": "Vyberte kalendár ('calendar' pre manuálny kalendár alebo 'predictive' pre deaktivované časové obdobia v režime SmartMowing)."
                 },
-                "day": {
+                "days": {
                     "name": "Deň",
                     "description": "Názov dňa v týždni, ktorý sa má nakonfigurovať."
                 },
