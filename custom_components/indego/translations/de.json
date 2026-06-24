@@ -648,7 +648,7 @@
                     "name": "Kalender Typ",
                     "description": "Kalender auswählen ('calendar' für manuellen Kalender oder 'predictive' für deaktivierte Zeiten im SmartMowing Modus)."
                 },
-                "day": {
+                "days": {
                     "name": "Tag",
                     "description": "Name des Wochentags der konfiguriert werden soll"
                 },
