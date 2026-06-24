@@ -638,7 +638,7 @@
                     "name": "Kalendertyp",
                     "description": "Välj kalender ('calendar' för den manuella kalendern eller 'predictive' för inaktiverade tidsperioder i SmartMowing-läge)."
                 },
-                "day": {
+                "days": {
                     "name": "Dag",
                     "description": "Namnet på veckodagen som ska konfigureras."
                 },
