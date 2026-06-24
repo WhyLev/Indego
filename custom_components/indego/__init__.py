@@ -656,7 +656,7 @@ def _calendar_to_payload(calendar, selected_cal: int = 1) -> dict:
         "sel_cal": selected_cal,
         "cals": [
             {
-                "cal": getattr(calendar, "cal", selected_cal) if calendar else selected_cal,
+                "cal": selected_cal,
                 "days": days,
             }
         ],
