@@ -196,6 +196,12 @@
             "battery_discharge": {
                 "name": "Rozładowanie baterii"
             },
+            "predictive_setup": {
+                "name": "Konfiguracja SmartMowing",
+                "state": {
+                    "configured": "Skonfigurowano"
+                }
+            },
             "calendar_slots": {
                 "state": {
                     "smartmowing_active": "SmartMowing aktywny",
@@ -643,7 +649,7 @@
                     "name": "Typ kalendarza",
                     "description": "Wybierz kalendarz ('calendar' dla kalendarza ręcznego lub 'predictive' dla dezaktywowanych okresów w trybie SmartMowing)."
                 },
-                "day": {
+                "days": {
                     "name": "Dzień",
                     "description": "Nazwa dnia tygodnia, który ma zostać skonfigurowany."
                 },

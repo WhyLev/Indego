@@ -196,6 +196,12 @@
             "battery_discharge": {
                 "name": "Batterieentladung"
             },
+            "predictive_setup": {
+                "name": "SmartMowing Konfiguration",
+                "state": {
+                    "configured": "Konfiguriert"
+                }
+            },
             "predictive_calendar_slots": {
                 "name": "SmartMowing Sperrzeiten",
                 "state": {
@@ -653,7 +659,7 @@
                     "name": "Kalender Typ",
                     "description": "Kalender auswählen ('calendar' für manuellen Kalender oder 'predictive' für deaktivierte Zeiten im SmartMowing Modus)."
                 },
-                "day": {
+                "days": {
                     "name": "Tag",
                     "description": "Name des Wochentags der konfiguriert werden soll"
                 },
