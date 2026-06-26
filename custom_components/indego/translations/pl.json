@@ -196,6 +196,15 @@
             "battery_discharge": {
                 "name": "Rozładowanie baterii"
             },
+            "network_mode": {
+                "name": "Tryb sieci"
+            },
+            "network_operator": {
+                "name": "Operator sieci komórkowej"
+            },
+            "network_signal": {
+                "name": "Siła sygnału"
+            },
             "bump_sensitivity": {
                 "name": "Warunki trawnika",
                 "state": {
@@ -208,7 +217,6 @@
                 "name": "Konfiguracja SmartMowing",
                 "state": {
                     "configured": "Skonfigurowano"
-                }
             },
             "calendar_slots": {
                 "state": {

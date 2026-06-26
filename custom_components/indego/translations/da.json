@@ -232,6 +232,15 @@
             "battery_discharge": {
                 "name": "Batteriudladning"
             },
+            "network_mode": {
+                "name": "Netværkstilstand"
+            },
+            "network_operator": {
+                "name": "Mobiloperatør"
+            },
+            "network_signal": {
+                "name": "Signalstyrke"
+            },
             "bump_sensitivity": {
                 "name": "Plæneforhold",
                 "state": {
@@ -244,7 +253,6 @@
                 "name": "SmartMowing-konfiguration",
                 "state": {
                     "configured": "Konfigureret"
-                }
             },
             "calendar_slots": {
                 "state": {

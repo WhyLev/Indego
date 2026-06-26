@@ -196,6 +196,15 @@
             "battery_discharge": {
                 "name": "Batterijontlading"
             },
+            "network_mode": {
+                "name": "Netwerkmodus"
+            },
+            "network_operator": {
+                "name": "Mobiele provider"
+            },
+            "network_signal": {
+                "name": "Signaalsterkte"
+            },
             "bump_sensitivity": {
                 "name": "Gazonomstandigheden",
                 "state": {
@@ -208,7 +217,6 @@
                 "name": "SmartMowing-configuratie",
                 "state": {
                     "configured": "Geconfigureerd"
-                }
             },
             "calendar_slots": {
                 "state": {

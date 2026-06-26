@@ -196,6 +196,15 @@
             "battery_discharge": {
                 "name": "Vybíjanie batérie"
             },
+            "network_mode": {
+                "name": "Režim siete"
+            },
+            "network_operator": {
+                "name": "Mobilný operátor"
+            },
+            "network_signal": {
+                "name": "Sila signálu"
+            },
             "bump_sensitivity": {
                 "name": "Podmienky trávnika",
                 "state": {
@@ -208,7 +217,6 @@
                 "name": "Konfigurácia SmartMowing",
                 "state": {
                     "configured": "Nakonfigurované"
-                }
             },
             "calendar_slots": {
                 "state": {

@@ -196,6 +196,15 @@
             "battery_discharge": {
                 "name": "Batteriavlastning"
             },
+            "network_mode": {
+                "name": "Nätverksläge"
+            },
+            "network_operator": {
+                "name": "Mobiloperatör"
+            },
+            "network_signal": {
+                "name": "Signalstyrka"
+            },
             "bump_sensitivity": {
                 "name": "Gräsförhållanden",
                 "state": {
@@ -208,7 +217,6 @@
                 "name": "SmartMowing-konfiguration",
                 "state": {
                     "configured": "Konfigurerad"
-                }
             },
             "calendar_slots": {
                 "state": {

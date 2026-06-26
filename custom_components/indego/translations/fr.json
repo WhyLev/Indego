@@ -196,6 +196,15 @@
             "battery_discharge": {
                 "name": "Décharge batterie"
             },
+            "network_mode": {
+                "name": "Mode réseau"
+            },
+            "network_operator": {
+                "name": "Opérateur mobile"
+            },
+            "network_signal": {
+                "name": "Puissance du signal"
+            },
             "bump_sensitivity": {
                 "name": "Conditions de la pelouse",
                 "state": {
@@ -208,7 +217,6 @@
                 "name": "Configuration SmartMowing",
                 "state": {
                     "configured": "Configuré"
-                }
             },
             "calendar_slots": {
                 "state": {
