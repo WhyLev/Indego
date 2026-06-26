@@ -1,14 +1,18 @@
 name: Validate with hassfest
+
 on:
   push:
   pull_request:
   schedule:
     - cron: '0 0 * * *'
+
 jobs:
   validate:
-    runs-on: "ubuntu-latest"
+    runs-on: ubuntu-latest
     steps:
-      - uses: "actions/checkout@v4"
-      - uses: "home-assistant/actions/hassfest@master"
-        with:
-          ignore-path: "chrome_extension"
+      - uses: actions/checkout@v4
+      - name: Run hassfest only for custom_components
+        run: |
+          mkdir -p /tmp/hassfest-repo
+          cp -r custom_components /tmp/hassfest-repo/
+          docker run --rm -v /tmp/hassfest-repo:/github/workspace ghcr.io/home-assistant/hassfest

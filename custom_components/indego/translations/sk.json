@@ -205,6 +205,11 @@
             "network_signal": {
                 "name": "Sila signálu"
             },
+            "predictive_setup": {
+                "name": "Konfigurácia SmartMowing",
+                "state": {
+                    "configured": "Nakonfigurované"
+            },
             "calendar_slots": {
                 "state": {
                     "smartmowing_active": "SmartMowing aktívny",
@@ -647,7 +652,7 @@
                     "name": "Typ kalendára",
                     "description": "Vyberte kalendár ('calendar' pre manuálny kalendár alebo 'predictive' pre deaktivované časové obdobia v režime SmartMowing)."
                 },
-                "day": {
+                "days": {
                     "name": "Deň",
                     "description": "Názov dňa v týždni, ktorý sa má nakonfigurovať."
                 },

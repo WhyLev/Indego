@@ -205,6 +205,11 @@
             "network_signal": {
                 "name": "Signalstyrke"
             },
+            "predictive_setup": {
+                "name": "SmartMowing-konfigurasjon",
+                "state": {
+                    "configured": "Konfigurert"
+            },
             "calendar_slots": {
                 "state": {
                     "smartmowing_active": "SmartMowing aktiv",
@@ -647,7 +652,7 @@
                     "name": "Kalendertype",
                     "description": "Velg kalender ('calendar' for manuell kalender eller 'predictive' for deaktiverte tidsrom i SmartMowing-modus)."
                 },
-                "day": {
+                "days": {
                     "name": "Dag",
                     "description": "Navnet på ukedagen som skal konfigureres."
                 },

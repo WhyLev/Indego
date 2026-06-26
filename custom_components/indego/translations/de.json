@@ -196,7 +196,8 @@
             "battery_discharge": {
                 "name": "Batterieentladung"
             },
-            "network_mode": {
+            "
+          _mode": {
                 "name": "Netzwerkmodus"
             },
             "network_operator": {
@@ -204,6 +205,11 @@
             },
             "network_signal": {
                 "name": "Signal"
+            },
+            "predictive_setup": {
+                "name": "SmartMowing Konfiguration",
+                "state": {
+                    "configured": "Konfiguriert"
             },
             "predictive_calendar_slots": {
                 "name": "SmartMowing Sperrzeiten",
@@ -657,7 +663,7 @@
                     "name": "Kalender Typ",
                     "description": "Kalender auswählen ('calendar' für manuellen Kalender oder 'predictive' für deaktivierte Zeiten im SmartMowing Modus)."
                 },
-                "day": {
+                "days": {
                     "name": "Tag",
                     "description": "Name des Wochentags der konfiguriert werden soll"
                 },
