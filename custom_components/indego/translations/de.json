@@ -196,8 +196,7 @@
             "battery_discharge": {
                 "name": "Batterieentladung"
             },
-            "
-          _mode": {
+            "network_mode": {
                 "name": "Netzwerkmodus"
             },
             "network_operator": {
