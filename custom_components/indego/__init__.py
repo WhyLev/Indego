@@ -1970,7 +1970,7 @@ class IndegoHub:
                 self._update_predictive_calendar(),
                 self._update_predictive_schedule(),
                 self._update_calendar(),
-                self._update_network()
+                self._update_network(),
                 self._update_predictive_setup()
             ],
             return_exceptions=True,
