@@ -217,6 +217,7 @@
                 "name": "Konfigurácia SmartMowing",
                 "state": {
                     "configured": "Nakonfigurované"
+                    }
             },
             "calendar_slots": {
                 "state": {

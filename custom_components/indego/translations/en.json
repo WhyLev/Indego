@@ -217,6 +217,7 @@
                 "name": "SmartMowing configuration",
                 "state": {
                     "configured": "Configured"
+                }
             },
             "calendar_slots": {
                 "state": {

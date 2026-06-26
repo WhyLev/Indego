@@ -218,6 +218,7 @@
                 "name": "SmartMowing Konfiguration",
                 "state": {
                     "configured": "Konfiguriert"
+                    }
             },
             "predictive_calendar_slots": {
                 "name": "SmartMowing Sperrzeiten",
