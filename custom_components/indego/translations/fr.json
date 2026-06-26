@@ -553,6 +553,11 @@
             "indego_smartmowing": {
                 "name": "SmartMowing"
             }
+        },
+        "weather": {
+            "predictive_weather": {
+                "name": "Météo SmartMowing"
+            }
         }
     },
     "services": {
