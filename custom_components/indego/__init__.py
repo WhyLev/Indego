@@ -548,6 +548,9 @@ ENTITY_DEFINITIONS = {
         CONF_TRANSLATION_KEY: "network_mode",
         CONF_ENTITY_CATEGORY: EntityCategory.DIAGNOSTIC,
         CONF_ENABLED_BY_DEFAULT: False,
+    },
+
+    
     ENTITY_PREDICTIVE_SETUP: {
         CONF_TYPE: SENSOR_TYPE,
         CONF_ICON: "mdi:cog-outline",
