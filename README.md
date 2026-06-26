@@ -24,6 +24,10 @@ A comprehensive Home Assistant integration that provides full control and monito
 - 📍 **Adaptive Stuck Detection** - Smart detection adjusting timeouts based on current activity (mowing/border cut/mapping) with startup grace period
 - 👤 **Custom User Agent** - Configurable User-Agent for API requests to work around Bosch restrictions
 - 📈 **Session Tracking** - Counter for completed mowing sessions
+- 🌤️ **SmartMowing Weather Entity** - Dedicated weather entity exposing Bosch API forecast attributes used by SmartMowing
+- 📡 **Network Diagnostic Entities** - Real-time connectivity status, signal parameters and link data for mower hardware
+- 🔐 **Security & PIN Management** - Configuration abstractions for PIN inputs, operation sensitivity and safety toggles
+- 🔋 **Energy Dashboard Integration** - Battery discharge sensor with `total_increasing` / `device_class: energy` for HA Energy Dashboard
 - 🎯 **Dynamic Camera Streaming** - Camera shows as streaming when mower is actively moving/mowing
 - 🔲 **Alert Action Buttons** - Quick action buttons to manage specific alerts
 - 📊 **Long-Term Statistics** - State class support for historical data graphs in Home Assistant
@@ -123,7 +127,7 @@ If you want to use HACS but the integration is not yet in the default store, you
 
 Bosch Indego uses OAuth authentication (Bosch SingleKey ID). To complete authentication, you need to install a browser extension:
 
-1. Download: [HomeAssistant Indego authentication helper](/browser-extension.zip)
+1. Download: [HomeAssistant Indego authentication helper](https://github.com/sander1988/Indego/releases/latest/download/browser-extension.zip)
 2. Extract the ZIP file
 3. Open your browser's extension management page:
    - **Chrome / Edge / Brave / Opera / Vivaldi / Arc:** `chrome://extensions` or `edge://extensions`
@@ -153,7 +157,7 @@ After adding the integration, you can enable additional features in **Settings �
 - **Custom User Agent** - Useful if Bosch Cloud is blocking requests. Try alternatives like `HomeAssistant/Indego` or `HA/Indego`
 - **Expose as Lawn Mower** - Enable native Home Assistant Lawn Mower entity (recommended for automation compatibility)
 - **Expose as Vacuum** - Enable legacy Vacuum entity for backward compatibility
-- **Show All Alerts** - Store all historical alerts (use sparingly due to Entity Registry limits)
+- **Show All ** - Store all historical alerts (use sparingly due to Entity Registry limits)
 
 ## 📊 Monitored Entities
 
@@ -199,6 +203,19 @@ All entities are automatically discovered after setup and will appear as "Unused
 | **Calendar Slots** | Currently configured mowing time slots |
 | **Predictive Calendar Slots** | Predicted/optimized mowing time slots |
 
+#### Network & Connectivity
+
+| Sensor | Description |
+|--------|-------------|
+| **Network Status** ⚙️ | Real-time connectivity status and signal parameters - diagnostic |
+| **Link Data** ⚙️ | Hardware link diagnostics for mower network interface - diagnostic |
+
+#### Weather
+
+| Sensor | Description |
+|--------|-------------|
+| **SmartMowing Weather Forecast** | Integrated Bosch API weather forecast used by SmartMowing scheduling |
+
 #### Position & Movement
 
 | Sensor | Description |
@@ -213,6 +230,7 @@ All entities are automatically discovered after setup and will appear as "Unused
 | **Last Error Code** | Last error code and timestamp with error description |
 | **Firmware Version** ⚙️ | Current firmware version - diagnostic |
 | **Maintenance Hours** | Maintenance counter (hours) with status (good/service_due_soon/service_required) |
+| **Firmware Version** ⚙️ | Current firmware version - diagnostic |
 
 ### 🔔 Binary Sensors
 
@@ -224,6 +242,7 @@ All entities are automatically discovered after setup and will appear as "Unused
 | **Battery Charging** | Whether mower is currently charging (On/Off) |
 | **Service Status** | Bosch Cloud API availability - detects HTTP 5xx errors |
 | **Update Available** | Firmware update availability (On/Off) |
+| **Battery Charging** | Whether mower is currently charging (On/Off) |
 
 ### 🎛️ Switches
 
@@ -239,6 +258,15 @@ All entities are automatically discovered after setup and will appear as "Unused
 | **Delete All Alerts** | Delete all alerts from the mower at once |
 | **Mark Alert as Read (Last)** | Mark the most recent alert as read |
 | **Mark All Alerts as Read** | Mark all alerts as read without deleting them |
+
+### 🔐 Security & PIN Control
+
+| Entity | Type | Description |
+|--------|------|-------------|
+| **PIN Lock** | Switch | Enable or disable PIN protection for physical mower controls |
+| **Operation Sensitivity** | Switch | Toggle sensitivity level for operation-critical actions |
+| **Safety Lock** | Switch | Explicit hardware safety toggle |
+| **PIN Code** | Sensor ⚙️ | Current PIN configuration status - diagnostic |
 
 ### 🏠 Native Home Assistant Entities (Optional)
 
@@ -401,6 +429,14 @@ Automatic stuck mower detection with activity-aware timeouts to minimize false p
   - `stuck_since` - Timestamp when mower became stuck
   - `stuck_x` - X position (pixels) where mower is stuck
   - `stuck_y` - Y position (pixels) where mower is stuck
+
+### 🌤️ SmartMowing Weather Forecast
+
+A dedicated Home Assistant **Weather entity** exposes the integrated Bosch API weather forecast that SmartMowing uses internally for schedule optimization:
+
+- **Entity ID**: `weather.indego_<SERIAL>_smartmowing_forecast`
+- **Attributes**: Forecast data as provided by the Bosch Cloud API
+- **Purpose**: Inspect the weather data driving your mower's automatic schedule adjustments
 
 ### 🌍 Multi-Mower Support
 
@@ -598,6 +634,8 @@ Different entity categories are used to organize features in Home Assistant:
 - `sensor.indego_<SERIAL>_mower_svg_x`
 - `sensor.indego_<SERIAL>_mower_svg_y`
 - `sensor.indego_<SERIAL>_firmware_version`
+- `sensor.indego_<SERIAL>_network_status`
+- `sensor.indego_<SERIAL>_link_data`
 
 Diagnostic entities are hidden by default but can be enabled via: **Settings → Devices & Services → Indego → Sensors → Enable**
 
@@ -820,6 +858,16 @@ _Not seeing your model? Please [open an issue](https://github.com/sander1988/Ind
 - 📚 [Documentation & Issues](https://github.com/sander1988/Indego/issues)
 - 💬 [Discord Community](https://discord.gg/aD33GsP)
 - 📋 Services reference: **Developer Tools → Services** (search "Bosch Indego")
+
+### 🔗 Related Projects
+
+Community-built companion tools for the Bosch Indego integration:
+
+| Project | Description |
+|---------|-------------|
+| [Bosch Indego Mower Card](https://github.com/kimzeuner/Bosch-Indego-Mower-Card) | Custom Lovelace card for a rich mower dashboard |
+| [Indego Weather-Based Schedule](https://github.com/kimzeuner/Indego-Weather-Based-Schedule) | Automation blueprint for weather-driven mowing schedules |
+| [Bosch Indego Calendar Card](https://github.com/kimzeuner/Bosch-Indego-Calendar-Card) | Custom Lovelace card to visualize and manage calendar slots |
 
 ## 🙏 Credits
 
