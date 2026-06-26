@@ -517,6 +517,29 @@ ENTITY_DEFINITIONS = {
         ],
         CONF_TRANSLATION_KEY: "predictive_schedule",
     },
+    ENTITY_PREDICTIVE_SETUP: {
+        CONF_TYPE: SENSOR_TYPE,
+        CONF_ICON: "mdi:cog-outline",
+        CONF_DEVICE_CLASS: None,
+        CONF_UNIT_OF_MEASUREMENT: None,
+        CONF_ATTR: [
+            "last_updated",
+            "mowing_duration",
+            "full_cuts",
+            "avoid_rain",
+            "avoid_temperature",
+            "use_grass_growth",
+            "rain_factor",
+            "temperature_factor",
+            "garden_latitude",
+            "garden_longitude",
+            "garden_timezone",
+            "garden_name",
+            "garden_country",
+        ],
+        CONF_TRANSLATION_KEY: "predictive_setup",
+        CONF_ENTITY_CATEGORY: EntityCategory.DIAGNOSTIC,
+    },
 }
 
 
@@ -1510,6 +1533,40 @@ class IndegoHub:
             }
         )
 
+    async def _update_predictive_setup(self):
+        """Update SmartMowing setup data."""
+        try:
+            setup = await self._indego_client.get(
+                f"alms/{self._serial}/predictive/setup"
+            )
+        except Exception as exc:
+            _LOGGER.warning("Failed to fetch predictive setup data: %s", exc)
+            return None
+
+        garden_location = setup.get("garden_location", {}) or {}
+
+        if ENTITY_PREDICTIVE_SETUP in self.entities:
+            self.entities[ENTITY_PREDICTIVE_SETUP].state = "configured"
+            self.entities[ENTITY_PREDICTIVE_SETUP].set_attributes(
+                {
+                    "last_updated": last_updated_now(),
+                    "mowing_duration": setup.get("mowing_duration"),
+                    "full_cuts": setup.get("full_cuts"),
+                    "avoid_rain": setup.get("avoid_rain"),
+                    "avoid_temperature": setup.get("avoid_temperature"),
+                    "use_grass_growth": setup.get("use_grass_growth"),
+                    "rain_factor": setup.get("rain_factor"),
+                    "temperature_factor": setup.get("temperature_factor"),
+                    "garden_latitude": garden_location.get("latitude"),
+                    "garden_longitude": garden_location.get("longitude"),
+                    "garden_timezone": garden_location.get("timezone"),
+                    "garden_name": garden_location.get("name"),
+                    "garden_country": garden_location.get("country"),
+                }
+            )
+
+        return setup
+
     async def async_send_command_to_client(self, command: str):
         """Send a mower command to the Indego client."""
         _LOGGER.debug("Sending command to mower (%s): '%s'", self._serial, command)
@@ -1792,30 +1849,29 @@ class IndegoHub:
         """Refresh Indego sensors every 10m."""
         _LOGGER.debug("Performing 10-minute refresh - fetching generic data, alerts, last completed/next mow")
 
-        update_tasks = [
-            ("generic_data", self._update_generic_data()),
-            ("alerts", self._update_alerts()),
-            ("last_completed_mow", self._update_last_completed_mow()),
-            ("next_mow", self._update_next_mow()),
-            ("predictive_calendar", self._update_predictive_calendar()),
-            ("predictive_schedule", self._update_predictive_schedule()),
-            ("calendar", self._update_calendar()),
-        ]
-
-        coros = [coro for (_name, coro) in update_tasks]
-        results = await asyncio.gather(*coros, return_exceptions=True)
+        results = await asyncio.gather(
+            *[
+                self._update_generic_data(),
+                self._update_alerts(),
+                self._update_last_completed_mow(),
+                self._update_next_mow(),
+                self._update_predictive_calendar(),
+                self._update_predictive_schedule(),
+                self._update_calendar(),
+                self._update_predictive_setup()
+            ],
+            return_exceptions=True,
+        )
 
         next_refresh = 600
-        for idx, (name) in enumerate([n for (n, _c) in update_tasks]):
-            res = results[idx]
+        index = 0
+        for res in results:
             if res and isinstance(res, BaseException):
-                exc_info_tuple = (type(res), res, getattr(res, "__traceback__", None))
-                _LOGGER.warning(
-                    "Update '%s' failed during 10-minute refresh: %s",
-                    name,
-                    str(res),
-                    exc_info=exc_info_tuple,
-                )
+                try:
+                    raise res
+                except Exception as exc:
+                    _LOGGER.warning("Update %d failed during 10-minute refresh: %s", index, str(exc))
+            index += 1
 
         self._refresh_10m_remover = async_call_later(
             self._hass, next_refresh, self.refresh_10m
