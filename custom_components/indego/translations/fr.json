@@ -204,6 +204,12 @@
                     "uneven": "Irrégulier"
                 }
             },
+            "predictive_setup": {
+                "name": "Configuration SmartMowing",
+                "state": {
+                    "configured": "Configuré"
+                }
+            },
             "calendar_slots": {
                 "state": {
                     "smartmowing_active": "SmartMowing actif",
@@ -564,6 +570,11 @@
             "automatic_update": {
                 "name": "Mises à jour automatiques"
             }
+        },
+        "weather": {
+            "predictive_weather": {
+                "name": "Météo SmartMowing"
+            }
         }
     },
     "services": {
@@ -665,7 +676,7 @@
                     "name": "Type de calendrier",
                     "description": "Sélectionnez le calendrier ('calendar' pour le calendrier manuel ou 'predictive' pour les périodes désactivées en mode SmartMowing)."
                 },
-                "day": {
+                "days": {
                     "name": "Jour",
                     "description": "Nom du jour de la semaine à configurer."
                 },

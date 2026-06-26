@@ -204,6 +204,12 @@
                     "uneven": "Uneven"
                 }
             },
+            "predictive_setup": {
+                "name": "SmartMowing configuration",
+                "state": {
+                    "configured": "Configured"
+                }
+            },
             "calendar_slots": {
                 "state": {
                     "smartmowing_active": "SmartMowing active",
@@ -564,6 +570,11 @@
             "automatic_update": {
                 "name": "Automatic updates"
             }
+        },
+        "weather": {
+            "predictive_weather": {
+                "name": "Weather SmartMowing"
+            }
         }
     },
     "services": {
@@ -665,7 +676,7 @@
                     "name": "Calendar Type",
                     "description": "Type of calendar to use. Use 'calendar' for manual calendar or 'predictive' for the forbidden time slots in SmartMowing mode."
                 },
-                "day": {
+                "days": {
                     "name": "Day",
                     "description": "Which day to configure.",
                     "example": "Montag"

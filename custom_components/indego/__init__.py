@@ -58,6 +58,7 @@ from .error_codes import (
 )
 from .button import IndegoAlertButton
 from .switch import IndegoSwitch
+from .weather import IndegoWeather
 from . import diagnostics, repairs
 
 _LOGGER = logging.getLogger(__name__)
@@ -536,6 +537,15 @@ ENTITY_DEFINITIONS = {
     ENTITY_BUMP_SENSITIVITY: {
         CONF_TYPE: SENSOR_TYPE,
         CONF_ICON: "mdi:alert-circle-outline",
+    },
+    ENTITY_PREDICTIVE_WEATHER: {
+        CONF_TYPE: WEATHER_TYPE,
+        CONF_ICON: "mdi:weather-partly-cloudy",
+        CONF_TRANSLATION_KEY: "predictive_weather",
+    },
+    ENTITY_PREDICTIVE_SETUP: {
+        CONF_TYPE: SENSOR_TYPE,
+        CONF_ICON: "mdi:cog-outline",
         CONF_DEVICE_CLASS: None,
         CONF_UNIT_OF_MEASUREMENT: None,
         CONF_ATTR: [
@@ -566,6 +576,21 @@ ENTITY_DEFINITIONS = {
         CONF_TRANSLATION_KEY: "automatic_update",
         CONF_ATTR: [],
         CONF_ENTITY_CATEGORY: EntityCategory.CONFIG,
+            "mowing_duration",
+            "full_cuts",
+            "avoid_rain",
+            "avoid_temperature",
+            "use_grass_growth",
+            "rain_factor",
+            "temperature_factor",
+            "garden_latitude",
+            "garden_longitude",
+            "garden_timezone",
+            "garden_name",
+            "garden_country",
+        ],
+        CONF_TRANSLATION_KEY: "predictive_setup",
+        CONF_ENTITY_CATEGORY: EntityCategory.DIAGNOSTIC,
     },
 }
 
@@ -706,7 +731,7 @@ def _calendar_to_payload(calendar, selected_cal: int = 1) -> dict:
         "sel_cal": selected_cal,
         "cals": [
             {
-                "cal": getattr(calendar, "cal", selected_cal) if calendar else selected_cal,
+                "cal": selected_cal,
                 "days": days,
             }
         ],
@@ -1549,7 +1574,7 @@ class IndegoHub:
         start: str | None = None,
         end: str | None = None,
     ):
-        """Set one calendar slot."""
+        """Set one manual calendar slot."""
         _LOGGER.info(
             "Setting calendar slot: days=%s slot=%s enabled=%s start=%s end=%s mower=%s",
             days,
@@ -1560,33 +1585,34 @@ class IndegoHub:
             self._serial,
         )
 
-        # Validierung der Zeiten, falls enabled
         if enabled:
             if not start or not end:
-                raise ValueError("start and end are required when enabled is true")
+                raise HomeAssistantError(
+                    "start and end are required when enabled is true"
+                )
+
             try:
                 _parse_slot_time(start)
                 _parse_slot_time(end)
-            except ValueError as e:
-                _LOGGER.error("Invalid time format for slot: %s", e)
-                raise HomeAssistantError(f"Invalid time format: {e}") from e
+            except ValueError as err:
+                _LOGGER.error("Invalid time format for slot: %s", err)
+                raise HomeAssistantError(f"Invalid time format: {err}") from err
 
         await self._indego_client.update_calendar()
         calendar = getattr(self._indego_client, "calendar", None)
 
-        payload = _calendar_to_payload(calendar, selected_cal=1)
+        payload = _calendar_to_payload(calendar, selected_cal=2)
+
         for day in days:
             payload = _set_payload_slot(payload, day, slot, enabled, start, end)
 
-        # Experimental: pyIndego documents GET /calendar, but not PUT /calendar.
-        result = await self._indego_client.put(
+        await self._indego_client.put(
             f"alms/{self._serial}/calendar",
             payload,
         )
 
-        _LOGGER.warning("SET CALENDAR SLOT RESULT = %r", result)
-
         await self._update_calendar()
+        await self._update_next_mow()
 
     async def async_select_manual_calendar(self):
         """Try to select the manual calendar after SmartMowing was disabled."""
@@ -1845,6 +1871,39 @@ class IndegoHub:
             self.entities[ENTITY_AUTOMATIC_UPDATE].is_on = enabled
 
         await self._update_automatic_update()
+    async def _update_predictive_setup(self):
+        """Update SmartMowing setup data."""
+        try:
+            setup = await self._indego_client.get(
+                f"alms/{self._serial}/predictive/setup"
+            )
+        except Exception as exc:
+            _LOGGER.warning("Failed to fetch predictive setup data: %s", exc)
+            return None
+
+        garden_location = setup.get("garden_location", {}) or {}
+
+        if ENTITY_PREDICTIVE_SETUP in self.entities:
+            self.entities[ENTITY_PREDICTIVE_SETUP].state = "configured"
+            self.entities[ENTITY_PREDICTIVE_SETUP].set_attributes(
+                {
+                    "last_updated": last_updated_now(),
+                    "mowing_duration": setup.get("mowing_duration"),
+                    "full_cuts": setup.get("full_cuts"),
+                    "avoid_rain": setup.get("avoid_rain"),
+                    "avoid_temperature": setup.get("avoid_temperature"),
+                    "use_grass_growth": setup.get("use_grass_growth"),
+                    "rain_factor": setup.get("rain_factor"),
+                    "temperature_factor": setup.get("temperature_factor"),
+                    "garden_latitude": garden_location.get("latitude"),
+                    "garden_longitude": garden_location.get("longitude"),
+                    "garden_timezone": garden_location.get("timezone"),
+                    "garden_name": garden_location.get("name"),
+                    "garden_country": garden_location.get("country"),
+                }
+            )
+
+        return setup
 
     async def async_send_command_to_client(self, command: str):
         """Send a mower command to the Indego client."""
@@ -1930,6 +1989,16 @@ class IndegoHub:
                     entity_id=f"indego_{self._serial}_{entity_key}",
                     name=None,
                     icon=entity[CONF_ICON],
+                    device_info=device_info,
+                    indego_hub=self,
+                    translation_key=entity[CONF_TRANSLATION_KEY] if CONF_TRANSLATION_KEY in entity else None,
+                    entity_category=entity[CONF_ENTITY_CATEGORY] if CONF_ENTITY_CATEGORY in entity else None,
+                )
+
+            elif entity[CONF_TYPE] == WEATHER_TYPE:
+                self.entities[entity_key] = IndegoWeather(
+                    entity_id=f"indego_{self._serial}_{entity_key}",
+                    name=None,
                     device_info=device_info,
                     indego_hub=self,
                     translation_key=entity[CONF_TRANSLATION_KEY] if CONF_TRANSLATION_KEY in entity else None,
@@ -2139,7 +2208,9 @@ class IndegoHub:
                 self._update_calendar(),
                 self._update_config(),
                 self._update_security(),
-                self._update_automatic_update()
+                self._update_automatic_update(),
+                self._update_predictive_weather(),
+                self._update_predictive_setup()
             ],
             return_exceptions=True,
         )
@@ -2387,6 +2458,18 @@ class IndegoHub:
                 **window,
             }
         )
+
+    async def _update_predictive_weather(self):
+        weather = await self._indego_client.get(
+            f"alms/{self._serial}/predictive/weather"
+        )
+
+        self._predictive_weather = weather
+
+        if ENTITY_PREDICTIVE_WEATHER in self.entities:
+            self.entities[ENTITY_PREDICTIVE_WEATHER].weather_data = weather
+
+        return weather
 
     async def _update_calendar(self):
         """Update calendar data / planned mowing slots."""

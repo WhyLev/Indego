@@ -240,6 +240,12 @@
                     "uneven": "Ujævn"
                 }
             },
+            "predictive_setup": {
+                "name": "SmartMowing-konfiguration",
+                "state": {
+                    "configured": "Konfigureret"
+                }
+            },
             "calendar_slots": {
                 "state": {
                     "smartmowing_active": "SmartMowing aktiv",
@@ -600,6 +606,11 @@
             "automatic_update": {
                 "name": "Automatiske opdateringer"
             }
+        },
+        "weather": {
+            "predictive_weather": {
+                "name": "Vejr SmartMowing"
+            }
         }
     },
     "services": {
@@ -701,7 +712,7 @@
                     "name": "Kalendertype",
                     "description": "Vælg kalender ('calendar' for manuel kalender oder 'predictive' for deaktiverede tidsrum i SmartMowing-tilstand)."
                 },
-                "day": {
+                "days": {
                     "name": "Dag",
                     "description": "Navnet på den ugedag, der skal konfigureres."
                 },

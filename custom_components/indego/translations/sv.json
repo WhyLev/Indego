@@ -204,6 +204,12 @@
                     "uneven": "Ojämnt"
                 }
             },
+            "predictive_setup": {
+                "name": "SmartMowing-konfiguration",
+                "state": {
+                    "configured": "Konfigurerad"
+                }
+            },
             "calendar_slots": {
                 "state": {
                     "smartmowing_active": "SmartMowing aktiv",
@@ -564,6 +570,11 @@
             "automatic_update": {
                 "name": "Automatiska uppdateringar"
             }
+        },
+        "weather": {
+            "predictive_weather": {
+                "name": "Väder SmartMowing"
+            }
         }
     },
     "services": {
@@ -665,7 +676,7 @@
                     "name": "Kalendertyp",
                     "description": "Välj kalender ('calendar' för den manuella kalendern eller 'predictive' för inaktiverade tidsperioder i SmartMowing-läge)."
                 },
-                "day": {
+                "days": {
                     "name": "Dag",
                     "description": "Namnet på veckodagen som ska konfigureras."
                 },
