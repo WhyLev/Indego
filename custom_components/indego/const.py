@@ -59,7 +59,8 @@ VACUUM_TYPE: Final = "vacuum"
 LAWN_MOWER_TYPE: Final = "lawn_mower"
 BUTTON_TYPE: Final = "button"
 SWITCH_TYPE: Final = "switch"
-INDEGO_PLATFORMS: Final = [SENSOR_TYPE, BINARY_SENSOR_TYPE, VACUUM_TYPE, LAWN_MOWER_TYPE, CAMERA_TYPE, BUTTON_TYPE, SWITCH_TYPE]
+WEATHER_TYPE: Final = "weather"
+INDEGO_PLATFORMS: Final = [SENSOR_TYPE, BINARY_SENSOR_TYPE, VACUUM_TYPE, LAWN_MOWER_TYPE, CAMERA_TYPE, BUTTON_TYPE, SWITCH_TYPE, WEATHER_TYPE]
 ENTITY_ONLINE: Final = "online"
 ENTITY_UPDATE_AVAILABLE: Final = "update_available"
 ENTITY_ALERT: Final = "alert"
@@ -95,6 +96,8 @@ ENTITY_DELETE_LAST_ALERT_BUTTON: Final = "delete_last_alert"
 ENTITY_READ_ALL_ALERTS_BUTTON: Final = "read_all_alerts"
 ENTITY_READ_LAST_ALERT_BUTTON: Final = "read_last_alert"
 ENTITY_SMARTMOWING_SWITCH: Final = "smartmowing_switch"
+ENTITY_AUTOMATIC_UPDATE: Final = "automatic_update"
+ENTITY_PREDICTIVE_WEATHER: Final = "predictive_weather"
 
 # Smart Mowing Sensors (Phase 1)
 ENTITY_WEATHER: Final = "weather"
@@ -131,6 +134,19 @@ ENTITY_NETWORK_SIGNAL: Final = "network_signal"
 ENTITY_NETWORK_OPERATOR: Final = "network_operator"
 ENTITY_NETWORK_MODE: Final = "network_mode"
 
+# Bump Sensitivity
+ENTITY_BUMP_SENSITIVITY: Final = "bump_sensitivity"
+SERVICE_NAME_SET_BUMP_SENSITIVITY: Final = "set_bump_sensitivity"
+CONF_BUMP_SENSITIVITY: Final = "bump_sensitivity"
+CONF_BUMP_SENSITIVITY_NORMAL: Final = "normal"
+CONF_BUMP_SENSITIVITY_SLIPPERY: Final = "slippery"
+CONF_BUMP_SENSITIVITY_UNEVEN: Final = "uneven"
+
+# Security
+ENTITY_SECURITY_ENABLED: Final = "security_enabled"
+ENTITY_AUTOLOCK: Final = "autolock"
+SERVICE_NAME_SET_PIN: Final = "set_pin"
+CONF_PIN: Final = "pin"
 
 DELETE_ALERTS_BATCH_DELAY_SECONDS: Final = 10
 DELETE_ALERTS_BATCH_MAX_ROUNDS: Final = 20
