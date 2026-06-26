@@ -679,7 +679,7 @@ def _calendar_to_payload(calendar, selected_cal: int = 1) -> dict:
         "sel_cal": selected_cal,
         "cals": [
             {
-                "cal": getattr(calendar, "cal", selected_cal) if calendar else selected_cal,
+                "cal": selected_cal,
                 "days": days,
             }
         ],
@@ -1431,7 +1431,7 @@ class IndegoHub:
         start: str | None = None,
         end: str | None = None,
     ):
-        """Set one calendar slot."""
+        """Set one manual calendar slot."""
         _LOGGER.info(
             "Setting calendar slot: days=%s slot=%s enabled=%s start=%s end=%s mower=%s",
             days,
@@ -1442,33 +1442,34 @@ class IndegoHub:
             self._serial,
         )
 
-        # Validierung der Zeiten, falls enabled
         if enabled:
             if not start or not end:
-                raise ValueError("start and end are required when enabled is true")
+                raise HomeAssistantError(
+                    "start and end are required when enabled is true"
+                )
+
             try:
                 _parse_slot_time(start)
                 _parse_slot_time(end)
-            except ValueError as e:
-                _LOGGER.error("Invalid time format for slot: %s", e)
-                raise HomeAssistantError(f"Invalid time format: {e}") from e
+            except ValueError as err:
+                _LOGGER.error("Invalid time format for slot: %s", err)
+                raise HomeAssistantError(f"Invalid time format: {err}") from err
 
         await self._indego_client.update_calendar()
         calendar = getattr(self._indego_client, "calendar", None)
 
-        payload = _calendar_to_payload(calendar, selected_cal=1)
+        payload = _calendar_to_payload(calendar, selected_cal=2)
+
         for day in days:
             payload = _set_payload_slot(payload, day, slot, enabled, start, end)
 
-        # Experimental: pyIndego documents GET /calendar, but not PUT /calendar.
-        result = await self._indego_client.put(
+        await self._indego_client.put(
             f"alms/{self._serial}/calendar",
             payload,
         )
 
-        _LOGGER.warning("SET CALENDAR SLOT RESULT = %r", result)
-
         await self._update_calendar()
+        await self._update_next_mow()
 
     async def async_select_manual_calendar(self):
         """Try to select the manual calendar after SmartMowing was disabled."""

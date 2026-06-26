@@ -644,7 +644,7 @@
                     "name": "Kalendertype",
                     "description": "Velg kalender ('calendar' for manuell kalender eller 'predictive' for deaktiverte tidsrom i SmartMowing-modus)."
                 },
-                "day": {
+                "days": {
                     "name": "Dag",
                     "description": "Navnet på ukedagen som skal konfigureres."
                 },

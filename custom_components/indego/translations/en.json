@@ -654,7 +654,7 @@
                     "name": "Calendar Type",
                     "description": "Type of calendar to use. Use 'calendar' for manual calendar or 'predictive' for the forbidden time slots in SmartMowing mode."
                 },
-                "day": {
+                "days": {
                     "name": "Day",
                     "description": "Which day to configure.",
                     "example": "Montag"
