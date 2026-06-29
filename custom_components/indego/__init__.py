@@ -2883,11 +2883,6 @@ class IndegoHub:
                     if ENTITY_MOWER_SVG_Y in self.entities:
                         self.entities[ENTITY_MOWER_SVG_Y].state = svg_y
 
-
-#                    current_state_code = self._indego_client.state.state
-#                    is_mowing = 500 <= current_state_code <= 799
-#                    now = datetime.now()
-
                     current_state_code = self._indego_client.state.state
                     stuck_detection_allowed = current_state_code not in self.STUCK_IGNORED_STATES
                     is_mowing = stuck_detection_allowed and (
@@ -2997,7 +2992,6 @@ class IndegoHub:
                     self._indego_client.generic_data,
                     "mowing_mode_description",
                     STATE_UNKNOWN,
-
                 )
 
                 effective_mowing_mode = self._forced_mowing_mode or mowing_mode
@@ -3010,7 +3004,6 @@ class IndegoHub:
                     self.entities[ENTITY_SMARTMOWING_SWITCH].is_on = (
                         str(effective_mowing_mode).lower() == "smartmowing"
                     )
-
             else:
                 _LOGGER.debug("Generic data is empty from API")
 
