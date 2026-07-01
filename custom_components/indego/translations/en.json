@@ -152,10 +152,7 @@
                 "name": "Next Mow"
             },
             "mowing_mode": {
-                "name": "Mowing Mode",
-                "state": {
-                    "Calendar": "Manual Calendar"
-                }
+                "name": "Mowing Mode"
             },
             "runtime_total": {
                 "name": "Mow Time Total"
