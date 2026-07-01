@@ -154,7 +154,7 @@
             "mowing_mode": {
                 "name": "Režim kosenia",
                 "state": {
-                    "calendar": "Manuálny kalendár"
+                    "Calendar": "Manuálny kalendár"
                 }
             },
             "runtime_total": {
@@ -170,7 +170,64 @@
                 "name": "Pozícia robota Y"
             },
             "last_error_code": {
-                "name": "Posledná chyba"
+                "name": "Posledná chyba",
+                "state": {
+                    "No error": "Žiadna chyba",
+                    "No errors": "Žiadne chyby",
+                    "Unknown internal error": "Neznáma interná chyba",
+                    "Button cell almost empty": "Gombíková batéria je takmer vybitá",
+                    "Compass error": "Chyba kompasu",
+                    "No data from mobile module": "Žiadne údaje z mobilného modulu",
+                    "Mower tilted": "Kosačka je naklonená",
+                    "Mower was lifted": "Kosačka bola zdvihnutá",
+                    "Lift sensor right front steering wheel": "Snímač zdvihnutia pravého predného kolesa",
+                    "Lift sensor left front steering wheel": "Snímač zdvihnutia ľavého predného kolesa",
+                    "Stop button pressed": "Stlačené tlačidlo STOP",
+                    "Mower tilted >45°": "Kosačka je naklonená o viac ako 45°",
+                    "Invalid input": "Neplatný vstup",
+                    "System error": "Systémová chyba",
+                    "Permanent tactile detected": "Zistený trvalý kontakt",
+                    "Charging current/voltage too high": "Príliš vysoký nabíjací prúd/napätie",
+                    "Cutter load too high": "Príliš vysoké zaťaženie noža",
+                    "Internal error": "Interná chyba",
+                    "Left wheel blocked": "Ľavé koleso je zablokované",
+                    "Right wheel blocked": "Pravé koleso je zablokované",
+                    "Internal wheel drive error": "Interná chyba pohonu kolies",
+                    "Intermittent error": "Dočasná chyba",
+                    "Mower out of perimeter limit": "Kosačka je mimo ohraničenej plochy",
+                    "No signal from perimeter wire": "Žiadny signál z obvodového vodiča",
+                    "Waiting for loop signal": "Čaká sa na signál slučky",
+                    "Charging error": "Chyba nabíjania",
+                    "No perimeter signal detected": "Nebol zistený signál obvodového vodiča",
+                    "Left wheel stuck": "Ľavé koleso uviazlo",
+                    "Mower stuck": "Kosačka uviazla",
+                    "Mower trapped": "Kosačka je zaseknutá",
+                    "Mower too high": "Kosačka je príliš vysoko",
+                    "Unable to proceed": "Nie je možné pokračovať",
+                    "Uneven ground": "Nerovný terén",
+                    "Grass too high": "Tráva je príliš vysoká",
+                    "Bluetooth error": "Chyba Bluetooth",
+                    "WiFi connection lost": "Stratené pripojenie Wi-Fi",
+                    "API connection error": "Chyba pripojenia API",
+                    "No connection to server": "Žiadne pripojenie k serveru",
+                    "Communication timeout": "Vypršal čas komunikácie",
+                    "Firmware error": "Chyba firmvéru",
+                    "Software error": "Chyba softvéru",
+                    "Configuration error": "Chyba konfigurácie",
+                    "Memory error": "Chyba pamäte",
+                    "Unknown error": "Neznáma chyba",
+                    "Shutdown detected": "Zistené vypnutie",
+                    "Mower is stuck": "Kosačka uviazla",
+                    "Inclination angle too large": "Uhol sklonu je príliš veľký",
+                    "Last run error": "Chyba pri poslednom kosení",
+                    "Orientation filter error": "Chyba filtra orientácie",
+                    "On-/Off error. Need PIN code to unlock": "Chyba zapnutia/vypnutia. Na odomknutie je potrebný PIN kód",
+                    "Unsupported battery pack": "Nepodporovaný akumulátor",
+                    "Reminder blade life": "Pripomienka: vymeňte nože",
+                    "SmartMowing disabled": "SmartMowing je vypnuté",
+                    "Software update complete": "Aktualizácia softvéru bola dokončená",
+                    "Mower reachable. SmartMow is now enabled.": "Kosačka je opäť dostupná. SmartMowing je teraz aktivované."
+                }
             },
             "firmware_version": {
                 "name": "Verzia firmvéru"

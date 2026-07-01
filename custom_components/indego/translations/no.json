@@ -154,7 +154,7 @@
             "mowing_mode": {
                 "name": "Klippemodus",
                 "state": {
-                    "calendar": "Manuell kalender"
+                    "Calendar": "Manuell kalender"
                 }
             },
             "runtime_total": {
@@ -170,7 +170,64 @@
                 "name": "Robot posisjon Y"
             },
             "last_error_code": {
-                "name": "Siste feil"
+                "name": "Siste feil",
+                "state": {
+                    "No error": "Ingen feil",
+                    "No errors": "Ingen feil",
+                    "Unknown internal error": "Ukjent intern feil",
+                    "Button cell almost empty": "Knappcellebatteriet er nesten tomt",
+                    "Compass error": "Kompassfeil",
+                    "No data from mobile module": "Ingen data fra mobilmodulen",
+                    "Mower tilted": "Klipperen er vippet",
+                    "Mower was lifted": "Klipperen ble løftet",
+                    "Lift sensor right front steering wheel": "Løftesensor høyre forhjul",
+                    "Lift sensor left front steering wheel": "Løftesensor venstre forhjul",
+                    "Stop button pressed": "Stoppknappen ble trykket",
+                    "Mower tilted >45°": "Klipperen er vippet mer enn 45°",
+                    "Invalid input": "Ugyldig inndata",
+                    "System error": "Systemfeil",
+                    "Permanent tactile detected": "Permanent berøring registrert",
+                    "Charging current/voltage too high": "Ladestrøm/-spenning for høy",
+                    "Cutter load too high": "Knivbelastning for høy",
+                    "Internal error": "Intern feil",
+                    "Left wheel blocked": "Venstre hjul blokkert",
+                    "Right wheel blocked": "Høyre hjul blokkert",
+                    "Internal wheel drive error": "Intern feil i hjuldriften",
+                    "Intermittent error": "Midlertidig feil",
+                    "Mower out of perimeter limit": "Klipperen er utenfor avgrensningen",
+                    "No signal from perimeter wire": "Ingen signal fra kantledningen",
+                    "Waiting for loop signal": "Venter på sløyfesignal",
+                    "Charging error": "Ladefeil",
+                    "No perimeter signal detected": "Ingen signal fra kantledningen registrert",
+                    "Left wheel stuck": "Venstre hjul har satt seg fast",
+                    "Mower stuck": "Klipperen har satt seg fast",
+                    "Mower trapped": "Klipperen sitter fast",
+                    "Mower too high": "Klipperen står for høyt",
+                    "Unable to proceed": "Kan ikke fortsette",
+                    "Uneven ground": "Ujevnt underlag",
+                    "Grass too high": "Gresset er for høyt",
+                    "Bluetooth error": "Bluetooth-feil",
+                    "WiFi connection lost": "WiFi-forbindelsen er brutt",
+                    "API connection error": "API-tilkoblingsfeil",
+                    "No connection to server": "Ingen forbindelse til serveren",
+                    "Communication timeout": "Kommunikasjonstidsavbrudd",
+                    "Firmware error": "Firmwarefeil",
+                    "Software error": "Programvarefeil",
+                    "Configuration error": "Konfigurasjonsfeil",
+                    "Memory error": "Minnefeil",
+                    "Unknown error": "Ukjent feil",
+                    "Shutdown detected": "Avslåing registrert",
+                    "Mower is stuck": "Klipperen har satt seg fast",
+                    "Inclination angle too large": "Helningsvinkelen er for stor",
+                    "Last run error": "Feil ved siste kjøring",
+                    "Orientation filter error": "Orienteringsfilterfeil",
+                    "On-/Off error. Need PIN code to unlock": "Av/på-feil. PIN-kode kreves for å låse opp",
+                    "Unsupported battery pack": "Batteripakken støttes ikke",
+                    "Reminder blade life": "Påminnelse: Bytt kniver",
+                    "SmartMowing disabled": "SmartMowing deaktivert",
+                    "Software update complete": "Programvareoppdatering fullført",
+                    "Mower reachable. SmartMow is now enabled.": "Klipperen er tilgjengelig igjen. SmartMowing er nå aktivert."
+                }
             },
             "firmware_version": {
                 "name": "Fastvareversjoner"
