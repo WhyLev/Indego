@@ -154,7 +154,7 @@
             "mowing_mode": {
                 "name": "Klippläge",
                 "state": {
-                    "calendar": "Manuell kalender"
+                    "Calendar": "Manuell kalender"
                 }
             },
             "runtime_total": {
@@ -170,7 +170,64 @@
                 "name": "Robotposition Y"
             },
             "last_error_code": {
-                "name": "Senaste fel"
+                "name": "Senaste fel",
+                "state": {
+                    "No error": "Inga fel",
+                    "No errors": "Inga fel",
+                    "Unknown internal error": "Okänt internt fel",
+                    "Button cell almost empty": "Knappcellsbatteriet är nästan slut",
+                    "Compass error": "Kompassfel",
+                    "No data from mobile module": "Ingen data från mobilmodulen",
+                    "Mower tilted": "Gräsklipparen lutar",
+                    "Mower was lifted": "Gräsklipparen har lyfts",
+                    "Lift sensor right front steering wheel": "Lyftsensor höger framhjul",
+                    "Lift sensor left front steering wheel": "Lyftsensor vänster framhjul",
+                    "Stop button pressed": "Stoppknappen har tryckts in",
+                    "Mower tilted >45°": "Gräsklipparen lutar mer än 45°",
+                    "Invalid input": "Ogiltig inmatning",
+                    "System error": "Systemfel",
+                    "Permanent tactile detected": "Permanent kontakt upptäckt",
+                    "Charging current/voltage too high": "Laddström/laddspänning för hög",
+                    "Cutter load too high": "Knivbelastningen är för hög",
+                    "Internal error": "Internt fel",
+                    "Left wheel blocked": "Vänster hjul blockerat",
+                    "Right wheel blocked": "Höger hjul blockerat",
+                    "Internal wheel drive error": "Internt fel i hjuldriften",
+                    "Intermittent error": "Tillfälligt fel",
+                    "Mower out of perimeter limit": "Gräsklipparen är utanför begränsningsområdet",
+                    "No signal from perimeter wire": "Ingen signal från begränsningsslingan",
+                    "Waiting for loop signal": "Väntar på slingsignal",
+                    "Charging error": "Laddningsfel",
+                    "No perimeter signal detected": "Ingen signal från begränsningsslingan upptäcktes",
+                    "Left wheel stuck": "Vänster hjul har fastnat",
+                    "Mower stuck": "Gräsklipparen har fastnat",
+                    "Mower trapped": "Gräsklipparen sitter fast",
+                    "Mower too high": "Gräsklipparen står för högt",
+                    "Unable to proceed": "Kan inte fortsätta",
+                    "Uneven ground": "Ojämn mark",
+                    "Grass too high": "Gräset är för högt",
+                    "Bluetooth error": "Bluetooth-fel",
+                    "WiFi connection lost": "Wi-Fi-anslutningen har förlorats",
+                    "API connection error": "API-anslutningsfel",
+                    "No connection to server": "Ingen anslutning till servern",
+                    "Communication timeout": "Kommunikationstimeout",
+                    "Firmware error": "Firmwarefel",
+                    "Software error": "Programvarufel",
+                    "Configuration error": "Konfigurationsfel",
+                    "Memory error": "Minnesfel",
+                    "Unknown error": "Okänt fel",
+                    "Shutdown detected": "Avstängning upptäckt",
+                    "Mower is stuck": "Gräsklipparen har fastnat",
+                    "Inclination angle too large": "Lutningsvinkeln är för stor",
+                    "Last run error": "Fel vid senaste körningen",
+                    "Orientation filter error": "Orienteringsfilterfel",
+                    "On-/Off error. Need PIN code to unlock": "På-/av-fel. PIN-kod krävs för att låsa upp",
+                    "Unsupported battery pack": "Batteripaketet stöds inte",
+                    "Reminder blade life": "Påminnelse: byt knivar",
+                    "SmartMowing disabled": "SmartMowing är inaktiverat",
+                    "Software update complete": "Programuppdateringen är klar",
+                    "Mower reachable. SmartMow is now enabled.": "Gräsklipparen är åter nåbar. SmartMowing är nu aktiverat."
+                }
             },
             "firmware_version": {
                 "name": "Fastvarversion"

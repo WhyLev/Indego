@@ -154,7 +154,7 @@
             "mowing_mode": {
                 "name": "Mähmodus",
                 "state": {
-                    "calendar": "Manueller Kalender"
+                    "Calendar": "Kalender"
                 }
             },
             "runtime_total": {
@@ -170,7 +170,63 @@
                 "name": "Mähroboter Position Y"
             },
             "last_error_code": {
-                "name": "Letzter Fehler"
+                "name": "Letzter Fehler",
+                "state": {
+                    "No error": "Kein Fehler",
+                    "No errors": "Keine Fehler",
+                    "Unknown internal error": "Unbekannter interner Fehler",
+                    "Button cell almost empty": "Knopfzelle fast leer",
+                    "Compass error": "Kompassfehler",
+                    "No data from mobile module": "Keine Daten vom Mobilfunkmodul",
+                    "Mower tilted": "Mäher gekippt",
+                    "Mower was lifted": "Mäher wurde angehoben",
+                    "Lift sensor right front steering wheel": "Hebesensor rechtes Vorderrad",
+                    "Lift sensor left front steering wheel": "Hebesensor linkes Vorderrad",
+                    "Stop button pressed": "Stopptaste gedrückt",
+                    "Mower tilted >45°": "Mäher um mehr als 45° gekippt",
+                    "Invalid input": "Ungültige Eingabe",
+                    "System error": "Systemfehler",
+                    "Permanent tactile detected": "Dauerhafte Berührung erkannt",
+                    "Charging current/voltage too high": "Ladestrom/Ladespannung zu hoch",
+                    "Cutter load too high": "Schneidwerk überlastet",
+                    "Internal error": "Interner Fehler",
+                    "Left wheel blocked": "Linkes Rad blockiert",
+                    "Right wheel blocked": "Rechtes Rad blockiert",
+                    "Internal wheel drive error": "Interner Fahrantriebsfehler",
+                    "Intermittent error": "Vorübergehender Fehler",
+                    "Mower out of perimeter limit": "Mäher außerhalb des Begrenzungsbereichs",
+                    "No signal from perimeter wire": "Kein Signal vom Begrenzungsdraht",
+                    "Waiting for loop signal": "Warte auf Schleifensignal",
+                    "Charging error": "Ladefehler",
+                    "No perimeter signal detected": "Kein Begrenzungssignal erkannt",
+                    "Left wheel stuck": "Linkes Rad festgefahren",
+                    "Mower stuck": "Mäher festgefahren",
+                    "Mower trapped": "Mäher eingeklemmt",
+                    "Mower too high": "Mäher steht zu hoch",
+                    "Unable to proceed": "Weiterfahrt nicht möglich",
+                    "Uneven ground": "Unebener Untergrund",
+                    "Grass too high": "Gras zu hoch",
+                    "Bluetooth error": "Bluetooth-Fehler",
+                    "WiFi connection lost": "WLAN-Verbindung verloren",
+                    "API connection error": "API-Verbindungsfehler",
+                    "No connection to server": "Keine Verbindung zum Server",
+                    "Communication timeout": "Kommunikationszeitüberschreitung",
+                    "Firmware error": "Firmwarefehler",
+                    "Software error": "Softwarefehler",
+                    "Configuration error": "Konfigurationsfehler",
+                    "Memory error": "Speicherfehler",
+                    "Unknown error": "Unbekannter Fehler",
+                    "Shutdown detected": "Abschaltung erkannt",
+                    "Inclination angle too large": "Neigungswinkel zu groß",
+                    "Last run error": "Fehler beim letzten Lauf",
+                    "Orientation filter error": "Orientierungsfilterfehler",
+                    "On-/Off error. Need PIN code to unlock": "Ein-/Aus-Fehler. PIN zum Entsperren erforderlich",
+                    "Unsupported battery pack": "Nicht unterstützter Akku",
+                    "Reminder blade life": "Erinnerung: Messer wechseln",
+                    "SmartMowing disabled": "SmartMowing deaktiviert",
+                    "Software update complete": "Software-Update abgeschlossen",
+                    "Mower reachable. SmartMow is now enabled.": "Mäher wieder erreichbar. SmartMowing wurde aktiviert."
+                }
             },
             "firmware_version": {
                 "name": "Firmware-Version"

@@ -154,7 +154,7 @@
             "mowing_mode": {
                 "name": "Mode de tonte",
                 "state": {
-                    "calendar": "Calendrier manuel"
+                    "Calendar": "Calendrier manuel"
                 }
             },
             "runtime_total": {
@@ -170,7 +170,64 @@
                 "name": "Position du robot Y"
             },
             "last_error_code": {
-                "name": "Dernière erreur"
+                "name": "Dernière erreur",
+                "state": {
+                    "No error": "Aucune erreur",
+                    "No errors": "Aucune erreur",
+                    "Unknown internal error": "Erreur interne inconnue",
+                    "Button cell almost empty": "Pile bouton presque déchargée",
+                    "Compass error": "Erreur de boussole",
+                    "No data from mobile module": "Aucune donnée du module mobile",
+                    "Mower tilted": "Tondeuse inclinée",
+                    "Mower was lifted": "La tondeuse a été soulevée",
+                    "Lift sensor right front steering wheel": "Capteur de levage de la roue avant droite",
+                    "Lift sensor left front steering wheel": "Capteur de levage de la roue avant gauche",
+                    "Stop button pressed": "Bouton d'arrêt enfoncé",
+                    "Mower tilted >45°": "Tondeuse inclinée de plus de 45°",
+                    "Invalid input": "Entrée non valide",
+                    "System error": "Erreur système",
+                    "Permanent tactile detected": "Contact permanent détecté",
+                    "Charging current/voltage too high": "Courant/tension de charge trop élevé",
+                    "Cutter load too high": "Charge de coupe trop élevée",
+                    "Internal error": "Erreur interne",
+                    "Left wheel blocked": "Roue gauche bloquée",
+                    "Right wheel blocked": "Roue droite bloquée",
+                    "Internal wheel drive error": "Erreur interne de l'entraînement des roues",
+                    "Intermittent error": "Erreur intermittente",
+                    "Mower out of perimeter limit": "Tondeuse hors du périmètre",
+                    "No signal from perimeter wire": "Aucun signal du câble périphérique",
+                    "Waiting for loop signal": "En attente du signal de boucle",
+                    "Charging error": "Erreur de charge",
+                    "No perimeter signal detected": "Aucun signal périphérique détecté",
+                    "Left wheel stuck": "Roue gauche bloquée",
+                    "Mower stuck": "Tondeuse bloquée",
+                    "Mower trapped": "Tondeuse coincée",
+                    "Mower too high": "Tondeuse trop haute",
+                    "Unable to proceed": "Impossible de continuer",
+                    "Uneven ground": "Terrain irrégulier",
+                    "Grass too high": "Herbe trop haute",
+                    "Bluetooth error": "Erreur Bluetooth",
+                    "WiFi connection lost": "Connexion Wi-Fi perdue",
+                    "API connection error": "Erreur de connexion à l'API",
+                    "No connection to server": "Aucune connexion au serveur",
+                    "Communication timeout": "Délai de communication dépassé",
+                    "Firmware error": "Erreur du micrologiciel",
+                    "Software error": "Erreur logicielle",
+                    "Configuration error": "Erreur de configuration",
+                    "Memory error": "Erreur mémoire",
+                    "Unknown error": "Erreur inconnue",
+                    "Shutdown detected": "Arrêt détecté",
+                    "Mower is stuck": "La tondeuse est bloquée",
+                    "Inclination angle too large": "Angle d'inclinaison trop important",
+                    "Last run error": "Erreur lors de la dernière tonte",
+                    "Orientation filter error": "Erreur du filtre d'orientation",
+                    "On-/Off error. Need PIN code to unlock": "Erreur marche/arrêt. Code PIN requis pour déverrouiller",
+                    "Unsupported battery pack": "Batterie non prise en charge",
+                    "Reminder blade life": "Rappel : remplacer les lames",
+                    "SmartMowing disabled": "SmartMowing désactivé",
+                    "Software update complete": "Mise à jour logicielle terminée",
+                    "Mower reachable. SmartMow is now enabled.": "La tondeuse est de nouveau joignable. SmartMowing est maintenant activé."
+                }
             },
             "firmware_version": {
                 "name": "Version du firmware"

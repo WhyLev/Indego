@@ -154,7 +154,7 @@
             "mowing_mode": {
                 "name": "Modalità di taglio",
                 "state": {
-                    "calendar": "Calendario manuale"
+                    "Calendar": "Calendario manuale"
                 }
             },
             "runtime_total": {
@@ -170,7 +170,64 @@
                 "name": "Posizione robot Y"
             },
             "last_error_code": {
-                "name": "Ultimo errore"
+                "name": "Ultimo errore",
+                "state": {
+                    "No error": "Nessun errore",
+                    "No errors": "Nessun errore",
+                    "Unknown internal error": "Errore interno sconosciuto",
+                    "Button cell almost empty": "Batteria a bottone quasi scarica",
+                    "Compass error": "Errore della bussola",
+                    "No data from mobile module": "Nessun dato dal modulo mobile",
+                    "Mower tilted": "Rasaerba inclinato",
+                    "Mower was lifted": "Il rasaerba è stato sollevato",
+                    "Lift sensor right front steering wheel": "Sensore di sollevamento ruota anteriore destra",
+                    "Lift sensor left front steering wheel": "Sensore di sollevamento ruota anteriore sinistra",
+                    "Stop button pressed": "Pulsante di arresto premuto",
+                    "Mower tilted >45°": "Rasaerba inclinato oltre 45°",
+                    "Invalid input": "Input non valido",
+                    "System error": "Errore di sistema",
+                    "Permanent tactile detected": "Contatto permanente rilevato",
+                    "Charging current/voltage too high": "Corrente/tensione di carica troppo elevata",
+                    "Cutter load too high": "Carico della lama troppo elevato",
+                    "Internal error": "Errore interno",
+                    "Left wheel blocked": "Ruota sinistra bloccata",
+                    "Right wheel blocked": "Ruota destra bloccata",
+                    "Internal wheel drive error": "Errore interno della trasmissione delle ruote",
+                    "Intermittent error": "Errore intermittente",
+                    "Mower out of perimeter limit": "Rasaerba fuori dal perimetro",
+                    "No signal from perimeter wire": "Nessun segnale dal filo perimetrale",
+                    "Waiting for loop signal": "In attesa del segnale del circuito",
+                    "Charging error": "Errore di ricarica",
+                    "No perimeter signal detected": "Nessun segnale del perimetro rilevato",
+                    "Left wheel stuck": "Ruota sinistra bloccata",
+                    "Mower stuck": "Rasaerba bloccato",
+                    "Mower trapped": "Rasaerba intrappolato",
+                    "Mower too high": "Rasaerba troppo alto",
+                    "Unable to proceed": "Impossibile procedere",
+                    "Uneven ground": "Terreno irregolare",
+                    "Grass too high": "Erba troppo alta",
+                    "Bluetooth error": "Errore Bluetooth",
+                    "WiFi connection lost": "Connessione Wi-Fi persa",
+                    "API connection error": "Errore di connessione API",
+                    "No connection to server": "Nessuna connessione al server",
+                    "Communication timeout": "Timeout di comunicazione",
+                    "Firmware error": "Errore firmware",
+                    "Software error": "Errore software",
+                    "Configuration error": "Errore di configurazione",
+                    "Memory error": "Errore di memoria",
+                    "Unknown error": "Errore sconosciuto",
+                    "Shutdown detected": "Spegnimento rilevato",
+                    "Mower is stuck": "Il rasaerba è bloccato",
+                    "Inclination angle too large": "Angolo di inclinazione troppo elevato",
+                    "Last run error": "Errore dell'ultima esecuzione",
+                    "Orientation filter error": "Errore del filtro di orientamento",
+                    "On-/Off error. Need PIN code to unlock": "Errore di accensione/spegnimento. È necessario il codice PIN per sbloccare",
+                    "Unsupported battery pack": "Pacco batteria non supportato",
+                    "Reminder blade life": "Promemoria: sostituire le lame",
+                    "SmartMowing disabled": "SmartMowing disattivato",
+                    "Software update complete": "Aggiornamento software completato",
+                    "Mower reachable. SmartMow is now enabled.": "Il rasaerba è nuovamente raggiungibile. SmartMowing è ora attivato."
+                }
             },
             "firmware_version": {
                 "name": "Versione firmware"

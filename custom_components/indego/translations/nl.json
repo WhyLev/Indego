@@ -154,7 +154,7 @@
             "mowing_mode": {
                 "name": "Maaimode",
                 "state": {
-                    "calendar": "Handmatige kalender"
+                    "Calendar": "Handmatige kalender"
                 }
             },
             "runtime_total": {
@@ -170,7 +170,64 @@
                 "name": "Robot positie Y"
             },
             "last_error_code": {
-                "name": "Laatste fout"
+                "name": "Laatste fout",
+                "state": {
+                    "No error": "Geen fout",
+                    "No errors": "Geen fouten",
+                    "Unknown internal error": "Onbekende interne fout",
+                    "Button cell almost empty": "Knoopcelbatterij bijna leeg",
+                    "Compass error": "Kompasfout",
+                    "No data from mobile module": "Geen gegevens van de mobiele module",
+                    "Mower tilted": "Maaier gekanteld",
+                    "Mower was lifted": "Maaier is opgetild",
+                    "Lift sensor right front steering wheel": "Heffingssensor rechter voorwiel",
+                    "Lift sensor left front steering wheel": "Heffingssensor linker voorwiel",
+                    "Stop button pressed": "Stopknop ingedrukt",
+                    "Mower tilted >45°": "Maaier meer dan 45° gekanteld",
+                    "Invalid input": "Ongeldige invoer",
+                    "System error": "Systeemfout",
+                    "Permanent tactile detected": "Permanente aanraking gedetecteerd",
+                    "Charging current/voltage too high": "Laadstroom/-spanning te hoog",
+                    "Cutter load too high": "Maaimotor overbelast",
+                    "Internal error": "Interne fout",
+                    "Left wheel blocked": "Linker wiel geblokkeerd",
+                    "Right wheel blocked": "Rechter wiel geblokkeerd",
+                    "Internal wheel drive error": "Interne aandrijffout",
+                    "Intermittent error": "Tijdelijke fout",
+                    "Mower out of perimeter limit": "Maaier buiten de begrenzing",
+                    "No signal from perimeter wire": "Geen signaal van de begrenzingsdraad",
+                    "Waiting for loop signal": "Wachten op lussignaal",
+                    "Charging error": "Laadfout",
+                    "No perimeter signal detected": "Geen begrenzingssignaal gedetecteerd",
+                    "Left wheel stuck": "Linker wiel vastgelopen",
+                    "Mower stuck": "Maaier vastgelopen",
+                    "Mower trapped": "Maaier vastgeraakt",
+                    "Mower too high": "Maaier staat te hoog",
+                    "Unable to proceed": "Kan niet verder",
+                    "Uneven ground": "Oneffen terrein",
+                    "Grass too high": "Gras te hoog",
+                    "Bluetooth error": "Bluetooth-fout",
+                    "WiFi connection lost": "WiFi-verbinding verbroken",
+                    "API connection error": "API-verbindingsfout",
+                    "No connection to server": "Geen verbinding met de server",
+                    "Communication timeout": "Communicatietime-out",
+                    "Firmware error": "Firmwarefout",
+                    "Software error": "Softwarefout",
+                    "Configuration error": "Configuratiefout",
+                    "Memory error": "Geheugenfout",
+                    "Unknown error": "Onbekende fout",
+                    "Shutdown detected": "Uitschakeling gedetecteerd",
+                    "Mower is stuck": "Maaier zit vast",
+                    "Inclination angle too large": "Hellingshoek te groot",
+                    "Last run error": "Fout tijdens laatste maaibeurt",
+                    "Orientation filter error": "Oriëntatiefilterfout",
+                    "On-/Off error. Need PIN code to unlock": "Aan/uit-fout. PIN-code vereist om te ontgrendelen",
+                    "Unsupported battery pack": "Niet-ondersteund accupakket",
+                    "Reminder blade life": "Herinnering: messen vervangen",
+                    "SmartMowing disabled": "SmartMowing uitgeschakeld",
+                    "Software update complete": "Software-update voltooid",
+                    "Mower reachable. SmartMow is now enabled.": "Maaier weer bereikbaar. SmartMowing is nu ingeschakeld."
+                }
             },
             "firmware_version": {
                 "name": "Firmwareversie"
