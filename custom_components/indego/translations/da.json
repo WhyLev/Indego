@@ -190,7 +190,7 @@
             "mowing_mode": {
                 "name": "Klippemode",
                 "state": {
-                    "calendar": "Manuel kalender"
+                    "Calendar": "Manuel kalender"
                 }
             },
             "runtime_total": {
@@ -206,7 +206,63 @@
                 "name": "Robot position Y"
             },
             "last_error_code": {
-                "name": "Seneste fejl"
+                "name": "Seneste fejl",
+                "state": {
+                    "No error": "Ingen fejl",
+                    "No errors": "Ingen fejl",
+                    "Unknown internal error": "Ukendt intern fejl",
+                    "Button cell almost empty": "Knapcelle næsten tom",
+                    "Compass error": "Kompasfejl",
+                    "No data from mobile module": "Ingen data fra mobilmodulet",
+                    "Mower tilted": "Plæneklipper vippet",
+                    "Mower was lifted": "Plæneklipper løftet",
+                    "Lift sensor right front steering wheel": "Løftesensor højre forhjul",
+                    "Lift sensor left front steering wheel": "Løftesensor venstre forhjul",
+                    "Stop button pressed": "Stopknap trykket",
+                    "Mower tilted >45°": "Plæneklipper vippet over 45°",
+                    "Invalid input": "Ugyldig indtastning",
+                    "System error": "Systemfejl",
+                    "Permanent tactile detected": "Permanent berøring registreret",
+                    "Charging current/voltage too high": "Ladestrøm/-spænding for høj",
+                    "Cutter load too high": "Knivbelastning for høj",
+                    "Internal error": "Intern fejl",
+                    "Left wheel blocked": "Venstre hjul blokeret",
+                    "Right wheel blocked": "Højre hjul blokeret",
+                    "Internal wheel drive error": "Intern hjuldrevfejl",
+                    "Intermittent error": "Midlertidig fejl",
+                    "Mower out of perimeter limit": "Plæneklipper uden for afgrænsning",
+                    "No signal from perimeter wire": "Intet signal fra kanttråd",
+                    "Waiting for loop signal": "Venter på sløjfesignal",
+                    "Charging error": "Ladefejl",
+                    "No perimeter signal detected": "Intet kanttrådssignal registreret",
+                    "Left wheel stuck": "Venstre hjul sidder fast",
+                    "Mower stuck": "Plæneklipper sidder fast",
+                    "Mower trapped": "Plæneklipper klemt fast",
+                    "Mower too high": "Plæneklipper står for højt",
+                    "Unable to proceed": "Kan ikke fortsætte",
+                    "Uneven ground": "Ujævnt terræn",
+                    "Grass too high": "Græsset er for højt",
+                    "Bluetooth error": "Bluetooth-fejl",
+                    "WiFi connection lost": "WiFi-forbindelse mistet",
+                    "API connection error": "API-forbindelsesfejl",
+                    "No connection to server": "Ingen forbindelse til server",
+                    "Communication timeout": "Kommunikationstimeout",
+                    "Firmware error": "Firmwarefejl",
+                    "Software error": "Softwarefejl",
+                    "Configuration error": "Konfigurationsfejl",
+                    "Memory error": "Hukommelsesfejl",
+                    "Unknown error": "Ukendt fejl",
+                    "Shutdown detected": "Nedlukning registreret",
+                    "Inclination angle too large": "Hældningsvinkel for stor",
+                    "Last run error": "Fejl ved sidste kørsel",
+                    "Orientation filter error": "Orienteringsfilterfejl",
+                    "On-/Off error. Need PIN code to unlock": "Tænd/sluk-fejl. PIN-kode kræves",
+                    "Unsupported battery pack": "Ikke understøttet batteripakke",
+                    "Reminder blade life": "Påmindelse: Udskift knive",
+                    "SmartMowing disabled": "SmartMowing deaktiveret",
+                    "Software update complete": "Softwareopdatering fuldført",
+                    "Mower reachable. SmartMow is now enabled.": "Plæneklipper er tilgængelig. SmartMowing er nu aktiveret."
+                }
             },
             "firmware_version": {
                 "name": "Firmwareversion"

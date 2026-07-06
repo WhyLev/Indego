@@ -154,7 +154,7 @@
             "mowing_mode": {
                 "name": "Tryb koszenia",
                 "state": {
-                    "calendar": "Kalendarz ręczny"
+                    "Calendar": "Kalendarz ręczny"
                 }
             },
             "runtime_total": {
@@ -170,7 +170,64 @@
                 "name": "Pozycja robota Y"
             },
             "last_error_code": {
-                "name": "Ostatni błąd"
+                "name": "Ostatni błąd",
+                "state": {
+                    "No error": "Brak błędów",
+                    "No errors": "Brak błędów",
+                    "Unknown internal error": "Nieznany błąd wewnętrzny",
+                    "Button cell almost empty": "Bateria guzikowa jest prawie rozładowana",
+                    "Compass error": "Błąd kompasu",
+                    "No data from mobile module": "Brak danych z modułu komunikacyjnego",
+                    "Mower tilted": "Kosiarka przechylona",
+                    "Mower was lifted": "Kosiarka została podniesiona",
+                    "Lift sensor right front steering wheel": "Czujnik podniesienia prawego przedniego koła",
+                    "Lift sensor left front steering wheel": "Czujnik podniesienia lewego przedniego koła",
+                    "Stop button pressed": "Naciśnięto przycisk STOP",
+                    "Mower tilted >45°": "Kosiarka przechylona o ponad 45°",
+                    "Invalid input": "Nieprawidłowe dane wejściowe",
+                    "System error": "Błąd systemu",
+                    "Permanent tactile detected": "Wykryto trwały kontakt",
+                    "Charging current/voltage too high": "Zbyt wysokie napięcie/prąd ładowania",
+                    "Cutter load too high": "Zbyt duże obciążenie noża",
+                    "Internal error": "Błąd wewnętrzny",
+                    "Left wheel blocked": "Lewe koło zablokowane",
+                    "Right wheel blocked": "Prawe koło zablokowane",
+                    "Internal wheel drive error": "Wewnętrzny błąd napędu kół",
+                    "Intermittent error": "Błąd chwilowy",
+                    "Mower out of perimeter limit": "Kosiarka poza obszarem pracy",
+                    "No signal from perimeter wire": "Brak sygnału z przewodu ograniczającego",
+                    "Waiting for loop signal": "Oczekiwanie na sygnał pętli",
+                    "Charging error": "Błąd ładowania",
+                    "No perimeter signal detected": "Nie wykryto sygnału przewodu ograniczającego",
+                    "Left wheel stuck": "Lewe koło zakleszczone",
+                    "Mower stuck": "Kosiarka utknęła",
+                    "Mower trapped": "Kosiarka została uwięziona",
+                    "Mower too high": "Kosiarka znajduje się zbyt wysoko",
+                    "Unable to proceed": "Nie można kontynuować",
+                    "Uneven ground": "Nierówne podłoże",
+                    "Grass too high": "Trawa jest zbyt wysoka",
+                    "Bluetooth error": "Błąd Bluetooth",
+                    "WiFi connection lost": "Utracono połączenie Wi-Fi",
+                    "API connection error": "Błąd połączenia z API",
+                    "No connection to server": "Brak połączenia z serwerem",
+                    "Communication timeout": "Przekroczono limit czasu komunikacji",
+                    "Firmware error": "Błąd oprogramowania układowego",
+                    "Software error": "Błąd oprogramowania",
+                    "Configuration error": "Błąd konfiguracji",
+                    "Memory error": "Błąd pamięci",
+                    "Unknown error": "Nieznany błąd",
+                    "Shutdown detected": "Wykryto wyłączenie",
+                    "Mower is stuck": "Kosiarka utknęła",
+                    "Inclination angle too large": "Zbyt duży kąt nachylenia",
+                    "Last run error": "Błąd podczas ostatniego koszenia",
+                    "Orientation filter error": "Błąd filtra orientacji",
+                    "On-/Off error. Need PIN code to unlock": "Błąd włączania/wyłączania. Wymagany kod PIN do odblokowania",
+                    "Unsupported battery pack": "Nieobsługiwany akumulator",
+                    "Reminder blade life": "Przypomnienie: wymień noże",
+                    "SmartMowing disabled": "SmartMowing wyłączony",
+                    "Software update complete": "Aktualizacja oprogramowania zakończona",
+                    "Mower reachable. SmartMow is now enabled.": "Kosiarka jest ponownie dostępna. SmartMowing zostało włączone."
+                }
             },
             "firmware_version": {
                 "name": "Wersja oprogramowania"

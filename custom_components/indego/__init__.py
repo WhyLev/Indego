@@ -1709,12 +1709,27 @@ class IndegoHub:
         """Update SmartMowing predictive schedule."""
         _LOGGER.debug("Fetching predictive schedule from Bosch API")
 
-        await self._indego_client.update_predictive_schedule()
+        try:
+            await self._indego_client.update_predictive_schedule()
+        except Exception as exc:
+            _LOGGER.warning("Failed to fetch predictive schedule data: %s", exc)
+
+            if ENTITY_PREDICTIVE_SCHEDULE in self.entities:
+                sensor = self.entities[ENTITY_PREDICTIVE_SCHEDULE]
+                sensor.state = "not_scheduled"
+                sensor.set_attributes(
+                    {
+                        "last_updated": last_updated_now(),
+                        **_predictive_schedule_attributes(None, self._hass),
+                    }
+                )
+
+            return None
 
         schedule = getattr(self._indego_client, "predictive_schedule", None)
 
         if ENTITY_PREDICTIVE_SCHEDULE not in self.entities:
-            return
+            return schedule
 
         attrs = _predictive_schedule_attributes(schedule, self._hass)
 
@@ -2529,7 +2544,11 @@ class IndegoHub:
         """Update predictive calendar data / SmartMowing allowed mowing window."""
         _LOGGER.debug("Fetching predictive calendar from Bosch API")
 
-        await self._indego_client.update_predictive_calendar()
+        try:
+            await self._indego_client.update_predictive_calendar()
+        except Exception as exc:
+            _LOGGER.warning("Failed to fetch predictive calendar data: %s", exc)
+            return
 
         calendar = getattr(self._indego_client, "predictive_calendar", None)
 
@@ -2883,6 +2902,11 @@ class IndegoHub:
                     if ENTITY_MOWER_SVG_Y in self.entities:
                         self.entities[ENTITY_MOWER_SVG_Y].state = svg_y
 
+
+#                    current_state_code = self._indego_client.state.state
+#                    is_mowing = 500 <= current_state_code <= 799
+#                    now = datetime.now()
+
                     current_state_code = self._indego_client.state.state
                     stuck_detection_allowed = current_state_code not in self.STUCK_IGNORED_STATES
                     is_mowing = stuck_detection_allowed and (
@@ -2992,6 +3016,7 @@ class IndegoHub:
                     self._indego_client.generic_data,
                     "mowing_mode_description",
                     STATE_UNKNOWN,
+
                 )
 
                 effective_mowing_mode = self._forced_mowing_mode or mowing_mode
@@ -3004,6 +3029,7 @@ class IndegoHub:
                     self.entities[ENTITY_SMARTMOWING_SWITCH].is_on = (
                         str(effective_mowing_mode).lower() == "smartmowing"
                     )
+
             else:
                 _LOGGER.debug("Generic data is empty from API")
 
