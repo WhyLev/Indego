@@ -3135,23 +3135,27 @@ class IndegoHub:
         self._update_alert_state()
 
     def _update_alert_state(self):
-        """Set alert sensor state based on current active error code, not just unread status."""
+        """Set alert sensor state based on current active error code and unread alerts."""
         if ENTITY_ALERT not in self.entities:
             return
 
         # Check if state is available and has 'error' attribute, otherwise default to 0 (no error)
-        current_error = getattr(self._indego_client.state, "error", 0)
+        current_error = getattr(
+            getattr(self._indego_client, "state", None),
+            "error",
+            None,
+        )
 
-        # If there are no active errors (current_error == 0) but the mower state is None, check for unread alerts to determine if we should show a problem state
-        if current_error == 0 and self._indego_client.state is None:
-            unread_count = sum(
-                1 for alert in self._indego_client.alerts
-                if str(alert.read_status).strip().lower() == "unread"
-            )
-            self.entities[ENTITY_ALERT].state = unread_count > 0
-        else:
-            # Show "Problem" if there is an active error code, otherwise "OK"
-            self.entities[ENTITY_ALERT].state = current_error != 0
+        unread_count = sum(
+            1 for alert in (self._indego_client.alerts or [])
+            if str(alert.read_status).strip().lower() == "unread"
+        )
+
+        # Show "Problem" if there is an active error code, otherwise "OK"
+        self.entities[ENTITY_ALERT].state = (
+            current_error not in (None, 0, "0")
+            or unread_count > 0
+        )
 
     async def _update_updates_available(self):
         await self._indego_client.update_updates_available()
