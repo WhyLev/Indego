@@ -444,6 +444,7 @@
                 "name": "Horario de SmartMowing",
                 "state": {
                     "manual_calendar_active": "Calendario manual activo",
+                    "not_scheduled": "No programado",
                     "none": "Ninguno"
                 },
                 "state_attributes": {
