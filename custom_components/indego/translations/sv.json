@@ -444,6 +444,7 @@
                 "name": "SmartMowing-schema",
                 "state": {
                     "manual_calendar_active": "Manuell kalender aktiv",
+                    "not_scheduled": "Inte schemalagd",
                     "none": "Ingen"
                 },
                 "state_attributes": {
