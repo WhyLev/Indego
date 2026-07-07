@@ -321,6 +321,7 @@
                 "name": "SmartMowing Zeitplan",
                 "state": {
                     "manual_calendar_active": "Manueller Kalender aktiv",
+                    "not_scheduled": "Nicht geplant",
                     "none": "Keine"
                 },
                 "state_attributes": {
