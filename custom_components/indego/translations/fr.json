@@ -444,6 +444,7 @@
                 "name": "Programme SmartMowing",
                 "state": {
                     "manual_calendar_active": "Calendrier manuel actif",
+                    "not_scheduled": "Non planifié",
                     "none": "Aucun"
                 },
                 "state_attributes": {
