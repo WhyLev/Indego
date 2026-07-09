@@ -384,6 +384,7 @@
                 "name": "SmartMowing schedule",
                 "state": {
                     "manual_calendar_active": "Manual calendar active",
+                    "not_scheduled": "Not scheduled",
                     "none": "None"
                 },
                 "state_attributes": {

@@ -1969,15 +1969,19 @@ class IndegoHub:
         await self._update_security()
 
     async def _update_automatic_update(self):
-        automatic_update = await self._indego_client.get(
-            f"alms/{self._serial}/automaticUpdate"
-        )
-
+        try:
+            automatic_update = await self._indego_client.get(
+                f"alms/{self._serial}/automaticUpdate"
+            )
+        except Exception as exc:
+            _LOGGER.warning("Failed to fetch automatic update data: %s", exc)
+            return None
+    
         if ENTITY_AUTOMATIC_UPDATE in self.entities:
             self.entities[ENTITY_AUTOMATIC_UPDATE].is_on = bool(
                 automatic_update.get("allow_automatic_update")
             )
-
+    
         return automatic_update
 
     async def async_set_automatic_update(self, enabled: bool):
@@ -2591,22 +2595,30 @@ class IndegoHub:
         )
 
     async def _update_predictive_weather(self):
-        weather = await self._indego_client.get(
-            f"alms/{self._serial}/predictive/weather"
-        )
-
+        try:
+            weather = await self._indego_client.get(
+                f"alms/{self._serial}/predictive/weather"
+            )
+        except Exception as exc:
+            _LOGGER.warning("Failed to fetch predictive weather data: %s", exc)
+            return None
+    
         self._predictive_weather = weather
-
+    
         if ENTITY_PREDICTIVE_WEATHER in self.entities:
             self.entities[ENTITY_PREDICTIVE_WEATHER].weather_data = weather
-
+    
         return weather
 
     async def _update_calendar(self):
         """Update calendar data / planned mowing slots."""
         _LOGGER.debug("Fetching calendar from Bosch API")
 
-        await self._indego_client.update_calendar()
+        try:
+            await self._indego_client.update_calendar()
+        except Exception as exc:
+            _LOGGER.warning("Failed to fetch calendar data: %s", exc)
+            return None
 
         calendar = getattr(self._indego_client, "calendar", None)
 
