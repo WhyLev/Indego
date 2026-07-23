@@ -1428,9 +1428,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
         await instance.async_set_pin(pin)
 
-
-
-
     # In HASS we can have multiple Indego component instances as long as the mower serial is unique.
     # So the mower services should only need to be registered for the first instance.
     if CONF_SERVICES_REGISTERED not in hass.data[DOMAIN]:
@@ -1442,7 +1439,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             async_send_command,
             schema=SERVICE_SCHEMA_COMMAND
         )
-
         hass.services.async_register(
             DOMAIN,
             SERVICE_NAME_SMARTMOW,
@@ -1485,21 +1481,18 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             async_set_calendar_slot,
             schema=SERVICE_SCHEMA_SET_CALENDAR_SLOT,
         )
-
         hass.services.async_register(
             DOMAIN,
             SERVICE_NAME_SET_PREDICTIVE_MOWING_WINDOW,
             async_set_predictive_mowing_window,
             schema=SERVICE_SCHEMA_SET_PREDICTIVE_MOWING_WINDOW,
         )
-
         hass.services.async_register(
             DOMAIN,
             SERVICE_NAME_SET_BUMP_SENSITIVITY,
             async_set_bump_sensitivity,
             schema=SERVICE_SCHEMA_SET_BUMP_SENSITIVITY,
         )
-
         hass.services.async_register(
             DOMAIN,
             SERVICE_NAME_SET_PIN,
@@ -1624,6 +1617,14 @@ class IndegoHub:
         )
         self._indego_client.set_default_header(HTTP_HEADER_USER_AGENT, user_agent)
 
+    def entity_enabled(self, key: str | list[str]) -> bool:
+        keys = [key] if isinstance(key, str) else key
+
+        return all(
+            k in self.entities and self.entities[k].enabled
+            for k in keys
+        )
+
     async def async_set_calendar_slot(
         self,
         days: list[str],
@@ -1707,6 +1708,11 @@ class IndegoHub:
 
     async def _update_predictive_schedule(self):
         """Update SmartMowing predictive schedule."""
+
+        if not self.entity_enabled(ENTITY_PREDICTIVE_SCHEDULE):
+            _LOGGER.debug("Predictive schedule entity disabled, NOT updating predictive schedule from Bosch API")
+            return None
+
         _LOGGER.debug("Fetching predictive schedule from Bosch API")
 
         try:
@@ -1727,12 +1733,7 @@ class IndegoHub:
             return None
 
         schedule = getattr(self._indego_client, "predictive_schedule", None)
-
-        if ENTITY_PREDICTIVE_SCHEDULE not in self.entities:
-            return schedule
-
         attrs = _predictive_schedule_attributes(schedule, self._hass)
-
         sensor = self.entities[ENTITY_PREDICTIVE_SCHEDULE]
 
         if not _is_smartmowing_active(
@@ -1752,6 +1753,17 @@ class IndegoHub:
 
     async def _update_network(self):
         """Update mower network data."""
+
+        if not self.entity_enabled([
+            ENTITY_NETWORK_SIGNAL,
+            ENTITY_NETWORK_OPERATOR,
+            ENTITY_NETWORK_MODE
+        ]):
+            _LOGGER.debug("No network entities enabled, NOT updating network data from Bosch API")
+            return None
+
+        _LOGGER.debug("Fetching network data from Bosch API")
+
         try:
             network = await self._indego_client.get(
                 f"alms/{self._serial}/network"
@@ -1770,12 +1782,10 @@ class IndegoHub:
             )
 
         if ENTITY_NETWORK_OPERATOR in self.entities:
-            
             operator_name = NETWORK_OPERATORS.get(
                 (network.get("mcc"), network.get("mnc")),
                 f"{network.get('mcc')}-{network.get('mnc')}",
             )
-
             self.entities[ENTITY_NETWORK_OPERATOR].state = operator_name
 
             self.entities[ENTITY_NETWORK_OPERATOR].set_attributes(
@@ -1803,8 +1813,14 @@ class IndegoHub:
             )
 
         return network
+
     async def _update_config(self):
         """Update mower config data."""
+
+        if not self.entity_enabled(ENTITY_BUMP_SENSITIVITY):
+            _LOGGER.debug("No config entities enabled, NOT updating config data from Bosch API")
+            return None
+
         _LOGGER.debug("Fetching config data from Bosch API")
 
         try:
@@ -1815,29 +1831,27 @@ class IndegoHub:
             _LOGGER.warning("Failed to fetch config data from API: %s", exc)
             return None
 
+        value = _get_config_value(
+            config,
+            "bump_sensitivity",
+            "bumpSensitivity",
+            "bump_sens",
+            "bumpSens",
+        )
 
-        if ENTITY_BUMP_SENSITIVITY in self.entities:
-            value = _get_config_value(
-                config,
-                "bump_sensitivity",
-                "bumpSensitivity",
-                "bump_sens",
-                "bumpSens",
-            )
+        self.entities[ENTITY_BUMP_SENSITIVITY].state = (
+            _bump_sensitivity_state(value)
+            if value is not None
+            else STATE_UNKNOWN
+        )
 
-            self.entities[ENTITY_BUMP_SENSITIVITY].state = (
-                _bump_sensitivity_state(value)
-                if value is not None
-                else STATE_UNKNOWN
-            )
+        self.entities[ENTITY_BUMP_SENSITIVITY].set_attributes(
+            {
+                "last_updated": last_updated_now(),
+            }
+        )
 
-            self.entities[ENTITY_BUMP_SENSITIVITY].set_attributes(
-                {
-                    "last_updated": last_updated_now(),
-                }
-            )
-
-            self.entities[ENTITY_BUMP_SENSITIVITY].async_schedule_update_ha_state()
+        self.entities[ENTITY_BUMP_SENSITIVITY].async_schedule_update_ha_state()
 
         return config
 
@@ -1910,30 +1924,31 @@ class IndegoHub:
 
     async def _update_security(self):
         """Update mower security data."""
+
+        if not self.entity_enabled([
+            ENTITY_SECURITY_ENABLED,
+            ENTITY_AUTOLOCK,
+        ]):
+            _LOGGER.debug("No security entities enabled, NOT updating security data from Bosch API")
+            return None
+
+        _LOGGER.debug("Fetching security data from Bosch API")
+
         try:
             security = await self._indego_client.get(
                 f"alms/{self._serial}/security"
             )
-
-
-#            _LOGGER.warning(
-#                type(security),
-#            )
-
-            if ENTITY_SECURITY_ENABLED in self.entities:
-                self.entities[ENTITY_SECURITY_ENABLED].is_on = bool(security.get("enabled"))
-
-            if ENTITY_AUTOLOCK in self.entities:
-                self.entities[ENTITY_AUTOLOCK].is_on = bool(security.get("autolock"))
-
-            return security
-
         except Exception as exc:
-            _LOGGER.warning(
-                "Failed to fetch security data: %s",
-                exc,
-            )
+            _LOGGER.warning("Failed to fetch security data from API: %s", exc)
             return None
+
+        if ENTITY_SECURITY_ENABLED in self.entities:
+            self.entities[ENTITY_SECURITY_ENABLED].is_on = bool(security.get("enabled"))
+
+        if ENTITY_AUTOLOCK in self.entities:
+            self.entities[ENTITY_AUTOLOCK].is_on = bool(security.get("autolock"))
+
+        return security
 
     async def async_set_security_enabled(self, enabled: bool):
         payload = {
@@ -1969,6 +1984,12 @@ class IndegoHub:
         await self._update_security()
 
     async def _update_automatic_update(self):
+        if not self.entity_enabled(ENTITY_AUTOMATIC_UPDATE):
+            _LOGGER.debug("No automatic update entities enabled, NOT updating automatic update data from Bosch API")
+            return None
+
+        _LOGGER.debug("Fetching automatic update data from Bosch API")
+
         try:
             automatic_update = await self._indego_client.get(
                 f"alms/{self._serial}/automaticUpdate"
@@ -1977,11 +1998,10 @@ class IndegoHub:
             _LOGGER.warning("Failed to fetch automatic update data: %s", exc)
             return None
     
-        if ENTITY_AUTOMATIC_UPDATE in self.entities:
-            self.entities[ENTITY_AUTOMATIC_UPDATE].is_on = bool(
-                automatic_update.get("allow_automatic_update")
-            )
-    
+        self.entities[ENTITY_AUTOMATIC_UPDATE].is_on = bool(
+            automatic_update.get("allow_automatic_update")
+        )
+
         return automatic_update
 
     async def async_set_automatic_update(self, enabled: bool):
@@ -2001,8 +2021,14 @@ class IndegoHub:
             self.entities[ENTITY_AUTOMATIC_UPDATE].is_on = enabled
 
         await self._update_automatic_update()
+
     async def _update_predictive_setup(self):
         """Update SmartMowing setup data."""
+
+        if not self.entity_enabled(ENTITY_PREDICTIVE_SETUP):
+            _LOGGER.debug("Predictive setup entity disabled, NOT updating predictive setup from Bosch API")
+            return None
+
         try:
             setup = await self._indego_client.get(
                 f"alms/{self._serial}/predictive/setup"
@@ -2013,25 +2039,24 @@ class IndegoHub:
 
         garden_location = setup.get("garden_location", {}) or {}
 
-        if ENTITY_PREDICTIVE_SETUP in self.entities:
-            self.entities[ENTITY_PREDICTIVE_SETUP].state = "configured"
-            self.entities[ENTITY_PREDICTIVE_SETUP].set_attributes(
-                {
-                    "last_updated": last_updated_now(),
-                    "mowing_duration": setup.get("mowing_duration"),
-                    "full_cuts": setup.get("full_cuts"),
-                    "avoid_rain": setup.get("avoid_rain"),
-                    "avoid_temperature": setup.get("avoid_temperature"),
-                    "use_grass_growth": setup.get("use_grass_growth"),
-                    "rain_factor": setup.get("rain_factor"),
-                    "temperature_factor": setup.get("temperature_factor"),
-                    "garden_latitude": garden_location.get("latitude"),
-                    "garden_longitude": garden_location.get("longitude"),
-                    "garden_timezone": garden_location.get("timezone"),
-                    "garden_name": garden_location.get("name"),
-                    "garden_country": garden_location.get("country"),
-                }
-            )
+        self.entities[ENTITY_PREDICTIVE_SETUP].state = "configured"
+        self.entities[ENTITY_PREDICTIVE_SETUP].set_attributes(
+            {
+                "last_updated": last_updated_now(),
+                "mowing_duration": setup.get("mowing_duration"),
+                "full_cuts": setup.get("full_cuts"),
+                "avoid_rain": setup.get("avoid_rain"),
+                "avoid_temperature": setup.get("avoid_temperature"),
+                "use_grass_growth": setup.get("use_grass_growth"),
+                "rain_factor": setup.get("rain_factor"),
+                "temperature_factor": setup.get("temperature_factor"),
+                "garden_latitude": garden_location.get("latitude"),
+                "garden_longitude": garden_location.get("longitude"),
+                "garden_timezone": garden_location.get("timezone"),
+                "garden_name": garden_location.get("name"),
+                "garden_country": garden_location.get("country"),
+            }
+        )
 
         return setup
 
@@ -2546,6 +2571,11 @@ class IndegoHub:
 
     async def _update_predictive_calendar(self):
         """Update predictive calendar data / SmartMowing allowed mowing window."""
+
+        if not self.entity_enabled(ENTITY_PREDICTIVE_CALENDAR_SLOTS):
+            _LOGGER.debug("Predictive calendar entity disabled, NOT updating predictive calendar from Bosch API")
+            return
+
         _LOGGER.debug("Fetching predictive calendar from Bosch API")
 
         try:
@@ -2555,10 +2585,6 @@ class IndegoHub:
             return
 
         calendar = getattr(self._indego_client, "predictive_calendar", None)
-
-
-        if ENTITY_PREDICTIVE_CALENDAR_SLOTS not in self.entities:
-            return
 
         mowing_mode = getattr(
             self._indego_client.generic_data,
@@ -2595,6 +2621,12 @@ class IndegoHub:
         )
 
     async def _update_predictive_weather(self):
+        if not self.entity_enabled(ENTITY_PREDICTIVE_WEATHER):
+            _LOGGER.debug("Predictive weather entity disabled, NOT updating predictive weather from Bosch API")
+            return None
+
+        _LOGGER.debug("Fetching predictive weather from Bosch API")
+
         try:
             weather = await self._indego_client.get(
                 f"alms/{self._serial}/predictive/weather"
@@ -2604,14 +2636,16 @@ class IndegoHub:
             return None
     
         self._predictive_weather = weather
-    
-        if ENTITY_PREDICTIVE_WEATHER in self.entities:
-            self.entities[ENTITY_PREDICTIVE_WEATHER].weather_data = weather
-    
+        self.entities[ENTITY_PREDICTIVE_WEATHER].weather_data = weather
         return weather
 
     async def _update_calendar(self):
         """Update calendar data / planned mowing slots."""
+
+        if not self.entity_enabled(ENTITY_CALENDAR_SLOTS):
+            _LOGGER.debug("Calendar entity disabled, NOT updating calendar from Bosch API")
+            return None
+
         _LOGGER.debug("Fetching calendar from Bosch API")
 
         try:
@@ -2621,9 +2655,6 @@ class IndegoHub:
             return None
 
         calendar = getattr(self._indego_client, "calendar", None)
-
-        if ENTITY_CALENDAR_SLOTS not in self.entities:
-            return
 
         slots_by_day = _calendar_slots_by_day(calendar)
         today_name = _today_calendar_day_name()
@@ -2913,11 +2944,6 @@ class IndegoHub:
                         self.entities[ENTITY_MOWER_SVG_X].state = svg_x
                     if ENTITY_MOWER_SVG_Y in self.entities:
                         self.entities[ENTITY_MOWER_SVG_Y].state = svg_y
-
-
-#                    current_state_code = self._indego_client.state.state
-#                    is_mowing = 500 <= current_state_code <= 799
-#                    now = datetime.now()
 
                     current_state_code = self._indego_client.state.state
                     stuck_detection_allowed = current_state_code not in self.STUCK_IGNORED_STATES

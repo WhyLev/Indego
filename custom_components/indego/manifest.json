@@ -18,7 +18,7 @@
     "pyIndego"
   ],
   "requirements": [
-    "pyIndego==3.2.2"
+    "pyIndego==3.2.3"
   ],
   "version": "6.0.0"
 }
