@@ -1620,7 +1620,7 @@ class IndegoHub:
     def entity_enabled(self, key: str | list[str]) -> bool:
         keys = [key] if isinstance(key, str) else key
 
-        return all(
+        return any(
             k in self.entities and self.entities[k].enabled
             for k in keys
         )
