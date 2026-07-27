@@ -99,7 +99,7 @@ To keep your dashboard organized, the integration splits data into logical secti
 ### Option 1: Via HACS (Recommended)
 
 1. Add this repository to HACS (Community Store) 
-2. Search for "Bosch Indego"
+2. Search for "Bosch Indego Mower"
 3. Click "Install"  
 4. Restart Home Assistant
 
