@@ -114,7 +114,7 @@ If you want to use HACS but the integration is not yet in the default store, you
 3. Select **Custom repositories**.
 4. Add the GitHub link: `https://github.com/sander1988/Indego`
 5. Select **Integration** from the category dropdown menu.
-6. Click **Add**, then search for **"Bosch Indego Lawnmower"** in HACS and click install.
+6. Click **Add**, then search for **"Bosch Indego Mower"** in HACS and click install.
 
 ### Option 3: Manual Installation
 
