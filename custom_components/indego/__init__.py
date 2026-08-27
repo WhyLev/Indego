@@ -12,7 +12,12 @@ from aiohttp.client_exceptions import ClientResponseError
 import homeassistant.util.dt
 import voluptuous as vol
 from homeassistant.core import HomeAssistant, CoreState
-from homeassistant.exceptions import HomeAssistantError, ConfigEntryAuthFailed
+from homeassistant.exceptions import (
+    HomeAssistantError,
+    ConfigEntryAuthFailed,
+    OAuth2TokenRequestReauthError,
+    OAuth2TokenRequestTransientError,
+)
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     CONF_DEVICE_CLASS,
@@ -1605,7 +1610,19 @@ class IndegoHub:
         self._forced_mowing_mode = None # force mowing mode and calendar sensors to update
 
         async def async_token_refresh() -> str:
-            await session.async_ensure_token_valid()
+            """Ensure OAuth token is valid."""
+        
+            try:
+                await session.async_ensure_token_valid()
+        
+            except OAuth2TokenRequestReauthError as exc:
+                raise ConfigEntryAuthFailed(
+                    "Bosch OAuth refresh token is no longer valid"
+                ) from exc
+        
+            except OAuth2TokenRequestTransientError:
+                raise
+        
             return session.token["access_token"]
 
         self._indego_client = IndegoAsyncClient(
