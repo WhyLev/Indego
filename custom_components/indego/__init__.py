@@ -1319,7 +1319,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
         await instance._update_alerts()
         await instance._indego_client.delete_alert(index)
-        await instance._update_alerts()
+        await instance._update_alerts(force_alert_state=True)
 
     async def async_delete_alert_all(call):
         """Handle the service call."""
@@ -1358,7 +1358,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             await instance._indego_client.delete_all_alerts()
             await asyncio.sleep(5)
 
-        await instance._update_alerts()
+        await instance._update_alerts(force_alert_state=True)
 
     async def async_read_alert(call):
         """Handle the service call."""
@@ -1368,7 +1368,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
         await instance._update_alerts()
         await instance._indego_client.put_alert_read(index)
-        await instance._update_alerts()
+        await instance._update_alerts(force_alert_state=True)
 
     async def async_read_alert_all(call):
         """Handle the service call."""
@@ -1377,7 +1377,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
         await instance._update_alerts()
         await instance._indego_client.put_all_alerts_read()
-        await instance._update_alerts()
+        await instance._update_alerts(force_alert_state=True)
 
     async def async_download_map(call):
         """Handle the download_map service call."""
@@ -1587,6 +1587,7 @@ class IndegoHub:
         self._refresh_24h_remover = None
         self._shutdown = False
         self._latest_alert = None
+        self._empty_alert_refresh_count = 0
         self.entities = {}
         self._update_fail_count = None
         self._lawn_map = None
@@ -2783,8 +2784,6 @@ class IndegoHub:
             # Mark service as UP on successful response
             self.set_service_status(True)
 
-            self._update_alert_state()
-
             # Check for offline error codes (WiFi lost, API error, No connection to server)
             state_code = getattr(self._indego_client.state, 'state', None)
             if state_code in (802, 803, 804):
@@ -3115,16 +3114,9 @@ class IndegoHub:
 
         return self._indego_client.generic_data
 
-    async def _update_alerts(self):
+    async def _update_alerts(self, force_alert_state: bool = False):
 
         await self._indego_client.update_alerts()
-
-        # Show "Problem" only if there are unread alerts
-        unread_count = sum(
-            1 for alert in self._indego_client.alerts
-            if str(alert.read_status).strip().lower() == "unread"
-        )
-        self.entities[ENTITY_ALERT].state = unread_count > 0
 
         if self._indego_client.alerts:
             # Build complete alert attributes with enhanced error descriptions
@@ -3187,26 +3179,46 @@ class IndegoHub:
             while self.entities[ENTITY_ALERT].clear_attribute(f"error_{error_index}_code", False):
                 error_index += 1
 
-        self._update_alert_state()
+        self._update_alert_state(force=force_alert_state)
 
-    def _update_alert_state(self):
-        """Set alert sensor state based on current active error code, not just unread status."""
+    def _update_alert_state(self, force: bool = False):
+        """Update alert state based on unread alerts."""
         if ENTITY_ALERT not in self.entities:
             return
-
-        # Check if state is available and has 'error' attribute, otherwise default to 0 (no error)
-        current_error = getattr(self._indego_client.state, "error", 0)
-
-        # If there are no active errors (current_error == 0) but the mower state is None, check for unread alerts to determine if we should show a problem state
-        if current_error == 0 and self._indego_client.state is None:
-            unread_count = sum(
-                1 for alert in self._indego_client.alerts
-                if str(alert.read_status).strip().lower() == "unread"
-            )
-            self.entities[ENTITY_ALERT].state = unread_count > 0
-        else:
-            # Show "Problem" if there is an active error code, otherwise "OK"
-            self.entities[ENTITY_ALERT].state = current_error != 0
+    
+        alerts = self._indego_client.alerts or []
+    
+        has_unread_alerts = any(
+            str(alert.read_status).strip().lower() == "unread"
+            for alert in alerts
+        )
+    
+        if has_unread_alerts:
+            # At least one unread alert exists.
+            self._empty_alert_refresh_count = 0
+            self.entities[ENTITY_ALERT].state = True
+            return
+    
+        if alerts:
+            # Alerts exist, but all of them have been read.
+            self._empty_alert_refresh_count = 0
+            self.entities[ENTITY_ALERT].state = False
+            return
+    
+        if force:
+            # An explicit read/delete operation was performed.
+            # Accept the empty alert list immediately.
+            self._empty_alert_refresh_count = 0
+            self.entities[ENTITY_ALERT].state = False
+            return
+    
+        # Bosch may occasionally return an empty alert list during
+        # periodic refreshes. Require two consecutive empty responses
+        # before clearing the problem state.
+        self._empty_alert_refresh_count += 1
+    
+        if self._empty_alert_refresh_count >= 2:
+            self.entities[ENTITY_ALERT].state = False
 
     async def _update_updates_available(self):
         await self._indego_client.update_updates_available()
