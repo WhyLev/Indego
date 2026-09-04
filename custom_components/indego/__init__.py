@@ -332,6 +332,7 @@ ENTITY_DEFINITIONS = {
     },
     ENTITY_MOWER_STUCK: {
         CONF_TYPE: BINARY_SENSOR_TYPE,
+        CONF_ICON: "mdi:alert-circle-outline",
         CONF_DEVICE_CLASS: BinarySensorDeviceClass.PROBLEM,
         CONF_ATTR: ["stuck_since", "stuck_x", "stuck_y"],
         CONF_ENTITY_CATEGORY: EntityCategory.DIAGNOSTIC,
