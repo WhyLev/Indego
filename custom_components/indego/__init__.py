@@ -30,8 +30,17 @@ from homeassistant.const import (
     EVENT_HOMEASSISTANT_STOP,
     STATE_ON,
     STATE_UNKNOWN,
+    PERCENTAGE,
+    UnitOfArea,
+    UnitOfElectricPotential,
+    UnitOfEnergy,
+    UnitOfLength,
+    UnitOfPower,
+    UnitOfSignalStrength,
     UnitOfTemperature,
+    UnitOfTime,
 )
+
 from homeassistant.components.binary_sensor import BinarySensorDeviceClass
 from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
 from homeassistant.helpers import config_validation as cv
@@ -151,6 +160,7 @@ ENTITY_DEFINITIONS = {
         CONF_ICON: "mdi:cloud-check",
         CONF_DEVICE_CLASS: BinarySensorDeviceClass.CONNECTIVITY,
         CONF_ATTR: [],
+        CONF_ENTITY_CATEGORY: EntityCategory.DIAGNOSTIC,
         CONF_TRANSLATION_KEY: "online",
     },
     ENTITY_UPDATE_AVAILABLE: {
@@ -178,6 +188,7 @@ ENTITY_DEFINITIONS = {
             "error_0_message",
             "error_0_read",
         ],
+        CONF_ENTITY_CATEGORY: EntityCategory.DIAGNOSTIC,
         CONF_TRANSLATION_KEY: "indego_alert",
     },
     ENTITY_MOWER_STATE: {
@@ -202,9 +213,9 @@ ENTITY_DEFINITIONS = {
     },
     ENTITY_BATTERY: {
         CONF_TYPE: SENSOR_TYPE,
-        CONF_ICON: "battery",
+        CONF_ICON: "mdi:battery",
         CONF_DEVICE_CLASS: SensorDeviceClass.BATTERY,
-        CONF_UNIT_OF_MEASUREMENT: "%",
+        CONF_UNIT_OF_MEASUREMENT: PERCENTAGE,
         CONF_ATTR: [
             "last_updated",
             "voltage_V",
@@ -220,7 +231,7 @@ ENTITY_DEFINITIONS = {
         CONF_TYPE: SENSOR_TYPE,
         CONF_ICON: "mdi:grass",
         CONF_DEVICE_CLASS: None,
-        CONF_UNIT_OF_MEASUREMENT: "%",
+        CONF_UNIT_OF_MEASUREMENT: PERCENTAGE,
         CONF_ATTR: [
             "last_updated",
             "last_completed_mow",
@@ -229,13 +240,14 @@ ENTITY_DEFINITIONS = {
             "last_session_cut_min",
             "last_session_charge_min",
         ],
+        CONF_STATE_CLASS: SensorStateClass.MEASUREMENT,
         CONF_TRANSLATION_KEY: "lawn_mowed",
     },
     ENTITY_LAWN_MOWED_SIZE: {
         CONF_TYPE: SENSOR_TYPE,
         CONF_ICON: "mdi:grass",
         CONF_DEVICE_CLASS: SensorDeviceClass.AREA,
-        CONF_UNIT_OF_MEASUREMENT: "m²",
+        CONF_UNIT_OF_MEASUREMENT: UnitOfArea.SQUARE_METERS,
         CONF_ATTR: [
             "last_updated",
         ],
@@ -264,13 +276,14 @@ ENTITY_DEFINITIONS = {
         CONF_DEVICE_CLASS: None,
         CONF_UNIT_OF_MEASUREMENT: None,
         CONF_ATTR: [],
+        CONF_ENTITY_CATEGORY: EntityCategory.DIAGNOSTIC,
         CONF_TRANSLATION_KEY: "mowing_mode",
     },
     ENTITY_RUNTIME: {
         CONF_TYPE: SENSOR_TYPE,
         CONF_ICON: "mdi:information-outline",
-        CONF_DEVICE_CLASS: None,
-        CONF_UNIT_OF_MEASUREMENT: "h",
+        CONF_DEVICE_CLASS: SensorDeviceClass.DURATION,
+        CONF_UNIT_OF_MEASUREMENT: UnitOfTime.HOURS,
         CONF_ATTR: [
             "total_mowing_time_h",
             "total_charging_time_h",
@@ -288,9 +301,11 @@ ENTITY_DEFINITIONS = {
     ENTITY_GARDEN_SIZE: {
         CONF_TYPE: SENSOR_TYPE,
         CONF_ICON: "mdi:ruler-square",
-        CONF_DEVICE_CLASS: None,
-        CONF_UNIT_OF_MEASUREMENT: "m²",
+        CONF_DEVICE_CLASS: SensorDeviceClass.AREA,
+        CONF_UNIT_OF_MEASUREMENT: UnitOfArea.SQUARE_METERS,
         CONF_ATTR: [],
+        CONF_STATE_CLASS: SensorStateClass.MEASUREMENT,
+        CONF_ENTITY_CATEGORY: EntityCategory.DIAGNOSTIC,
         CONF_TRANSLATION_KEY: "garden_size",
     },
     ENTITY_CAMERA: {
@@ -304,6 +319,7 @@ ENTITY_DEFINITIONS = {
         CONF_UNIT_OF_MEASUREMENT: "px",
         CONF_ATTR: [],
         CONF_ENTITY_CATEGORY: EntityCategory.DIAGNOSTIC,
+        CONF_STATE_CLASS: SensorStateClass.MEASUREMENT,
         CONF_TRANSLATION_KEY: "mower_position_x",
     },
     ENTITY_MOWER_SVG_Y: {
@@ -313,13 +329,14 @@ ENTITY_DEFINITIONS = {
         CONF_UNIT_OF_MEASUREMENT: "px",
         CONF_ATTR: [],
         CONF_ENTITY_CATEGORY: EntityCategory.DIAGNOSTIC,
+        CONF_STATE_CLASS: SensorStateClass.MEASUREMENT,
         CONF_TRANSLATION_KEY: "mower_position_y",
     },
     ENTITY_MOWER_STUCK: {
         CONF_TYPE: BINARY_SENSOR_TYPE,
-        CONF_ICON: "mdi:alert-circle-outline",
         CONF_DEVICE_CLASS: BinarySensorDeviceClass.PROBLEM,
         CONF_ATTR: ["stuck_since", "stuck_x", "stuck_y"],
+        CONF_ENTITY_CATEGORY: EntityCategory.DIAGNOSTIC,
         CONF_TRANSLATION_KEY: "mower_stuck",
     },
     ENTITY_LAST_ERROR_CODE: {
@@ -328,6 +345,7 @@ ENTITY_DEFINITIONS = {
         CONF_DEVICE_CLASS: None,
         CONF_UNIT_OF_MEASUREMENT: None,
         CONF_ATTR: ["error_code", "error_time"],
+        CONF_ENTITY_CATEGORY: EntityCategory.DIAGNOSTIC,
         CONF_TRANSLATION_KEY: "last_error_code",
     },
     ENTITY_FIRMWARE_VERSION: {
@@ -342,9 +360,11 @@ ENTITY_DEFINITIONS = {
     ENTITY_MAINTENANCE_HOURS: {
         CONF_TYPE: SENSOR_TYPE,
         CONF_ICON: "mdi:tools",
-        CONF_DEVICE_CLASS: None,
-        CONF_UNIT_OF_MEASUREMENT: "h",
+        CONF_DEVICE_CLASS: SensorDeviceClass.DURATION,
+        CONF_UNIT_OF_MEASUREMENT: UnitOfTime.HOURS,
         CONF_ATTR: ["maintenance_status"],
+        CONF_STATE_CLASS: SensorStateClass.TOTAL_INCREASING,
+        CONF_ENTITY_CATEGORY: EntityCategory.DIAGNOSTIC,
         CONF_TRANSLATION_KEY: "maintenance_hours",
     },
     ENTITY_SESSION_COUNT: {
@@ -353,15 +373,18 @@ ENTITY_DEFINITIONS = {
         CONF_DEVICE_CLASS: None,
         CONF_UNIT_OF_MEASUREMENT: None,
         CONF_ATTR: [],
+        CONF_STATE_CLASS: SensorStateClass.TOTAL_INCREASING,
+        CONF_ENTITY_CATEGORY: EntityCategory.DIAGNOSTIC,
         CONF_TRANSLATION_KEY: "session_count",
     },
     ENTITY_BATTERY_VOLTAGE: {
         CONF_TYPE: SENSOR_TYPE,
         CONF_ICON: "mdi:lightning-bolt",
         CONF_DEVICE_CLASS: SensorDeviceClass.VOLTAGE,
-        CONF_UNIT_OF_MEASUREMENT: "V",
+        CONF_UNIT_OF_MEASUREMENT: UnitOfElectricPotential.VOLTS,
         CONF_ATTR: [],
         CONF_ENABLED_BY_DEFAULT: False,
+        CONF_STATE_CLASS: SensorStateClass.MEASUREMENT,
         CONF_ENTITY_CATEGORY: EntityCategory.DIAGNOSTIC,
         CONF_TRANSLATION_KEY: "battery_voltage",
     },
@@ -372,6 +395,7 @@ ENTITY_DEFINITIONS = {
         CONF_UNIT_OF_MEASUREMENT: UnitOfTemperature.CELSIUS,
         CONF_ATTR: [],
         CONF_ENABLED_BY_DEFAULT: False,
+        CONF_STATE_CLASS: SensorStateClass.MEASUREMENT,
         CONF_ENTITY_CATEGORY: EntityCategory.DIAGNOSTIC,
         CONF_TRANSLATION_KEY: "battery_temperature",
     },
@@ -382,6 +406,8 @@ ENTITY_DEFINITIONS = {
         CONF_UNIT_OF_MEASUREMENT: UnitOfTemperature.CELSIUS,
         CONF_ATTR: [],
         CONF_ENABLED_BY_DEFAULT: False,
+        CONF_STATE_CLASS: SensorStateClass.MEASUREMENT,
+        CONF_ENTITY_CATEGORY: EntityCategory.DIAGNOSTIC,
         CONF_TRANSLATION_KEY: "ambient_temperature",
     },
     ENTITY_BATTERY_CYCLES: {
@@ -391,6 +417,7 @@ ENTITY_DEFINITIONS = {
         CONF_UNIT_OF_MEASUREMENT: None,
         CONF_ATTR: [],
         CONF_ENABLED_BY_DEFAULT: False,
+        CONF_STATE_CLASS: SensorStateClass.TOTAL_INCREASING,
         CONF_ENTITY_CATEGORY: EntityCategory.DIAGNOSTIC,
         CONF_TRANSLATION_KEY: "battery_cycles",
     },
@@ -398,11 +425,11 @@ ENTITY_DEFINITIONS = {
         CONF_TYPE: SENSOR_TYPE,
         CONF_ICON: "mdi:battery-minus",
         CONF_DEVICE_CLASS: SensorDeviceClass.ENERGY,
-        CONF_UNIT_OF_MEASUREMENT: "Wh",
+        CONF_UNIT_OF_MEASUREMENT: UnitOfEnergy.WATT_HOUR,
         CONF_ATTR: [],
         CONF_ENABLED_BY_DEFAULT: False,
         CONF_ENTITY_CATEGORY: EntityCategory.DIAGNOSTIC,
-        CONF_STATE_CLASS: SensorStateClass.TOTAL_INCREASING,
+        CONF_STATE_CLASS: SensorStateClass.MEASUREMENT,
         CONF_TRANSLATION_KEY: "battery_discharge",
     },
     ENTITY_BATTERY_CHARGING: {
@@ -537,19 +564,20 @@ ENTITY_DEFINITIONS = {
             "exclusion_sunday_user",
             "exclusion_sunday_weather",
         ],
+        CONF_ENTITY_CATEGORY: EntityCategory.DIAGNOSTIC,
         CONF_TRANSLATION_KEY: "predictive_schedule",
     },
     ENTITY_NETWORK_SIGNAL: {
         CONF_TYPE: SENSOR_TYPE,
         CONF_ICON: "mdi:signal-cellular-outline",
-        CONF_DEVICE_CLASS: None,
-        CONF_UNIT_OF_MEASUREMENT: "dBm",
+        CONF_DEVICE_CLASS: SensorDeviceClass.SIGNAL_STRENGTH,
+        CONF_UNIT_OF_MEASUREMENT: SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
         CONF_ATTR: ["last_updated"],
         CONF_TRANSLATION_KEY: "network_signal",
         CONF_ENTITY_CATEGORY: EntityCategory.DIAGNOSTIC,
+        CONF_STATE_CLASS: SensorStateClass.MEASUREMENT,
         CONF_ENABLED_BY_DEFAULT: False,
     },
-
     ENTITY_NETWORK_OPERATOR: {
         CONF_TYPE: SENSOR_TYPE,
         CONF_ICON: "mdi:access-point-network",
@@ -606,6 +634,7 @@ ENTITY_DEFINITIONS = {
         CONF_ATTR: [
             "last_updated",
         ],
+        CONF_ENTITY_CATEGORY: EntityCategory.DIAGNOSTIC,
         CONF_TRANSLATION_KEY: "bump_sensitivity",
     },
     ENTITY_SECURITY_ENABLED: {
@@ -633,7 +662,6 @@ ENTITY_DEFINITIONS = {
         CONF_ENTITY_CATEGORY: EntityCategory.CONFIG,
     },
 }
-
 
 def format_indego_date(date: datetime) -> str:
     return date.astimezone().strftime("%Y-%m-%d %H:%M:%S")
