@@ -317,7 +317,7 @@ ENTITY_DEFINITIONS = {
         CONF_UNIT_OF_MEASUREMENT: "px",
         CONF_ATTR: [],
         CONF_ENTITY_CATEGORY: EntityCategory.DIAGNOSTIC,
-        CONF_STATE_CLASS: SensorStateClass.MEASUREMENT,
+        CONF_STATE_CLASS: None,
         CONF_TRANSLATION_KEY: "mower_position_x",
     },
     ENTITY_MOWER_SVG_Y: {
@@ -327,7 +327,7 @@ ENTITY_DEFINITIONS = {
         CONF_UNIT_OF_MEASUREMENT: "px",
         CONF_ATTR: [],
         CONF_ENTITY_CATEGORY: EntityCategory.DIAGNOSTIC,
-        CONF_STATE_CLASS: SensorStateClass.MEASUREMENT,
+        CONF_STATE_CLASS: None,
         CONF_TRANSLATION_KEY: "mower_position_y",
     },
     ENTITY_MOWER_STUCK: {
