@@ -379,7 +379,7 @@ ENTITY_DEFINITIONS = {
         CONF_TYPE: SENSOR_TYPE,
         CONF_ICON: "mdi:lightning-bolt",
         CONF_DEVICE_CLASS: SensorDeviceClass.VOLTAGE,
-        CONF_UNIT_OF_MEASUREMENT: UnitOfElectricPotential.VOLTS,
+        CONF_UNIT_OF_MEASUREMENT: UnitOfElectricPotential.VOLT,
         CONF_ATTR: [],
         CONF_ENABLED_BY_DEFAULT: False,
         CONF_STATE_CLASS: SensorStateClass.MEASUREMENT,
