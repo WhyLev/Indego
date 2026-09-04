@@ -166,7 +166,7 @@ ENTITY_DEFINITIONS = {
         CONF_ICON: "mdi:download-outline",
         CONF_DEVICE_CLASS: BinarySensorDeviceClass.UPDATE,
         CONF_ATTR: [],
-        CONF_ENTITY_CATEGORY: None,
+        CONF_ENTITY_CATEGORY: EntityCategory.DIAGNOSTIC,
         CONF_TRANSLATION_KEY: "update_available",
     },
     ENTITY_ALERT: {
