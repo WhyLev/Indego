@@ -158,7 +158,7 @@ ENTITY_DEFINITIONS = {
         CONF_ICON: "mdi:cloud-check",
         CONF_DEVICE_CLASS: BinarySensorDeviceClass.CONNECTIVITY,
         CONF_ATTR: [],
-        CONF_ENTITY_CATEGORY: EntityCategory.DIAGNOSTIC,
+        CONF_ENTITY_CATEGORY: None,
         CONF_TRANSLATION_KEY: "online",
     },
     ENTITY_UPDATE_AVAILABLE: {
@@ -166,7 +166,7 @@ ENTITY_DEFINITIONS = {
         CONF_ICON: "mdi:download-outline",
         CONF_DEVICE_CLASS: BinarySensorDeviceClass.UPDATE,
         CONF_ATTR: [],
-        CONF_ENTITY_CATEGORY: EntityCategory.DIAGNOSTIC,
+        CONF_ENTITY_CATEGORY: None,
         CONF_TRANSLATION_KEY: "update_available",
     },
     ENTITY_ALERT: {
@@ -186,7 +186,7 @@ ENTITY_DEFINITIONS = {
             "error_0_message",
             "error_0_read",
         ],
-        CONF_ENTITY_CATEGORY: EntityCategory.DIAGNOSTIC,
+        CONF_ENTITY_CATEGORY: None,
         CONF_TRANSLATION_KEY: "indego_alert",
     },
     ENTITY_MOWER_STATE: {
@@ -274,7 +274,7 @@ ENTITY_DEFINITIONS = {
         CONF_DEVICE_CLASS: None,
         CONF_UNIT_OF_MEASUREMENT: None,
         CONF_ATTR: [],
-        CONF_ENTITY_CATEGORY: EntityCategory.DIAGNOSTIC,
+        CONF_ENTITY_CATEGORY: None,
         CONF_TRANSLATION_KEY: "mowing_mode",
     },
     ENTITY_RUNTIME: {
@@ -303,7 +303,7 @@ ENTITY_DEFINITIONS = {
         CONF_UNIT_OF_MEASUREMENT: UnitOfArea.SQUARE_METERS,
         CONF_ATTR: [],
         CONF_STATE_CLASS: SensorStateClass.MEASUREMENT,
-        CONF_ENTITY_CATEGORY: EntityCategory.DIAGNOSTIC,
+        CONF_ENTITY_CATEGORY: None,
         CONF_TRANSLATION_KEY: "garden_size",
     },
     ENTITY_CAMERA: {
@@ -335,7 +335,7 @@ ENTITY_DEFINITIONS = {
         CONF_ICON: "mdi:alert-circle-outline",
         CONF_DEVICE_CLASS: BinarySensorDeviceClass.PROBLEM,
         CONF_ATTR: ["stuck_since", "stuck_x", "stuck_y"],
-        CONF_ENTITY_CATEGORY: EntityCategory.DIAGNOSTIC,
+        CONF_ENTITY_CATEGORY: None,
         CONF_TRANSLATION_KEY: "mower_stuck",
     },
     ENTITY_LAST_ERROR_CODE: {
@@ -344,7 +344,7 @@ ENTITY_DEFINITIONS = {
         CONF_DEVICE_CLASS: None,
         CONF_UNIT_OF_MEASUREMENT: None,
         CONF_ATTR: ["error_code", "error_time"],
-        CONF_ENTITY_CATEGORY: EntityCategory.DIAGNOSTIC,
+        CONF_ENTITY_CATEGORY: None,
         CONF_TRANSLATION_KEY: "last_error_code",
     },
     ENTITY_FIRMWARE_VERSION: {
@@ -563,7 +563,7 @@ ENTITY_DEFINITIONS = {
             "exclusion_sunday_user",
             "exclusion_sunday_weather",
         ],
-        CONF_ENTITY_CATEGORY: EntityCategory.DIAGNOSTIC,
+        CONF_ENTITY_CATEGORY: None,
         CONF_TRANSLATION_KEY: "predictive_schedule",
     },
     ENTITY_NETWORK_SIGNAL: {
@@ -623,7 +623,7 @@ ENTITY_DEFINITIONS = {
             "garden_country",
         ],
         CONF_TRANSLATION_KEY: "predictive_setup",
-        CONF_ENTITY_CATEGORY: EntityCategory.DIAGNOSTIC,
+        CONF_ENTITY_CATEGORY: None,
     },
     ENTITY_BUMP_SENSITIVITY: {
         CONF_TYPE: SENSOR_TYPE,
