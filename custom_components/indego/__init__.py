@@ -179,9 +179,13 @@ ENTITY_DEFINITIONS = {
             "last_alert_error_code",
             "last_alert_date",
             "last_alert_read",
+            "last_alert_severity",
+            "last_alert_severity_value",
             "error_0",
             "error_0_code",
             "error_0_description",
+            "error_0_severity",
+            "error_0_severity_value",
             "error_0_timestamp",
             "error_0_message",
             "error_0_read",
@@ -343,7 +347,14 @@ ENTITY_DEFINITIONS = {
         CONF_ICON: "mdi:alert",
         CONF_DEVICE_CLASS: None,
         CONF_UNIT_OF_MEASUREMENT: None,
-        CONF_ATTR: ["error_code", "error_time"],
+        CONF_ATTR: [
+            "error_code",
+            "error_time",
+            "error_severity",
+            "error_severity_value",
+            "error_context",
+            "user_action",
+        ],
         CONF_ENTITY_CATEGORY: None,
         CONF_TRANSLATION_KEY: "last_error_code",
     },
@@ -2793,6 +2804,30 @@ class IndegoHub:
                 "last_service_error": self._last_service_error
             })
 
+    def _has_critical_unread_alerts(self) -> bool:
+        """Check for unread alerts with ERROR or CRITICAL severity."""
+        if not hasattr(self, "_indego_client"):
+            return False
+
+        alerts = getattr(self._indego_client, "alerts", [])
+        if not alerts:
+            return False
+
+        for alert in alerts:
+            read_status = getattr(alert, "read_status", None)
+            if read_status is not False:
+                continue
+
+            error_code = getattr(alert, "error_code", None)
+            if error_code is None or error_code == "":
+                continue
+
+            severity = get_error_severity(str(error_code))
+            if severity.value >= ErrorSeverity.ERROR.value:
+                return True
+
+        return False
+
     async def _update_state(self, longpoll: bool = True):
         try:
             _LOGGER.debug("Fetching mower state from Bosch API (longpoll: %s)", longpoll)
@@ -3018,77 +3053,82 @@ class IndegoHub:
                     current_state_code = getattr(self._indego_client.state, 'state', None)
                     now = datetime.now()
 
-                    # 1. Ignored states → never stuck
-                    if current_state_code in self.STUCK_IGNORED_STATES:
+                    # Safety check: if state code is None, skip stuck detection
+                    if current_state_code is None:
                         stuck = False
-                        _LOGGER.debug(
-                            "Stuck detection ignored for state %s (%s)",
-                            current_state_code,
-                            self._indego_client.state_description_detail
-                        )
+                        _LOGGER.debug("State code is None - skipping stuck detection")
                     else:
-                        # 2. State change detection
-                        if current_state_code != self._last_state_code:
-                            # State has changed → reset timers and allow grace period
-                            self._last_state_code = current_state_code
-                            self._state_change_time = now
-                            self._last_position_change_time = now
-                            self._last_svg_x = svg_x
-                            self._last_svg_y = svg_y
+                        # 1. Ignored states → never stuck
+                        if current_state_code in self.STUCK_IGNORED_STATES:
                             stuck = False
                             _LOGGER.debug(
-                                "State changed to %s (%s) – resetting stuck timers",
+                                "Stuck detection ignored for state %s (%s)",
                                 current_state_code,
                                 self._indego_client.state_description_detail
                             )
                         else:
-                            # State unchanged → check if stuck
-                            # 3. Grace period after state change
-                            if self._state_change_time is not None:
-                                time_since_state_change = (now - self._state_change_time).total_seconds()
-                                if time_since_state_change < self.STATE_CHANGE_GRACE_PERIOD:
-                                    stuck = False
-                                    _LOGGER.debug(
-                                        "Still in grace period after state change (%.1fs < %ds)",
-                                        time_since_state_change,
-                                        self.STATE_CHANGE_GRACE_PERIOD
-                                    )
-                                else:
-                                    # 4. Determine if mowing session is active
-                                    is_mowing = 500 <= current_state_code <= 799
-                                    if is_mowing:
-                                        # 5. Grace period after mowing start
-                                        if self._mowing_session_start_time is None:
-                                            self._mowing_session_start_time = now
-                                            _LOGGER.debug("Mowing session started")
-
-                                        session_duration = (now - self._mowing_session_start_time).total_seconds()
-                                        if session_duration < self.MOWING_SESSION_GRACE_PERIOD:
-                                            stuck = False
-                                            _LOGGER.debug(
-                                                "Mowing session in grace period (%.1fs < %ds)",
-                                                session_duration,
-                                                self.MOWING_SESSION_GRACE_PERIOD
-                                            )
-                                        else:
-                                            # 6. Check position change with state-specific timeout
-                                            timeout = self.STUCK_DETECTION_TIMEOUTS.get(current_state_code, 300)
-                                            time_since_move = (now - self._last_position_change_time).total_seconds()
-                                            stuck = time_since_move > timeout
-                                            if stuck:
-                                                _LOGGER.warning(
-                                                    "Mower stuck – no position change for %ds (state %d, timeout %ds)",
-                                                    int(time_since_move),
-                                                    current_state_code,
-                                                    timeout
-                                                )
-                                    else:
-                                        # Not mowing – no stuck detection
+                            # 2. State change detection
+                            if current_state_code != self._last_state_code:
+                                # State has changed → reset timers and allow grace period
+                                self._last_state_code = current_state_code
+                                self._state_change_time = now
+                                self._last_position_change_time = now
+                                self._last_svg_x = svg_x
+                                self._last_svg_y = svg_y
+                                stuck = False
+                                _LOGGER.debug(
+                                    "State changed to %s (%s) – resetting stuck timers",
+                                    current_state_code,
+                                    self._indego_client.state_description_detail
+                                )
+                            else:
+                                # State unchanged → check if stuck
+                                # 3. Grace period after state change
+                                if self._state_change_time is not None:
+                                    time_since_state_change = (now - self._state_change_time).total_seconds()
+                                    if time_since_state_change < self.STATE_CHANGE_GRACE_PERIOD:
                                         stuck = False
                                         _LOGGER.debug(
-                                            "Not mowing – stuck detection skipped (state %s)",
-                                            self._indego_client.state_description_detail
+                                            "Still in grace period after state change (%.1fs < %ds)",
+                                            time_since_state_change,
+                                            self.STATE_CHANGE_GRACE_PERIOD
                                         )
+                                    else:
+                                        # 4. Determine if mowing session is active
+                                        is_mowing = 500 <= current_state_code <= 799
+                                        if is_mowing:
+                                            # 5. Grace period after mowing start
+                                            if self._mowing_session_start_time is None:
+                                                self._mowing_session_start_time = now
+                                                _LOGGER.debug("Mowing session started")
+
+                                            session_duration = (now - self._mowing_session_start_time).total_seconds()
+                                            if session_duration < self.MOWING_SESSION_GRACE_PERIOD:
+                                                stuck = False
+                                                _LOGGER.debug(
+                                                    "Mowing session in grace period (%.1fs < %ds)",
+                                                    session_duration,
+                                                    self.MOWING_SESSION_GRACE_PERIOD
+                                                )
+                                            else:
+                                                # 6. Check position change with state-specific timeout
+                                                timeout = self.STUCK_DETECTION_TIMEOUTS.get(current_state_code, 300)
+                                                time_since_move = (now - self._last_position_change_time).total_seconds()
+                                                stuck = time_since_move > timeout
+                                                if stuck:
+                                                    _LOGGER.warning(
+                                                        "Mower stuck – no position change for %ds (state %d, timeout %ds)",
+                                                        int(time_since_move),
+                                                        current_state_code,
+                                                        timeout
+                                                    )
+                                        else:
+                                            # Not mowing – no stuck detection
+                                            stuck = False
+                                            _LOGGER.debug(
+                                                "Not mowing – stuck detection skipped (state %s)",
+                                                self._indego_client.state_description_detail
+                                            )
 
                     # Update stuck sensor
                     if ENTITY_MOWER_STUCK in self.entities:
@@ -3108,7 +3148,7 @@ class IndegoHub:
                             })
 
                     # Update position and trail (only for mowing states)
-                    if 500 <= current_state_code <= 799:
+                    if current_state_code is not None and 500 <= current_state_code <= 799:
                         self._map_trail.append((svg_x, svg_y))
 
                     # Update map SVG (existing call)
@@ -3210,12 +3250,26 @@ class IndegoHub:
                 "last_alert_read": self._indego_client.alerts[0].read_status,
             }
 
+            # Add severity for last alert (with safety check)
+            last_error_code = str(self._indego_client.alerts[0].error_code) if self._indego_client.alerts[0].error_code else ""
+            if last_error_code and last_error_code != "":
+                last_severity = get_error_severity(last_error_code)
+                alert_attributes["last_alert_severity"] = last_severity.name
+                alert_attributes["last_alert_severity_value"] = last_severity.value
+            else:
+                alert_attributes["last_alert_severity"] = "INFO"
+                alert_attributes["last_alert_severity_value"] = 0
+
             # Always store all alerts as individual attributes for easy extraction in automations
             for index, alert in enumerate(self._indego_client.alerts):
-                error_code = str(alert.error_code)
+                error_code = str(alert.error_code) if alert.error_code else ""
                 # Use new comprehensive error description
-                error_desc = get_error_description(error_code)
-                error_severity = get_error_severity(error_code)
+                if error_code and error_code != "":
+                    error_desc = get_error_description(error_code)
+                    error_severity = get_error_severity(error_code)
+                else:
+                    error_desc = "Unknown error"
+                    error_severity = ErrorSeverity.INFO
                 alert_time = format_indego_date(alert.date)
 
                 # Format: "ERROR_CODE: Error Description - 2024-01-01 12:34:56 [SEVERITY]"
@@ -3225,6 +3279,7 @@ class IndegoHub:
                 alert_attributes[f"error_{index}_code"] = error_code
                 alert_attributes[f"error_{index}_description"] = error_desc
                 alert_attributes[f"error_{index}_severity"] = error_severity.name
+                alert_attributes[f"error_{index}_severity_value"] = error_severity.value
                 alert_attributes[f"error_{index}_timestamp"] = alert_time
                 alert_attributes[f"error_{index}_message"] = alert.message
                 alert_attributes[f"error_{index}_read"] = alert.read_status
@@ -3390,35 +3445,60 @@ class IndegoHub:
         try:
             if self._indego_client.alerts and len(self._indego_client.alerts) > 0:
                 latest_alert = self._indego_client.alerts[0]
-                error_code = str(latest_alert.error_code)
+                error_code = str(latest_alert.error_code) if latest_alert.error_code else ""
 
                 # Use new comprehensive error description
-                error_description = get_error_description(error_code)
-                error_severity = get_error_severity(error_code)
+                if error_code and error_code != "":
+                    error_description = get_error_description(error_code)
+                    error_severity = get_error_severity(error_code)
+                    error_details, _ = parse_composite_error(error_code)
+                else:
+                    error_description = "No error code"
+                    error_severity = ErrorSeverity.INFO
+                    error_details = None
 
                 self._last_error_code = error_code
                 self._last_error_time = latest_alert.date
 
                 self.entities[ENTITY_LAST_ERROR_CODE].state = error_description
-                self.entities[ENTITY_LAST_ERROR_CODE].add_attributes({
+                attributes = {
                     "error_code": error_code,
                     "error_time": format_indego_date(latest_alert.date),
                     "error_severity": error_severity.name,
-                })
+                    "error_severity_value": error_severity.value,
+                }
 
-                # Log mower error message
-                _LOGGER.info(
-                    "Mower %s: %s (Code: %s)",
-                    error_severity.name.lower(),
-                    error_description,
-                    error_code,
-                )
+                # Add context and user action if available
+                if error_details:
+                    if "context" in error_details:
+                        attributes["error_context"] = error_details["context"]
+                    if "user_action" in error_details:
+                        attributes["user_action"] = error_details["user_action"]
+
+                self.entities[ENTITY_LAST_ERROR_CODE].add_attributes(attributes)
+
+                # Log based on severity
+                if error_severity.value >= 2:
+                    _LOGGER.error(
+                        "Mower %s: %s (Code: %s)",
+                        error_severity.name.lower(),
+                        error_description,
+                        error_code,
+                    )
+                else:
+                    _LOGGER.info(
+                        "Mower %s: %s (Code: %s)",
+                        error_severity.name.lower(),
+                        error_description,
+                        error_code,
+                    )
             else:
                 self.entities[ENTITY_LAST_ERROR_CODE].state = "No errors"
                 self.entities[ENTITY_LAST_ERROR_CODE].add_attributes({
                     "error_code": "0",
                     "error_time": "N/A",
                     "error_severity": ErrorSeverity.INFO.name,
+                    "error_severity_value": ErrorSeverity.INFO.value,
                 })
         except Exception as exc:
             _LOGGER.error("Failed to process error tracking: %s", str(exc))

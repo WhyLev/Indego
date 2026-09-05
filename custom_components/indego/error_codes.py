@@ -209,7 +209,7 @@ DEVICE_ERROR_CODES: Dict[str, Dict[str, Any]] = {
     "1148": {"msg": "On-/Off error. Need PIN code to unlock", "severity": "ERROR"},
     "1156": {"msg": "Unsupported battery pack", "severity": "ERROR"},
 
-    # Special Alert Codes (string-based) – now with correct severity
+    # Special Alert Codes (string-based) – with correct severity
     "ntfy_blade_life": {"msg": "Reminder blade life", "severity": "INFO"},
     "smartMow.mowerUnreachable": {"msg": "SmartMowing disabled", "severity": "WARNING"},
     "firmware.updateComplete": {"msg": "Software update complete", "severity": "INFO"},
@@ -374,18 +374,39 @@ class ErrorSeverity(Enum):
 # =============================================================================
 
 def get_mower_state_info(state_code: str) -> Optional[dict]:
-    """Get mower state information."""
+    """Get mower state information.
+
+    Args:
+        state_code: State code as string
+
+    Returns:
+        Dict with 'name', 'display', 'state' or None
+    """
     return MOWER_STATE_CODES.get(str(state_code))
 
 def get_device_error_description(error_code: str) -> str:
-    """Get device/hardware error description."""
+    """Get device/hardware error description.
+
+    Args:
+        error_code: Error code as string
+
+    Returns:
+        Error description string
+    """
     entry = DEVICE_ERROR_CODES.get(str(error_code))
     if entry:
         return entry.get("msg", f"Unknown device error: {error_code}")
     return f"Unknown device error: {error_code}"
 
 def get_device_error_severity(error_code: str) -> ErrorSeverity:
-    """Get device/hardware error severity."""
+    """Get device/hardware error severity.
+
+    Args:
+        error_code: Error code as string
+
+    Returns:
+        ErrorSeverity enum value
+    """
     entry = DEVICE_ERROR_CODES.get(str(error_code))
     if entry:
         severity_str = entry.get("severity", "ERROR")
@@ -399,24 +420,56 @@ def get_device_error_severity(error_code: str) -> ErrorSeverity:
     return ErrorSeverity.ERROR
 
 def get_api_error_details(error_suffix: str) -> Optional[dict]:
-    """Get API error details from suffix."""
+    """Get API error details from suffix.
+
+    Args:
+        error_suffix: Error suffix (e.g., "_12292", "_10752")
+
+    Returns:
+        Dict with 'msg', 'severity', 'context' or None
+    """
     return API_ERROR_CODES.get(error_suffix)
 
 def get_http_error_pattern(composite_code: str) -> Optional[dict]:
-    """Get HTTP error pattern details."""
+    """Get HTTP error pattern details.
+
+    Args:
+        composite_code: Composite error code (e.g., "04_409", "16_500_12288")
+
+    Returns:
+        Dict with 'msg', 'severity', 'context' or None
+    """
+    # Try exact match first
     if composite_code in HTTP_ERROR_PATTERNS:
         return HTTP_ERROR_PATTERNS[composite_code]
+
+    # Check for XX_5XX pattern (mower disabled)
     if "_5" in composite_code and "XX" not in composite_code:
         parts = composite_code.split("_")
         if len(parts) >= 2 and parts[1].startswith("5"):
             return HTTP_ERROR_PATTERNS.get("XX_5XX")
+
     return None
 
 def parse_composite_error(error_code: str) -> Tuple[Optional[dict], Optional[str]]:
-    """Parse composite error code and extract details."""
+    """Parse composite error code and extract details.
+
+    Handles formats:
+    - State Code: "257" (mower state)
+    - API Suffix: "_12292" (API error)
+    - HTTP Pattern: "09_409" (HTTP conflict)
+    - HTTP + Suffix: "16_500_12288" (HTTP 500 with mower error)
+    - Simple device error: "104" (device error)
+
+    Args:
+        error_code: Error code string
+
+    Returns:
+        Tuple of (error_details_dict, error_description_str)
+    """
     error_code = str(error_code).strip()
 
-    # 1. Check mower state
+    # 1. Check if it's a mower state code
     state_info = get_mower_state_info(error_code)
     if state_info:
         return (
@@ -424,15 +477,16 @@ def parse_composite_error(error_code: str) -> Tuple[Optional[dict], Optional[str
             state_info["display"]
         )
 
-    # 2. Check API suffix
+    # 2. Check if it's an API suffix (starts with "_")
     if error_code.startswith("_"):
         api_details = get_api_error_details(error_code)
         if api_details:
             return (api_details, api_details["msg"])
 
-    # 3. Check HTTP pattern
+    # 3. Check if it's a composite HTTP pattern (contains "_" and at least one digit)
     if "_" in error_code and any(c.isdigit() for c in error_code):
         parts = error_code.split("_")
+        # HTTP pattern with suffix (e.g., "16_500_12288")
         if len(parts) >= 3 and parts[1].isdigit():
             http_pattern = "_".join(parts[:2])
             error_suffix = "_" + parts[2]
@@ -445,11 +499,12 @@ def parse_composite_error(error_code: str) -> Tuple[Optional[dict], Optional[str
                     {"msg": combined_msg, "severity": severity, "context": http_details.get("context")},
                     combined_msg
                 )
+        # Pure HTTP pattern (e.g., "09_409")
         http_details = get_http_error_pattern(error_code)
         if http_details:
             return (http_details, http_details["msg"])
 
-    # 4. Check device error (with severity)
+    # 4. Check if it's a device error (with severity)
     device_entry = DEVICE_ERROR_CODES.get(error_code)
     if device_entry:
         msg = device_entry["msg"]
@@ -463,12 +518,26 @@ def parse_composite_error(error_code: str) -> Tuple[Optional[dict], Optional[str
     return (None, f"Unknown error code: {error_code}")
 
 def get_error_description(error_code: str) -> str:
-    """Get human-readable error description."""
+    """Get human-readable error description.
+
+    Args:
+        error_code: Error code as string
+
+    Returns:
+        Error description or "Unknown error code" if not found
+    """
     _, description = parse_composite_error(error_code)
     return description
 
 def get_error_severity(error_code: str) -> ErrorSeverity:
-    """Get error severity level."""
+    """Get error severity level.
+
+    Args:
+        error_code: Error code as string
+
+    Returns:
+        ErrorSeverity enum value
+    """
     details, _ = parse_composite_error(error_code)
     if details and "severity" in details:
         severity_str = details["severity"]

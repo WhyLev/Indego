@@ -174,10 +174,21 @@ class IndegoLawnMower(IndegoEntity, LawnMowerEntity):
                 has_critical_unread,
             )
 
-        # Log unsupported states
+        # Log unsupported states - only for truly unknown states
         if self._attr_activity == LawnMowerActivity.ERROR and not has_critical_unread:
-            _LOGGER.warning(
-                "Unsupported or error state detected: %d (%s)",
-                self._attr_indego_state,
-                self._attr_indego_state_detail,
-            )
+            # Check if this state was explicitly classified via STATE_CLASSIFICATION_TO_ACTIVITY
+            if state_info and state_info.get("state") in STATE_CLASSIFICATION_TO_ACTIVITY:
+                # State is known but classified as ERROR - log as debug
+                _LOGGER.debug(
+                    "Mower state %d classified as ERROR: %s (state: %s)",
+                    self._attr_indego_state,
+                    self._attr_indego_state_detail,
+                    state_info.get("state"),
+                )
+            else:
+                # Truly unknown state - log as warning
+                _LOGGER.warning(
+                    "Unsupported or unknown state detected: %d (%s)",
+                    self._attr_indego_state,
+                    self._attr_indego_state_detail,
+                )
