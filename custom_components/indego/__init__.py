@@ -2815,7 +2815,8 @@ class IndegoHub:
 
         for alert in alerts:
             read_status = getattr(alert, "read_status", None)
-            if read_status is not False:
+            is_unread = str(read_status).strip().lower() == "unread" or read_status is False
+            if not is_unread:
                 continue
 
             error_code = getattr(alert, "error_code", None)

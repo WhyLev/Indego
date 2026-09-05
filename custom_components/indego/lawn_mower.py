@@ -152,7 +152,9 @@ class IndegoLawnMower(IndegoEntity, LawnMowerEntity):
         if self._indego_hub and hasattr(self._indego_hub, "_indego_client"):
             alerts = getattr(self._indego_hub._indego_client, "alerts", [])
             for alert in alerts:
-                if getattr(alert, "read_status", True) is False:
+                read_status = getattr(alert, "read_status", None)
+                is_unread = str(read_status).strip().lower() == "unread" or read_status is False
+                if is_unread:
                     error_code = str(getattr(alert, "error_code", ""))
                     severity = get_error_severity(error_code)
                     if severity.value >= ErrorSeverity.ERROR.value:  # ERROR or CRITICAL
