@@ -16,7 +16,7 @@ from homeassistant.components.vacuum import (
 
 from .const import DOMAIN
 from .mixins import IndegoEntity
-from .error_codes import get_mower_state_info
+from .error_codes import get_mower_state_info, get_error_severity, ErrorSeverity
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -152,15 +152,19 @@ class IndegoVacuum(IndegoEntity, StateVacuumEntity):
         if self._attr_indego_state_detail.startswith("Returning to"):
             new_activity = VacuumActivity.RETURNING
 
-        # Check for active unread alerts -> override to ERROR
-        has_unread_alerts = False
+        # Check for active unread alerts with severity ERROR or higher
+        has_critical_unread = False
         if self._indego_hub and hasattr(self._indego_hub, "_indego_client"):
             alerts = getattr(self._indego_hub._indego_client, "alerts", [])
-            has_unread_alerts = any(
-                getattr(alert, "read_status", True) is False for alert in alerts
-            )
+            for alert in alerts:
+                if getattr(alert, "read_status", True) is False:
+                    error_code = str(getattr(alert, "error_code", ""))
+                    severity = get_error_severity(error_code)
+                    if severity.value >= ErrorSeverity.ERROR.value:  # ERROR or CRITICAL
+                        has_critical_unread = True
+                        break
 
-        if has_unread_alerts:
+        if has_critical_unread:
             new_activity = VacuumActivity.ERROR
 
         # Update if changed
@@ -168,15 +172,15 @@ class IndegoVacuum(IndegoEntity, StateVacuumEntity):
             self._attr_activity = new_activity
             self.async_schedule_update_ha_state()
             _LOGGER.debug(
-                "Vacuum activity updated: %s (state: %d, detail: %s, unread_alerts: %s)",
+                "Vacuum activity updated: %s (state: %d, detail: %s, critical_unread: %s)",
                 self._attr_activity,
                 self._attr_indego_state,
                 self._attr_indego_state_detail,
-                has_unread_alerts,
+                has_critical_unread,
             )
 
         # Log unsupported states
-        if self._attr_activity == VacuumActivity.ERROR and not has_unread_alerts:
+        if self._attr_activity == VacuumActivity.ERROR and not has_critical_unread:
             _LOGGER.warning(
                 "Unsupported or error state detected: %d (%s)",
                 self._attr_indego_state,
