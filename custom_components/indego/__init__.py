@@ -3112,7 +3112,21 @@ class IndegoHub:
                                                     self.MOWING_SESSION_GRACE_PERIOD
                                                 )
                                             else:
-                                                # 6. Check position change with state-specific timeout
+                                                # 6. Detect position movement (5px threshold)
+                                                moved = (
+                                                    self._last_svg_x is None
+                                                    or self._last_svg_y is None
+                                                    or math.sqrt(
+                                                        (svg_x - self._last_svg_x) ** 2
+                                                        + (svg_y - self._last_svg_y) ** 2
+                                                    ) > 5
+                                                )
+                                                if moved:
+                                                    self._last_svg_x = svg_x
+                                                    self._last_svg_y = svg_y
+                                                    self._last_position_change_time = now
+
+                                                # 7. Check position change with state-specific timeout
                                                 timeout = self.STUCK_DETECTION_TIMEOUTS.get(current_state_code, 300)
                                                 time_since_move = (now - self._last_position_change_time).total_seconds()
                                                 stuck = time_since_move > timeout
