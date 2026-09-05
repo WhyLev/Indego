@@ -1,12 +1,13 @@
-"""Comprehensive error code mappings for Bosch Indego mowers.
+"""
+Comprehensive error code mappings for Bosch Indego mowers.
 
 This module provides complete error handling for:
 1. Mower State Codes (firmware states)
-2. API Error Codes (operation errors from endpoints)
-3. HTTP Error Patterns (composite codes from API responses)
-4. Communication/System Errors
+2. Device/Hardware Error Codes (mower-reported errors)
+3. API Error Codes (operation errors from endpoints)
+4. HTTP Error Patterns (composite codes from API responses)
 
-Based on Bosch Indego Connect v4.1.2 Reverse Engineering.
+Based on Bosch Indego Connect v4.1.2 Reverse Engineering and Service Manuals.
 """
 
 from enum import Enum
@@ -25,24 +26,30 @@ MOWER_STATE_CODES = {
     "261": {"name": "IN_DOCK_DOCKED2", "display": "Docked", "state": "docked"},
     "262": {"name": "IN_DOCK_LOADING_MAP", "display": "Docked – loading map", "state": "docked"},
     "263": {"name": "IN_DOCK_SAVING_MAP", "display": "Docked – saving map", "state": "docked"},
-    "266": {"name": "IN_DOCK_LEAVING_DOCK", "display": "Leaving dock", "state": "docked"},
+    "266": {"name": "IN_DOCK_LEAVING_DOCK", "display": "Leaving dock", "state": "leaving"},
+    "270": {"name": "IN_DOCK_FIRMWARE_DOWNLOAD", "display": "Firmware download", "state": "docked"},
+    "271": {"name": "IN_DOCK_FIRMWARE_INSTALL", "display": "Installing firmware", "state": "docked"},
 
     # Lawn States (512-599)
-    "512": {"name": "IN_LAWN_LEAVING_DOCK", "display": "Leaving dock", "state": "mowing"},
+    "512": {"name": "IN_LAWN_LEAVING_DOCK", "display": "Leaving dock", "state": "leaving"},
     "513": {"name": "IN_LAWN_MOWING", "display": "Mowing", "state": "mowing"},
     "514": {"name": "IN_LAWN_RELOCALISING", "display": "Relocalising", "state": "mowing"},
     "515": {"name": "IN_LAWN_LOADING_MAP", "display": "Loading map", "state": "mowing"},
-    "516": {"name": "IN_LAWN_MAPPING", "display": "Learning lawn", "state": "mowing"},
+    "516": {"name": "IN_LAWN_MAPPING", "display": "Learning lawn", "state": "mapping"},
     "517": {"name": "IN_LAWN_PAUSED", "display": "Paused", "state": "paused"},
     "518": {"name": "IN_LAWN_BORDER_CUT", "display": "Border cut", "state": "mowing"},
-    "519": {"name": "IN_LAWN_IDLE", "display": "Idle in lawn", "state": "mowing"},
-    "520": {"name": "IN_LAWN_MAPPING_PAUSED", "display": "Learning lawn (paused)", "state": "paused"},
+    "519": {"name": "IN_LAWN_IDLE", "display": "Idle in lawn", "state": "idle"},
+    "520": {"name": "IN_LAWN_MAPPING_PAUSED", "display": "Learning lawn (paused)", "state": "mapping_paused"},
     "521": {"name": "IN_LAWN_BORDER_CUTTING", "display": "Border cutting", "state": "mowing"},
-    "522": {"name": "IN_LAWN_UNUSED", "display": "Border cutting", "state": "mowing"},
-    "523": {"name": "IN_LAWN_SPOT_MOWING", "display": "Spot mowing", "state": "mowing"},
-    "524": {"name": "IN_LAWN_RANDOM_MOWING", "display": "Random mowing", "state": "mowing"},
+    "522": {"name": "IN_LAWN_UNUSED", "display": "Border cutting", "state": "mowing"},  # legacy, kept as is
+    "523": {"name": "IN_LAWN_SPOT_MOWING", "display": "Spot mowing", "state": "spot_mowing"},
+    "524": {"name": "IN_LAWN_RANDOM_MOWING", "display": "Random mowing", "state": "random_mowing"},
     "525": {"name": "IN_LAWN_SPOT_MOWING_COMPLETE", "display": "Spot mowing complete", "state": "mowing"},
     "526": {"name": "IN_LAWN_RANDOM_MOWING_COMPLETE", "display": "Random mowing complete", "state": "mowing"},
+    "528": {"name": "IN_LAWN_SPOT_MOWING_PAUSED", "display": "Spot mowing (paused)", "state": "paused"},
+    "529": {"name": "IN_LAWN_RANDOM_MOWING_PAUSED", "display": "Random mowing (paused)", "state": "paused"},
+    "530": {"name": "IN_LAWN_ZONE_MOWING", "display": "Zone mowing", "state": "zone_mowing"},
+    "531": {"name": "IN_LAWN_ZONE_MOWING_PAUSED", "display": "Zone mowing (paused)", "state": "paused"},
 
     # Returning to Dock (768-799)
     "768": {"name": "RET_DOCK", "display": "Returning to dock", "state": "returning"},
@@ -51,25 +58,26 @@ MOWER_STATE_CODES = {
     "771": {"name": "RET_DOCK_BATTERY_LOW", "display": "Returning to dock – battery low", "state": "returning"},
     "772": {"name": "RET_DOCK_CALENDAR", "display": "Returning to dock – calendar", "state": "returning"},
     "773": {"name": "RET_DOCK_BATTERY_TEMP", "display": "Returning to dock – battery temp", "state": "returning"},
-    "774": {"name": "RET_DOCK_APP", "display": "Returning to dock", "state": "returning"},
+    "774": {"name": "RET_DOCK_APP", "display": "Returning to dock (app triggered)", "state": "returning"},
     "775": {"name": "RET_DOCK_GARDEN_COMPLETE", "display": "Returning to dock – lawn complete", "state": "returning"},
     "776": {"name": "RET_DOCK_RELOCALISING", "display": "Returning to dock – relocalising", "state": "returning"},
+    "777": {"name": "RET_DOCK_ZONE_CHANGE", "display": "Returning to dock – zone change", "state": "returning"},
 
     # Service/Maintenance (1025+)
-    "1025": {"name": "SERVICE_DIAGNOSTIC_MODE", "display": "Diagnostic mode", "state": "error"},
-    "1026": {"name": "SERVICE_EOL_MODE", "display": "EOL mode", "state": "error"},
-    "1027": {"name": "SERVICE_REQUESTING_STATUS", "display": "Getting status", "state": "error"},
-    "1281": {"name": "SW_UPDATE_MODE", "display": "Firmware update", "state": "error"},
-    "1537": {"name": "LOW_POWER_MODE", "display": "Low power mode", "state": "error"},
-    "1792": {"name": "LEAVING_DOCK", "display": "Leaving dock", "state": "error"},
+    "1025": {"name": "SERVICE_DIAGNOSTIC_MODE", "display": "Diagnostic mode", "state": "maintenance"},
+    "1026": {"name": "SERVICE_EOL_MODE", "display": "EOL mode", "state": "maintenance"},
+    "1027": {"name": "SERVICE_REQUESTING_STATUS", "display": "Getting status", "state": "unknown"},
+    "1281": {"name": "SW_UPDATE_MODE", "display": "Firmware update", "state": "updating"},
+    "1537": {"name": "LOW_POWER_MODE", "display": "Low power mode", "state": "low_power"},
+    "1792": {"name": "LEAVING_DOCK", "display": "Leaving dock", "state": "leaving"},
 
     # Synthetic States (app-side only)
     "0": {"name": "GETTING_STATUS", "display": "Getting status", "state": "unknown"},
     "1": {"name": "OFFLINE", "display": "Offline", "state": "offline"},
-    "2": {"name": "UNPAIRED", "display": "No mower paired", "state": "unknown"},
-    "3": {"name": "NOT_MAPPED", "display": "Mower not mapped", "state": "error"},
-    "4": {"name": "NO_PIN", "display": "PIN not set", "state": "error"},
-    "5": {"name": "DISABLED", "display": "Mower disabled", "state": "error"},
+    "2": {"name": "UNPAIRED", "display": "No mower paired", "state": "unpaired"},
+    "3": {"name": "NOT_MAPPED", "display": "Mower not mapped", "state": "not_mapped"},
+    "4": {"name": "NO_PIN", "display": "PIN not set", "state": "no_pin"},
+    "5": {"name": "DISABLED", "display": "Mower disabled", "state": "disabled"},
     "64513": {"name": "WAKING_UP_INDEGO", "display": "Getting status", "state": "unknown"},
     "69420": {"name": "SYNTHETIC_COMMAND_SENT", "display": "Command sent", "state": "unknown"},
 }
@@ -84,6 +92,9 @@ DEVICE_ERROR_CODES = {
 
     # Internal/System errors (40-70)
     "45": "Unknown internal error",
+    "46": "Wheel motor overload",
+    "48": "Perimeter wire short circuit",
+    "49": "Perimeter wire broken",
     "55": "Button cell almost empty",
     "57": "Compass error",
     "58": "No data from mobile module",
@@ -99,28 +110,71 @@ DEVICE_ERROR_CODES = {
     "107": "System error",
     "108": "System error",
     "109": "System error",
+    "110": "Charging station error",
+    "111": "Charging contact error",
     "115": "Permanent tactile detected",
     "126": "Charging current/voltage too high",
     "127": "Charging current/voltage too high",
+    "128": "Cutter motor overload",
     "129": "Cutter load too high",
     "130": "Cutter load too high",
     "131": "Cutter load too high",
+    "132": "Cutter blade blocked",
     "133": "Internal error",
     "134": "Internal error",
+    "135": "Wheel drive error",
     "136": "Left wheel blocked",
     "137": "Right wheel blocked",
+    "138": "Left wheel motor error",
+    "139": "Right wheel motor error",
+    "140": "Wheel drive temperature too high",
     "142": "Internal wheel drive error",
     "143": "Intermittent error",
+    "144": "Internal communication error",
+    "145": "Sensor error",
 
-    # Perimeter/Wire errors (149-194)
+    # Perimeter/Wire errors (149-197)
     "149": "Mower out of perimeter limit",
     "150": "No signal from perimeter wire",
     "151": "Waiting for loop signal",
+    "152": "Loop signal interference",
+    "153": "Loop signal too weak",
+    "160": "Battery temperature too high",
+    "161": "Battery temperature too low",
     "162": "Charging error",
+    "163": "Charging error – battery defective",
+    "164": "Charging error – charger defective",
+    "165": "Charging error – connection",
+    "166": "Charging error – timeout",
+    "170": "Battery cell imbalance",
+    "171": "Battery capacity too low",
+    "172": "Battery communication error",
+    "190": "Perimeter wire not connected",
+    "191": "Perimeter wire short",
+    "192": "Perimeter wire broken",
+    "193": "Perimeter wire interference",
     "194": "No perimeter signal detected",
+    "195": "Loop signal lost",
+    "196": "Loop signal error",
+    "197": "Perimeter wire crossed",
 
     # Drive errors (216)
     "216": "Left wheel stuck",
+
+    # GPS errors (210-213)
+    "210": "GPS error",
+    "211": "GPS signal lost",
+    "212": "GPS position error",
+    "213": "GPS module error",
+
+    # Sensor errors (220-226)
+    "220": "Lift sensor error",
+    "221": "Tilt sensor error",
+    "222": "Compass error",
+    "223": "Gyroscope error",
+    "224": "Accelerometer error",
+    "225": "Ultrasonic sensor error",
+    "226": "Rain sensor error",
 
     # Navigation/Stuck errors (700-799)
     "701": "Mower stuck",
@@ -143,7 +197,7 @@ DEVICE_ERROR_CODES = {
     "903": "Configuration error",
     "904": "Memory error",
 
-    # Battery/System errors (1100+)
+    # Battery/System errors (1000+)
     "1000": "System error",
     "1001": "Unknown error",
     "1002": "Shutdown detected",
@@ -226,12 +280,20 @@ API_ERROR_CODES = {
     "_16896": {"msg": "Mower not in dock – cannot change PIN", "severity": "ERROR", "context": "PUT /security"},
     "_17152": {"msg": "Invalid autolock value", "severity": "ERROR", "context": "PUT /security"},
     "_17153": {"msg": "Already locked/unlocked – cannot change autolock", "severity": "INFO", "context": "PUT /security"},
+    "_16897": {"msg": "PIN change not allowed", "severity": "ERROR", "context": "PUT /security"},
+    "_16898": {"msg": "PIN too short", "severity": "ERROR", "context": "PUT /security"},
+    "_17154": {"msg": "Autolock value out of range", "severity": "ERROR", "context": "PUT /security"},
 
-    # Date & Time Errors (suffix: _14336)
+    # Date & Time Errors (suffix: _14336, _14337, _14338)
     "_14336": {"msg": "Invalid date/time value", "severity": "ERROR", "context": "PUT /dateAndTime"},
+    "_14337": {"msg": "Invalid timezone", "severity": "ERROR", "context": "PUT /dateAndTime"},
+    "_14338": {"msg": "Invalid date format", "severity": "ERROR", "context": "PUT /dateAndTime"},
 
-    # Border Cut Errors (suffix: _15616)
+    # Border Cut Errors (suffix: _15616 to _15619)
     "_15616": {"msg": "Border cut cannot be changed in current state", "severity": "ERROR", "context": "PUT /borderCut"},
+    "_15617": {"msg": "Border cut not supported", "severity": "WARNING", "context": "PUT /borderCut"},
+    "_15618": {"msg": "Border cut already active", "severity": "INFO", "context": "PUT /borderCut"},
+    "_15619": {"msg": "Border cut cancelled", "severity": "INFO", "context": "PUT /borderCut"},
 
     # Config Errors (suffix: _8, _9 in config context)
     "_config_8": {"msg": "Invalid config ID", "severity": "ERROR", "context": "PUT /config"},
@@ -276,8 +338,16 @@ HTTP_ERROR_PATTERNS = {
     "22_500": {"msg": "Security update failed – see details", "severity": "ERROR", "context": "PUT /security"},
     "53_500": {"msg": "Map deletion failed – see details", "severity": "ERROR", "context": "DELETE /map"},
 
-    # 500 with Mower Disabled (_5 suffix)
+    # Specific 500 with mower error suffixes (more precise)
+    "16_500_12288": {"msg": "Cannot mow – battery too low or temperature too low", "severity": "ERROR", "context": "PUT /state (mow)"},
+    "16_500_12289": {"msg": "Cannot mow – no map available", "severity": "ERROR", "context": "PUT /state (mow)"},
+    "16_500_12290": {"msg": "Cannot mow – PIN required", "severity": "ERROR", "context": "PUT /state (mow)"},
+    "16_500_12292": {"msg": "Cannot mow – PIN not set", "severity": "ERROR", "context": "PUT /state (mow)"},
+
+    # 500 with Mower Disabled (_5 suffix) – generic catch-all
     "XX_5XX": {"msg": "Mower disabled – operation not available", "severity": "ERROR", "context": "Any endpoint"},
+
+    # Additional specific cases
     "16_202": {"msg": "Mower disabled – command rejected", "severity": "WARNING", "context": "PUT /state"},
 
     # 504 Gateway Timeout
@@ -298,7 +368,6 @@ class ErrorSeverity(Enum):
     ERROR = 2
     CRITICAL = 3
 
-
 # =============================================================================
 # HELPER FUNCTIONS
 # =============================================================================
@@ -314,7 +383,6 @@ def get_mower_state_info(state_code: str) -> Optional[dict]:
     """
     return MOWER_STATE_CODES.get(str(state_code))
 
-
 def get_device_error_description(error_code: str) -> str:
     """Get device/hardware error description.
 
@@ -326,7 +394,6 @@ def get_device_error_description(error_code: str) -> str:
     """
     return DEVICE_ERROR_CODES.get(str(error_code), f"Unknown device error: {error_code}")
 
-
 def get_api_error_details(error_suffix: str) -> Optional[dict]:
     """Get API error details from suffix.
 
@@ -337,7 +404,6 @@ def get_api_error_details(error_suffix: str) -> Optional[dict]:
         Dict with 'msg', 'severity', 'context' or None
     """
     return API_ERROR_CODES.get(error_suffix)
-
 
 def get_http_error_pattern(composite_code: str) -> Optional[dict]:
     """Get HTTP error pattern details.
@@ -361,16 +427,15 @@ def get_http_error_pattern(composite_code: str) -> Optional[dict]:
 
     return None
 
-
 def parse_composite_error(error_code: str) -> Tuple[Optional[dict], Optional[str]]:
     """Parse composite error code and extract details.
 
     Handles formats:
-    - Simple: "12292" (device error)
+    - State Code: "257" (mower state)
     - API Suffix: "_12292" (API error)
     - HTTP Pattern: "09_409" (HTTP conflict)
     - HTTP + Suffix: "16_500_12288" (HTTP 500 with mower error)
-    - State Code: "257" (mower state)
+    - Simple device error: "104" (device error)
 
     Args:
         error_code: Error code string
@@ -380,37 +445,8 @@ def parse_composite_error(error_code: str) -> Tuple[Optional[dict], Optional[str
     """
     error_code = str(error_code).strip()
 
-    # Check if it's a composite HTTP pattern
-    if "_" in error_code:
-        parts = error_code.split("_")
-
-        # HTTP pattern with suffix (e.g., "16_500_12288")
-        if len(parts) >= 3 and parts[1].isdigit():
-            http_pattern = "_".join(parts[:2])
-            error_suffix = "_" + parts[2]
-
-            http_details = get_http_error_pattern(http_pattern)
-            api_details = get_api_error_details(error_suffix)
-
-            if http_details and api_details:
-                combined_msg = f"{http_details['msg']}: {api_details['msg']}"
-                severity = api_details.get("severity", http_details.get("severity", "ERROR"))
-                return (
-                    {"msg": combined_msg, "severity": severity, "context": http_details.get("context")},
-                    combined_msg
-                )
-
-        # Pure HTTP pattern (e.g., "09_409")
-        http_details = get_http_error_pattern(error_code)
-        if http_details:
-            return (http_details, http_details["msg"])
-
-        # API suffix (e.g., "_12292")
-        api_details = get_api_error_details(error_code if error_code.startswith("_") else "_" + error_code)
-        if api_details:
-            return (api_details, api_details["msg"])
-
-    # Check if it's a mower state code
+    # 1. Check if it's a mower state code (numeric, possibly with leading zeros)
+    # State codes are typically 3-4 digits, but can be 0, 1, etc.
     state_info = get_mower_state_info(error_code)
     if state_info:
         return (
@@ -418,7 +454,34 @@ def parse_composite_error(error_code: str) -> Tuple[Optional[dict], Optional[str
             state_info["display"]
         )
 
-    # Check if it's a device error
+    # 2. Check if it's an API suffix (starts with "_")
+    if error_code.startswith("_"):
+        api_details = get_api_error_details(error_code)
+        if api_details:
+            return (api_details, api_details["msg"])
+
+    # 3. Check if it's a composite HTTP pattern (contains "_" and at least one digit)
+    if "_" in error_code and any(c.isdigit() for c in error_code):
+        parts = error_code.split("_")
+        # HTTP pattern with suffix (e.g., "16_500_12288")
+        if len(parts) >= 3 and parts[1].isdigit():
+            http_pattern = "_".join(parts[:2])
+            error_suffix = "_" + parts[2]
+            http_details = get_http_error_pattern(http_pattern)
+            api_details = get_api_error_details(error_suffix)
+            if http_details and api_details:
+                combined_msg = f"{http_details['msg']}: {api_details['msg']}"
+                severity = api_details.get("severity", http_details.get("severity", "ERROR"))
+                return (
+                    {"msg": combined_msg, "severity": severity, "context": http_details.get("context")},
+                    combined_msg
+                )
+        # Pure HTTP pattern (e.g., "09_409")
+        http_details = get_http_error_pattern(error_code)
+        if http_details:
+            return (http_details, http_details["msg"])
+
+    # 4. Check if it's a device error
     device_msg = get_device_error_description(error_code)
     if not device_msg.startswith("Unknown"):
         return (
@@ -426,9 +489,8 @@ def parse_composite_error(error_code: str) -> Tuple[Optional[dict], Optional[str
             device_msg
         )
 
-    # Unknown error
+    # 5. Unknown
     return (None, f"Unknown error code: {error_code}")
-
 
 def get_error_description(error_code: str) -> str:
     """Get human-readable error description (backward compatible).
@@ -441,7 +503,6 @@ def get_error_description(error_code: str) -> str:
     """
     _, description = parse_composite_error(error_code)
     return description
-
 
 def get_error_severity(error_code: str) -> ErrorSeverity:
     """Get error severity level.
@@ -465,7 +526,6 @@ def get_error_severity(error_code: str) -> ErrorSeverity:
         return severity_map.get(severity_str, ErrorSeverity.ERROR)
 
     return ErrorSeverity.ERROR
-
 
 def format_error_message(error_code: str, include_context: bool = False) -> str:
     """Format error message for display.
@@ -499,7 +559,6 @@ def format_error_message(error_code: str, include_context: bool = False) -> str:
         message += f" — Action: {details['user_action']}"
 
     return message
-
 
 # =============================================================================
 # BACKWARD COMPATIBILITY
