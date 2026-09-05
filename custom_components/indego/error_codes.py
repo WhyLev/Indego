@@ -3,7 +3,7 @@ Comprehensive error code mappings for Bosch Indego mowers.
 
 This module provides complete error handling for:
 1. Mower State Codes (firmware states)
-2. Device/Hardware Error Codes (mower-reported errors)
+2. Device/Hardware Error Codes (mower-reported errors) – with severity
 3. API Error Codes (operation errors from endpoints)
 4. HTTP Error Patterns (composite codes from API responses)
 
@@ -11,7 +11,7 @@ Based on Bosch Indego Connect v4.1.2 Reverse Engineering and Service Manuals.
 """
 
 from enum import Enum
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Dict, Any
 
 # =============================================================================
 # MOWER STATE CODES (Firmware States)
@@ -83,136 +83,137 @@ MOWER_STATE_CODES = {
 }
 
 # =============================================================================
-# DEVICE/HARDWARE ERROR CODES (Mower-reported errors)
+# DEVICE/HARDWARE ERROR CODES (Mower-reported errors) with severity
 # =============================================================================
 
-DEVICE_ERROR_CODES = {
+# Severity can be: INFO, WARNING, ERROR, CRITICAL
+DEVICE_ERROR_CODES: Dict[str, Dict[str, Any]] = {
     # No error
-    "0": "No error",
+    "0": {"msg": "No error", "severity": "INFO"},
 
     # Internal/System errors (40-70)
-    "45": "Unknown internal error",
-    "46": "Wheel motor overload",
-    "48": "Perimeter wire short circuit",
-    "49": "Perimeter wire broken",
-    "55": "Button cell almost empty",
-    "57": "Compass error",
-    "58": "No data from mobile module",
-    "60": "Mower tilted",
+    "45": {"msg": "Unknown internal error", "severity": "ERROR"},
+    "46": {"msg": "Wheel motor overload", "severity": "ERROR"},
+    "48": {"msg": "Perimeter wire short circuit", "severity": "ERROR"},
+    "49": {"msg": "Perimeter wire broken", "severity": "ERROR"},
+    "55": {"msg": "Button cell almost empty", "severity": "WARNING"},
+    "57": {"msg": "Compass error", "severity": "ERROR"},
+    "58": {"msg": "No data from mobile module", "severity": "ERROR"},
+    "60": {"msg": "Mower tilted", "severity": "WARNING"},
 
     # Wheel/Motor/Sensor errors (100-220)
-    "101": "Mower was lifted",
-    "102": "Lift sensor right front steering wheel",
-    "103": "Lift sensor left front steering wheel",
-    "104": "Stop button pressed",
-    "105": "Mower tilted >45°",
-    "106": "Invalid input",
-    "107": "System error",
-    "108": "System error",
-    "109": "System error",
-    "110": "Charging station error",
-    "111": "Charging contact error",
-    "115": "Permanent tactile detected",
-    "126": "Charging current/voltage too high",
-    "127": "Charging current/voltage too high",
-    "128": "Cutter motor overload",
-    "129": "Cutter load too high",
-    "130": "Cutter load too high",
-    "131": "Cutter load too high",
-    "132": "Cutter blade blocked",
-    "133": "Internal error",
-    "134": "Internal error",
-    "135": "Wheel drive error",
-    "136": "Left wheel blocked",
-    "137": "Right wheel blocked",
-    "138": "Left wheel motor error",
-    "139": "Right wheel motor error",
-    "140": "Wheel drive temperature too high",
-    "142": "Internal wheel drive error",
-    "143": "Intermittent error",
-    "144": "Internal communication error",
-    "145": "Sensor error",
+    "101": {"msg": "Mower was lifted", "severity": "WARNING"},
+    "102": {"msg": "Lift sensor right front steering wheel", "severity": "ERROR"},
+    "103": {"msg": "Lift sensor left front steering wheel", "severity": "ERROR"},
+    "104": {"msg": "Stop button pressed", "severity": "WARNING"},
+    "105": {"msg": "Mower tilted >45°", "severity": "ERROR"},
+    "106": {"msg": "Invalid input", "severity": "ERROR"},
+    "107": {"msg": "System error", "severity": "ERROR"},
+    "108": {"msg": "System error", "severity": "ERROR"},
+    "109": {"msg": "System error", "severity": "ERROR"},
+    "110": {"msg": "Charging station error", "severity": "ERROR"},
+    "111": {"msg": "Charging contact error", "severity": "ERROR"},
+    "115": {"msg": "Permanent tactile detected", "severity": "WARNING"},
+    "126": {"msg": "Charging current/voltage too high", "severity": "ERROR"},
+    "127": {"msg": "Charging current/voltage too high", "severity": "ERROR"},
+    "128": {"msg": "Cutter motor overload", "severity": "ERROR"},
+    "129": {"msg": "Cutter load too high", "severity": "ERROR"},
+    "130": {"msg": "Cutter load too high", "severity": "ERROR"},
+    "131": {"msg": "Cutter load too high", "severity": "ERROR"},
+    "132": {"msg": "Cutter blade blocked", "severity": "ERROR"},
+    "133": {"msg": "Internal error", "severity": "ERROR"},
+    "134": {"msg": "Internal error", "severity": "ERROR"},
+    "135": {"msg": "Wheel drive error", "severity": "ERROR"},
+    "136": {"msg": "Left wheel blocked", "severity": "ERROR"},
+    "137": {"msg": "Right wheel blocked", "severity": "ERROR"},
+    "138": {"msg": "Left wheel motor error", "severity": "ERROR"},
+    "139": {"msg": "Right wheel motor error", "severity": "ERROR"},
+    "140": {"msg": "Wheel drive temperature too high", "severity": "ERROR"},
+    "142": {"msg": "Internal wheel drive error", "severity": "ERROR"},
+    "143": {"msg": "Intermittent error", "severity": "WARNING"},
+    "144": {"msg": "Internal communication error", "severity": "ERROR"},
+    "145": {"msg": "Sensor error", "severity": "ERROR"},
 
     # Perimeter/Wire errors (149-197)
-    "149": "Mower out of perimeter limit",
-    "150": "No signal from perimeter wire",
-    "151": "Waiting for loop signal",
-    "152": "Loop signal interference",
-    "153": "Loop signal too weak",
-    "160": "Battery temperature too high",
-    "161": "Battery temperature too low",
-    "162": "Charging error",
-    "163": "Charging error – battery defective",
-    "164": "Charging error – charger defective",
-    "165": "Charging error – connection",
-    "166": "Charging error – timeout",
-    "170": "Battery cell imbalance",
-    "171": "Battery capacity too low",
-    "172": "Battery communication error",
-    "190": "Perimeter wire not connected",
-    "191": "Perimeter wire short",
-    "192": "Perimeter wire broken",
-    "193": "Perimeter wire interference",
-    "194": "No perimeter signal detected",
-    "195": "Loop signal lost",
-    "196": "Loop signal error",
-    "197": "Perimeter wire crossed",
+    "149": {"msg": "Mower out of perimeter limit", "severity": "ERROR"},
+    "150": {"msg": "No signal from perimeter wire", "severity": "ERROR"},
+    "151": {"msg": "Waiting for loop signal", "severity": "WARNING"},
+    "152": {"msg": "Loop signal interference", "severity": "WARNING"},
+    "153": {"msg": "Loop signal too weak", "severity": "WARNING"},
+    "160": {"msg": "Battery temperature too high", "severity": "WARNING"},
+    "161": {"msg": "Battery temperature too low", "severity": "WARNING"},
+    "162": {"msg": "Charging error", "severity": "ERROR"},
+    "163": {"msg": "Charging error – battery defective", "severity": "ERROR"},
+    "164": {"msg": "Charging error – charger defective", "severity": "ERROR"},
+    "165": {"msg": "Charging error – connection", "severity": "ERROR"},
+    "166": {"msg": "Charging error – timeout", "severity": "ERROR"},
+    "170": {"msg": "Battery cell imbalance", "severity": "ERROR"},
+    "171": {"msg": "Battery capacity too low", "severity": "WARNING"},
+    "172": {"msg": "Battery communication error", "severity": "ERROR"},
+    "190": {"msg": "Perimeter wire not connected", "severity": "ERROR"},
+    "191": {"msg": "Perimeter wire short", "severity": "ERROR"},
+    "192": {"msg": "Perimeter wire broken", "severity": "ERROR"},
+    "193": {"msg": "Perimeter wire interference", "severity": "WARNING"},
+    "194": {"msg": "No perimeter signal detected", "severity": "ERROR"},
+    "195": {"msg": "Loop signal lost", "severity": "ERROR"},
+    "196": {"msg": "Loop signal error", "severity": "ERROR"},
+    "197": {"msg": "Perimeter wire crossed", "severity": "ERROR"},
 
     # Drive errors (216)
-    "216": "Left wheel stuck",
+    "216": {"msg": "Left wheel stuck", "severity": "ERROR"},
 
     # GPS errors (210-213)
-    "210": "GPS error",
-    "211": "GPS signal lost",
-    "212": "GPS position error",
-    "213": "GPS module error",
+    "210": {"msg": "GPS error", "severity": "ERROR"},
+    "211": {"msg": "GPS signal lost", "severity": "ERROR"},
+    "212": {"msg": "GPS position error", "severity": "ERROR"},
+    "213": {"msg": "GPS module error", "severity": "ERROR"},
 
     # Sensor errors (220-226)
-    "220": "Lift sensor error",
-    "221": "Tilt sensor error",
-    "222": "Compass error",
-    "223": "Gyroscope error",
-    "224": "Accelerometer error",
-    "225": "Ultrasonic sensor error",
-    "226": "Rain sensor error",
+    "220": {"msg": "Lift sensor error", "severity": "ERROR"},
+    "221": {"msg": "Tilt sensor error", "severity": "ERROR"},
+    "222": {"msg": "Compass error", "severity": "ERROR"},
+    "223": {"msg": "Gyroscope error", "severity": "ERROR"},
+    "224": {"msg": "Accelerometer error", "severity": "ERROR"},
+    "225": {"msg": "Ultrasonic sensor error", "severity": "ERROR"},
+    "226": {"msg": "Rain sensor error", "severity": "WARNING"},
 
     # Navigation/Stuck errors (700-799)
-    "701": "Mower stuck",
-    "702": "Mower trapped",
-    "703": "Mower too high",
-    "704": "Unable to proceed",
-    "705": "Uneven ground",
-    "706": "Grass too high",
+    "701": {"msg": "Mower stuck", "severity": "ERROR"},
+    "702": {"msg": "Mower trapped", "severity": "ERROR"},
+    "703": {"msg": "Mower too high", "severity": "WARNING"},
+    "704": {"msg": "Unable to proceed", "severity": "ERROR"},
+    "705": {"msg": "Uneven ground", "severity": "WARNING"},
+    "706": {"msg": "Grass too high", "severity": "WARNING"},
 
     # Communication errors (800-899)
-    "801": "Bluetooth error",
-    "802": "WiFi connection lost",
-    "803": "API connection error",
-    "804": "No connection to server",
-    "805": "Communication timeout",
+    "801": {"msg": "Bluetooth error", "severity": "ERROR"},
+    "802": {"msg": "WiFi connection lost", "severity": "ERROR"},
+    "803": {"msg": "API connection error", "severity": "ERROR"},
+    "804": {"msg": "No connection to server", "severity": "ERROR"},
+    "805": {"msg": "Communication timeout", "severity": "WARNING"},
 
     # Firmware/Software errors (900-999)
-    "901": "Firmware error",
-    "902": "Software error",
-    "903": "Configuration error",
-    "904": "Memory error",
+    "901": {"msg": "Firmware error", "severity": "ERROR"},
+    "902": {"msg": "Software error", "severity": "ERROR"},
+    "903": {"msg": "Configuration error", "severity": "ERROR"},
+    "904": {"msg": "Memory error", "severity": "ERROR"},
 
     # Battery/System errors (1000+)
-    "1000": "System error",
-    "1001": "Unknown error",
-    "1002": "Shutdown detected",
-    "1008": "Mower is stuck",
-    "1108": "Inclination angle too large",
-    "1138": "Last run error",
-    "1146": "Orientation filter error",
-    "1148": "On-/Off error. Need PIN code to unlock",
-    "1156": "Unsupported battery pack",
+    "1000": {"msg": "System error", "severity": "ERROR"},
+    "1001": {"msg": "Unknown error", "severity": "ERROR"},
+    "1002": {"msg": "Shutdown detected", "severity": "WARNING"},
+    "1008": {"msg": "Mower is stuck", "severity": "ERROR"},
+    "1108": {"msg": "Inclination angle too large", "severity": "WARNING"},
+    "1138": {"msg": "Last run error", "severity": "ERROR"},
+    "1146": {"msg": "Orientation filter error", "severity": "ERROR"},
+    "1148": {"msg": "On-/Off error. Need PIN code to unlock", "severity": "ERROR"},
+    "1156": {"msg": "Unsupported battery pack", "severity": "ERROR"},
 
-    # Special Alert Codes (string-based)
-    "ntfy_blade_life": "Reminder blade life",
-    "smartMow.mowerUnreachable": "SmartMowing disabled",
-    "firmware.updateComplete": "Software update complete",
-    "smartMow.mowerReachable": "Mower reachable. SmartMow is now enabled.",
+    # Special Alert Codes (string-based) – now with correct severity
+    "ntfy_blade_life": {"msg": "Reminder blade life", "severity": "INFO"},
+    "smartMow.mowerUnreachable": {"msg": "SmartMowing disabled", "severity": "WARNING"},
+    "firmware.updateComplete": {"msg": "Software update complete", "severity": "INFO"},
+    "smartMow.mowerReachable": {"msg": "Mower reachable. SmartMow is now enabled.", "severity": "INFO"},
 }
 
 # =============================================================================
@@ -373,80 +374,49 @@ class ErrorSeverity(Enum):
 # =============================================================================
 
 def get_mower_state_info(state_code: str) -> Optional[dict]:
-    """Get mower state information.
-
-    Args:
-        state_code: State code as string
-
-    Returns:
-        Dict with 'name', 'display', 'state' or None
-    """
+    """Get mower state information."""
     return MOWER_STATE_CODES.get(str(state_code))
 
 def get_device_error_description(error_code: str) -> str:
-    """Get device/hardware error description.
+    """Get device/hardware error description."""
+    entry = DEVICE_ERROR_CODES.get(str(error_code))
+    if entry:
+        return entry.get("msg", f"Unknown device error: {error_code}")
+    return f"Unknown device error: {error_code}"
 
-    Args:
-        error_code: Error code as string
-
-    Returns:
-        Error description string
-    """
-    return DEVICE_ERROR_CODES.get(str(error_code), f"Unknown device error: {error_code}")
+def get_device_error_severity(error_code: str) -> ErrorSeverity:
+    """Get device/hardware error severity."""
+    entry = DEVICE_ERROR_CODES.get(str(error_code))
+    if entry:
+        severity_str = entry.get("severity", "ERROR")
+        severity_map = {
+            "INFO": ErrorSeverity.INFO,
+            "WARNING": ErrorSeverity.WARNING,
+            "ERROR": ErrorSeverity.ERROR,
+            "CRITICAL": ErrorSeverity.CRITICAL,
+        }
+        return severity_map.get(severity_str, ErrorSeverity.ERROR)
+    return ErrorSeverity.ERROR
 
 def get_api_error_details(error_suffix: str) -> Optional[dict]:
-    """Get API error details from suffix.
-
-    Args:
-        error_suffix: Error suffix (e.g., "_12292", "_10752")
-
-    Returns:
-        Dict with 'msg', 'severity', 'context' or None
-    """
+    """Get API error details from suffix."""
     return API_ERROR_CODES.get(error_suffix)
 
 def get_http_error_pattern(composite_code: str) -> Optional[dict]:
-    """Get HTTP error pattern details.
-
-    Args:
-        composite_code: Composite error code (e.g., "04_409", "16_500_12288")
-
-    Returns:
-        Dict with 'msg', 'severity', 'context' or None
-    """
-    # Try exact match first
+    """Get HTTP error pattern details."""
     if composite_code in HTTP_ERROR_PATTERNS:
         return HTTP_ERROR_PATTERNS[composite_code]
-
-    # Try regex-like patterns
-    # Check for XX_5XX pattern (mower disabled)
     if "_5" in composite_code and "XX" not in composite_code:
         parts = composite_code.split("_")
         if len(parts) >= 2 and parts[1].startswith("5"):
             return HTTP_ERROR_PATTERNS.get("XX_5XX")
-
     return None
 
 def parse_composite_error(error_code: str) -> Tuple[Optional[dict], Optional[str]]:
-    """Parse composite error code and extract details.
-
-    Handles formats:
-    - State Code: "257" (mower state)
-    - API Suffix: "_12292" (API error)
-    - HTTP Pattern: "09_409" (HTTP conflict)
-    - HTTP + Suffix: "16_500_12288" (HTTP 500 with mower error)
-    - Simple device error: "104" (device error)
-
-    Args:
-        error_code: Error code string
-
-    Returns:
-        Tuple of (error_details_dict, error_description_str)
-    """
+    """Parse composite error code and extract details."""
     error_code = str(error_code).strip()
 
-    # 1. Check if it's a mower state code (numeric, possibly with leading zeros)
-    # State codes are typically 3-4 digits, but can be 0, 1, etc.
+    # 1. Check mower state
     state_info = get_mower_state_info(error_code)
     if state_info:
         return (
@@ -454,16 +424,15 @@ def parse_composite_error(error_code: str) -> Tuple[Optional[dict], Optional[str
             state_info["display"]
         )
 
-    # 2. Check if it's an API suffix (starts with "_")
+    # 2. Check API suffix
     if error_code.startswith("_"):
         api_details = get_api_error_details(error_code)
         if api_details:
             return (api_details, api_details["msg"])
 
-    # 3. Check if it's a composite HTTP pattern (contains "_" and at least one digit)
+    # 3. Check HTTP pattern
     if "_" in error_code and any(c.isdigit() for c in error_code):
         parts = error_code.split("_")
-        # HTTP pattern with suffix (e.g., "16_500_12288")
         if len(parts) >= 3 and parts[1].isdigit():
             http_pattern = "_".join(parts[:2])
             error_suffix = "_" + parts[2]
@@ -476,45 +445,31 @@ def parse_composite_error(error_code: str) -> Tuple[Optional[dict], Optional[str
                     {"msg": combined_msg, "severity": severity, "context": http_details.get("context")},
                     combined_msg
                 )
-        # Pure HTTP pattern (e.g., "09_409")
         http_details = get_http_error_pattern(error_code)
         if http_details:
             return (http_details, http_details["msg"])
 
-    # 4. Check if it's a device error
-    device_msg = get_device_error_description(error_code)
-    if not device_msg.startswith("Unknown"):
+    # 4. Check device error (with severity)
+    device_entry = DEVICE_ERROR_CODES.get(error_code)
+    if device_entry:
+        msg = device_entry["msg"]
+        severity = device_entry.get("severity", "ERROR")
         return (
-            {"msg": device_msg, "severity": "ERROR"},
-            device_msg
+            {"msg": msg, "severity": severity},
+            msg
         )
 
     # 5. Unknown
     return (None, f"Unknown error code: {error_code}")
 
 def get_error_description(error_code: str) -> str:
-    """Get human-readable error description (backward compatible).
-
-    Args:
-        error_code: Error code as string
-
-    Returns:
-        Error description or "Unknown error code" if not found
-    """
+    """Get human-readable error description."""
     _, description = parse_composite_error(error_code)
     return description
 
 def get_error_severity(error_code: str) -> ErrorSeverity:
-    """Get error severity level.
-
-    Args:
-        error_code: Error code as string
-
-    Returns:
-        ErrorSeverity enum value
-    """
+    """Get error severity level."""
     details, _ = parse_composite_error(error_code)
-
     if details and "severity" in details:
         severity_str = details["severity"]
         severity_map = {
@@ -524,7 +479,6 @@ def get_error_severity(error_code: str) -> ErrorSeverity:
             "CRITICAL": ErrorSeverity.CRITICAL,
         }
         return severity_map.get(severity_str, ErrorSeverity.ERROR)
-
     return ErrorSeverity.ERROR
 
 def format_error_message(error_code: str, include_context: bool = False) -> str:
@@ -543,14 +497,14 @@ def format_error_message(error_code: str, include_context: bool = False) -> str:
         return description
 
     severity = details.get("severity", "ERROR")
-    severity_icon = {
-        "INFO": "ℹ️",
-        "WARNING": "⚠️",
-        "ERROR": "❌",
-        "CRITICAL": "🔴",
-    }.get(severity, "❓")
+    severity_label = {
+        "INFO": "[INFO]",
+        "WARNING": "[WARNING]",
+        "ERROR": "[ERROR]",
+        "CRITICAL": "[CRITICAL]",
+    }.get(severity, "[UNKNOWN]")
 
-    message = f"{severity_icon} {description}"
+    message = f"{severity_label} {description}"
 
     if include_context and "context" in details:
         message += f" [{details['context']}]"
@@ -564,5 +518,5 @@ def format_error_message(error_code: str, include_context: bool = False) -> str:
 # BACKWARD COMPATIBILITY
 # =============================================================================
 
-# Keep the old ERROR_CODE_MAP for backward compatibility
-ERROR_CODE_MAP = {**DEVICE_ERROR_CODES}
+# Keep old ERROR_CODE_MAP for backward compatibility (now maps to msg only)
+ERROR_CODE_MAP = {code: entry["msg"] for code, entry in DEVICE_ERROR_CODES.items()}
