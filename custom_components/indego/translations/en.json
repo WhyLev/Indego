@@ -171,7 +171,6 @@
             },
             "last_error_code": {
                 "name": "Last Error"
-                }
             },
             "firmware_version": {
                 "name": "Firmware Version"
