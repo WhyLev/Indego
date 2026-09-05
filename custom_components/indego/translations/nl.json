@@ -154,7 +154,7 @@
             "mowing_mode": {
                 "name": "Maaimode",
                 "state": {
-                    "Calendar": "Handmatige kalender"
+                    "calendar": "Handmatige kalender"
                 }
             },
             "runtime_total": {
@@ -873,7 +873,7 @@
         "command_options": {
             "options": {
                 "mow": "Maaien",
-                "returnToDock": "Terug naar het laadstation",
+                "return_to_dock": "Terug naar het laadstation",
                 "pause": "Pauze"
             }
         },

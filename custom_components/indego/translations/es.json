@@ -154,7 +154,7 @@
             "mowing_mode": {
                 "name": "Modo de corte",
                 "state": {
-                    "Calendar": "Calendario manual"
+                    "calendar": "Calendario manual"
                 }
             },
             "runtime_total": {
@@ -873,7 +873,7 @@
         "command_options": {
             "options": {
                 "mow": "Cortar césped",
-                "returnToDock": "Volver a la estación de carga",
+                "return_to_dock": "Volver a la estación de carga",
                 "pause": "Pausa"
             }
         },

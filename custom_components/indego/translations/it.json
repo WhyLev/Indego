@@ -154,7 +154,7 @@
             "mowing_mode": {
                 "name": "Modalità di taglio",
                 "state": {
-                    "Calendar": "Calendario manuale"
+                    "calendar": "Calendario manuale"
                 }
             },
             "runtime_total": {
@@ -873,7 +873,7 @@
         "command_options": {
             "options": {
                 "mow": "Taglia l'erba",
-                "returnToDock": "Ritorna alla stazione di ricarica",
+                "return_to_dock": "Ritorna alla stazione di ricarica",
                 "pause": "Pausa"
             }
         },

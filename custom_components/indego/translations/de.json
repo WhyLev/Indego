@@ -154,7 +154,7 @@
             "mowing_mode": {
                 "name": "Mähmodus",
                 "state": {
-                    "Calendar": "Kalender"
+                    "calendar": "Kalender"
                 }
             },
             "runtime_total": {
@@ -872,7 +872,7 @@
         "command_options": {
             "options": {
                 "mow": "Mähen",
-                "returnToDock": "Zurück zur Ladestation",
+                "return_to_dock": "Zurück zur Ladestation",
                 "pause": "Pause"
             }
         },

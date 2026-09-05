@@ -154,7 +154,7 @@
             "mowing_mode": {
                 "name": "Mode de tonte",
                 "state": {
-                    "Calendar": "Calendrier manuel"
+                    "calendar": "Calendrier manuel"
                 }
             },
             "runtime_total": {
@@ -873,7 +873,7 @@
         "command_options": {
             "options": {
                 "mow": "Tondre",
-                "returnToDock": "Retour à la station de charge",
+                "return_to_dock": "Retour à la station de charge",
                 "pause": "Pause"
             }
         },

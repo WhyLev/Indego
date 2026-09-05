@@ -154,7 +154,7 @@
             "mowing_mode": {
                 "name": "Režim kosenia",
                 "state": {
-                    "Calendar": "Manuálny kalendár"
+                    "calendar": "Manuálny kalendár"
                 }
             },
             "runtime_total": {
@@ -873,7 +873,7 @@
         "command_options": {
             "options": {
                 "mow": "Kosiť",
-                "returnToDock": "Návrat do dokovacej stanice",
+                "return_to_dock": "Návrat do dokovacej stanice",
                 "pause": "Pauza"
             }
         },

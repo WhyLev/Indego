@@ -154,7 +154,7 @@
             "mowing_mode": {
                 "name": "Tryb koszenia",
                 "state": {
-                    "Calendar": "Kalendarz ręczny"
+                    "calendar": "Kalendarz ręczny"
                 }
             },
             "runtime_total": {
@@ -873,7 +873,7 @@
         "command_options": {
             "options": {
                 "mow": "Koszenie",
-                "returnToDock": "Powrót do stacji dokującej",
+                "return_to_dock": "Powrót do stacji dokującej",
                 "pause": "Pauza"
             }
         },

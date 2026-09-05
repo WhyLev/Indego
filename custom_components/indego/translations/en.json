@@ -154,7 +154,7 @@
             "mowing_mode": {
                 "name": "Mowing Mode",
                 "state": {
-                    "Calendar": "Manual calendar"
+                    "calendar": "Manual calendar"
                 }
             },
             "runtime_total": {
@@ -170,62 +170,7 @@
                 "name": "Mower Position Y"
             },
             "last_error_code": {
-                "name": "Last Error",
-                "state": {
-                    "No error": "No error",
-                    "No errors": "No errors",
-                    "Unknown internal error": "Unknown internal error",
-                    "Button cell almost empty": "Button cell almost empty",
-                    "Compass error": "Compass error",
-                    "No data from mobile module": "No data from mobile module",
-                    "Mower tilted": "Mower tilted",
-                    "Mower was lifted": "Mower was lifted",
-                    "Lift sensor right front steering wheel": "Lift sensor right front steering wheel",
-                    "Lift sensor left front steering wheel": "Lift sensor left front steering wheel",
-                    "Stop button pressed": "Stop button pressed",
-                    "Mower tilted >45°": "Mower tilted >45°",
-                    "Invalid input": "Invalid input",
-                    "System error": "System error",
-                    "Permanent tactile detected": "Permanent tactile detected",
-                    "Charging current/voltage too high": "Charging current/voltage too high",
-                    "Cutter load too high": "Cutter load too high",
-                    "Internal error": "Internal error",
-                    "Left wheel blocked": "Left wheel blocked",
-                    "Right wheel blocked": "Right wheel blocked",
-                    "Internal wheel drive error": "Internal wheel drive error",
-                    "Intermittent error": "Intermittent error",
-                    "Mower out of perimeter limit": "Mower out of perimeter limit",
-                    "No signal from perimeter wire": "No signal from perimeter wire",
-                    "Waiting for loop signal": "Waiting for loop signal",
-                    "Charging error": "Charging error",
-                    "No perimeter signal detected": "No perimeter signal detected",
-                    "Left wheel stuck": "Left wheel stuck",
-                    "Mower stuck": "Mower stuck",
-                    "Mower trapped": "Mower trapped",
-                    "Mower too high": "Mower too high",
-                    "Unable to proceed": "Unable to proceed",
-                    "Uneven ground": "Uneven ground",
-                    "Grass too high": "Grass too high",
-                    "Bluetooth error": "Bluetooth error",
-                    "WiFi connection lost": "WiFi connection lost",
-                    "API connection error": "API connection error",
-                    "No connection to server": "No connection to server",
-                    "Communication timeout": "Communication timeout",
-                    "Firmware error": "Firmware error",
-                    "Software error": "Software error",
-                    "Configuration error": "Configuration error",
-                    "Memory error": "Memory error",
-                    "Unknown error": "Unknown error",
-                    "Shutdown detected": "Shutdown detected",
-                    "Inclination angle too large": "Inclination angle too large",
-                    "Last run error": "Last run error",
-                    "Orientation filter error": "Orientation filter error",
-                    "On-/Off error. Need PIN code to unlock": "On-/Off error. Need PIN code to unlock",
-                    "Unsupported battery pack": "Unsupported battery pack",
-                    "Reminder blade life": "Reminder blade life",
-                    "SmartMowing disabled": "SmartMowing disabled",
-                    "Software update complete": "Software update complete",
-                    "Mower reachable. SmartMow is now enabled.": "Mower reachable. SmartMow is now enabled."
+                "name": "Last Error"
                 }
             },
             "firmware_version": {
@@ -872,7 +817,7 @@
         "command_options": {
             "options": {
                 "mow": "Mow",
-                "returnToDock": "Return to dock",
+                "return_to_dock": "Return to dock",
                 "pause": "Pause"
             }
         },

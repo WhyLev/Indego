@@ -154,7 +154,7 @@
             "mowing_mode": {
                 "name": "Klippemodus",
                 "state": {
-                    "Calendar": "Manuell kalender"
+                    "calendar": "Manuell kalender"
                 }
             },
             "runtime_total": {
@@ -873,7 +873,7 @@
         "command_options": {
             "options": {
                 "mow": "Klipp gress",
-                "returnToDock": "Tilbake til ladestasjonen",
+                "return_to_dock": "Tilbake til ladestasjonen",
                 "pause": "Pause"
             }
         },
