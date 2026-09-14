@@ -37,6 +37,7 @@ STATE_CLASSIFICATION_TO_ACTIVITY = {
     "random_mowing": LawnMowerActivity.MOWING,
     "zone_mowing": LawnMowerActivity.MOWING,
     "leaving": LawnMowerActivity.MOWING,
+    "stuck": LawnMowerActivity.ERROR,
     "not_mapped": LawnMowerActivity.ERROR,
     "no_pin": LawnMowerActivity.ERROR,
     "disabled": LawnMowerActivity.ERROR,

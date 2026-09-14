@@ -64,6 +64,7 @@ from .error_codes import (
     ERROR_CODE_MAP,
     get_error_description,
     get_error_severity,
+    get_mower_state_info,
     parse_composite_error,
     format_error_message,
     ErrorSeverity,
@@ -1590,8 +1591,6 @@ class IndegoHub:
         # Map/Learning states
         515: 300,   # Loading map
         516: 600,   # Learning lawn (can take very long)
-        262: 300,   # Docked - loading map
-        263: 300,   # Docked - saving map
 
         # Returning states (longest, accounts for large lawns)
         768: 600,
@@ -1615,10 +1614,23 @@ class IndegoHub:
         517, 519, 520, 528, 529, 531,
         # Completion states
         525, 526,
-        # Service/maintenance
-        1025, 1026, 1281, 1537,
+        # Service/maintenance (1537 is intentionally NOT here - see
+        # STUCK_IMMEDIATE_STATES: it is the mower's own "stuck" signal)
+        1025, 1026, 1281,
         # Synthetic
         0, 1, 2, 3, 4, 5,
+    }
+
+    # States where the mower firmware itself is already reporting that it is
+    # stuck/immobilized (per pyIndego's MOWER_STATE_DESCRIPTION_DETAIL: 1537
+    # = "Stuck on lawn, help needed", 1038 = "Mower immobilized"). These are
+    # reported immediately as stuck, without waiting for a movement timeout.
+    STUCK_IMMEDIATE_STATES = {1038, 1537}
+
+    # States considered "actively moving" for position-based stuck detection.
+    STUCK_ACTIVE_CLASSIFICATIONS = {
+        "mowing", "leaving", "returning", "mapping",
+        "spot_mowing", "random_mowing", "zone_mowing",
     }
 
     # Grace period after mowing session starts (seconds)
@@ -3050,7 +3062,7 @@ class IndegoHub:
                     if ENTITY_MOWER_SVG_Y in self.entities:
                         self.entities[ENTITY_MOWER_SVG_Y].state = svg_y
 
-                    # --- Improved stuck detection ---
+                    # --- Stuck detection ---
                     current_state_code = getattr(self._indego_client.state, 'state', None)
                     now = datetime.now()
 
@@ -3059,91 +3071,110 @@ class IndegoHub:
                         stuck = False
                         _LOGGER.debug("State code is None - skipping stuck detection")
                     else:
-                        # 1. Ignored states → never stuck
-                        if current_state_code in self.STUCK_IGNORED_STATES:
+                        state_info = get_mower_state_info(str(current_state_code))
+                        is_mowing = (
+                            state_info is not None
+                            and state_info.get("state") in self.STUCK_ACTIVE_CLASSIFICATIONS
+                        )
+
+                        # A mowing session ends whenever the mower leaves an actively
+                        # moving state (docked, paused, stuck, ...), so the grace period
+                        # applies fresh to every new mowing session instead of only once
+                        # after Home Assistant starts.
+                        if not is_mowing:
+                            self._mowing_session_start_time = None
+
+                        if current_state_code in self.STUCK_IMMEDIATE_STATES:
+                            # The mower firmware itself already reports being
+                            # stuck/immobilized (state 1537 "Stuck on lawn, help
+                            # needed" / 1038 "Mower immobilized") - trust that signal
+                            # immediately instead of waiting for a movement timeout.
+                            stuck = True
+                            self._last_state_code = current_state_code
+                            self._state_change_time = self._state_change_time or now
+                            if self._last_position_change_time is None:
+                                self._last_position_change_time = now
+                            _LOGGER.warning(
+                                "Mower reports itself stuck (state %s: %s)",
+                                current_state_code,
+                                self._indego_client.state_description_detail,
+                            )
+                        elif current_state_code in self.STUCK_IGNORED_STATES:
+                            # 1. Ignored states → never stuck
                             stuck = False
                             _LOGGER.debug(
                                 "Stuck detection ignored for state %s (%s)",
                                 current_state_code,
                                 self._indego_client.state_description_detail
                             )
+                        elif current_state_code != self._last_state_code:
+                            # 2. State has changed → reset timers and allow grace period
+                            self._last_state_code = current_state_code
+                            self._state_change_time = now
+                            self._last_position_change_time = now
+                            self._last_svg_x = svg_x
+                            self._last_svg_y = svg_y
+                            stuck = False
+                            _LOGGER.debug(
+                                "State changed to %s (%s) – resetting stuck timers",
+                                current_state_code,
+                                self._indego_client.state_description_detail
+                            )
+                        elif (now - self._state_change_time).total_seconds() < self.STATE_CHANGE_GRACE_PERIOD:
+                            # 3. Grace period after state change
+                            stuck = False
+                            _LOGGER.debug(
+                                "Still in grace period after state change (%.1fs < %ds)",
+                                (now - self._state_change_time).total_seconds(),
+                                self.STATE_CHANGE_GRACE_PERIOD
+                            )
+                        elif not is_mowing:
+                            # 4. Not an actively moving state – no position-based check
+                            stuck = False
+                            _LOGGER.debug(
+                                "Not mowing – stuck detection skipped (state %s)",
+                                self._indego_client.state_description_detail
+                            )
                         else:
-                            # 2. State change detection
-                            if current_state_code != self._last_state_code:
-                                # State has changed → reset timers and allow grace period
-                                self._last_state_code = current_state_code
-                                self._state_change_time = now
-                                self._last_position_change_time = now
-                                self._last_svg_x = svg_x
-                                self._last_svg_y = svg_y
+                            # 5. Grace period after mowing session starts
+                            if self._mowing_session_start_time is None:
+                                self._mowing_session_start_time = now
+                                _LOGGER.debug("Mowing session started")
+
+                            session_duration = (now - self._mowing_session_start_time).total_seconds()
+                            if session_duration < self.MOWING_SESSION_GRACE_PERIOD:
                                 stuck = False
                                 _LOGGER.debug(
-                                    "State changed to %s (%s) – resetting stuck timers",
-                                    current_state_code,
-                                    self._indego_client.state_description_detail
+                                    "Mowing session in grace period (%.1fs < %ds)",
+                                    session_duration,
+                                    self.MOWING_SESSION_GRACE_PERIOD
                                 )
                             else:
-                                # State unchanged → check if stuck
-                                # 3. Grace period after state change
-                                if self._state_change_time is not None:
-                                    time_since_state_change = (now - self._state_change_time).total_seconds()
-                                    if time_since_state_change < self.STATE_CHANGE_GRACE_PERIOD:
-                                        stuck = False
-                                        _LOGGER.debug(
-                                            "Still in grace period after state change (%.1fs < %ds)",
-                                            time_since_state_change,
-                                            self.STATE_CHANGE_GRACE_PERIOD
-                                        )
-                                    else:
-                                        # 4. Determine if mowing session is active
-                                        is_mowing = 500 <= current_state_code <= 799
-                                        if is_mowing:
-                                            # 5. Grace period after mowing start
-                                            if self._mowing_session_start_time is None:
-                                                self._mowing_session_start_time = now
-                                                _LOGGER.debug("Mowing session started")
+                                # 6. Detect position movement (5px threshold)
+                                moved = (
+                                    self._last_svg_x is None
+                                    or self._last_svg_y is None
+                                    or math.sqrt(
+                                        (svg_x - self._last_svg_x) ** 2
+                                        + (svg_y - self._last_svg_y) ** 2
+                                    ) > 5
+                                )
+                                if moved:
+                                    self._last_svg_x = svg_x
+                                    self._last_svg_y = svg_y
+                                    self._last_position_change_time = now
 
-                                            session_duration = (now - self._mowing_session_start_time).total_seconds()
-                                            if session_duration < self.MOWING_SESSION_GRACE_PERIOD:
-                                                stuck = False
-                                                _LOGGER.debug(
-                                                    "Mowing session in grace period (%.1fs < %ds)",
-                                                    session_duration,
-                                                    self.MOWING_SESSION_GRACE_PERIOD
-                                                )
-                                            else:
-                                                # 6. Detect position movement (5px threshold)
-                                                moved = (
-                                                    self._last_svg_x is None
-                                                    or self._last_svg_y is None
-                                                    or math.sqrt(
-                                                        (svg_x - self._last_svg_x) ** 2
-                                                        + (svg_y - self._last_svg_y) ** 2
-                                                    ) > 5
-                                                )
-                                                if moved:
-                                                    self._last_svg_x = svg_x
-                                                    self._last_svg_y = svg_y
-                                                    self._last_position_change_time = now
-
-                                                # 7. Check position change with state-specific timeout
-                                                timeout = self.STUCK_DETECTION_TIMEOUTS.get(current_state_code, 300)
-                                                time_since_move = (now - self._last_position_change_time).total_seconds()
-                                                stuck = time_since_move > timeout
-                                                if stuck:
-                                                    _LOGGER.warning(
-                                                        "Mower stuck – no position change for %ds (state %d, timeout %ds)",
-                                                        int(time_since_move),
-                                                        current_state_code,
-                                                        timeout
-                                                    )
-                                        else:
-                                            # Not mowing – no stuck detection
-                                            stuck = False
-                                            _LOGGER.debug(
-                                                "Not mowing – stuck detection skipped (state %s)",
-                                                self._indego_client.state_description_detail
-                                            )
+                                # 7. Check position change with state-specific timeout
+                                timeout = self.STUCK_DETECTION_TIMEOUTS.get(current_state_code, 300)
+                                time_since_move = (now - self._last_position_change_time).total_seconds()
+                                stuck = time_since_move > timeout
+                                if stuck:
+                                    _LOGGER.warning(
+                                        "Mower stuck – no position change for %ds (state %d, timeout %ds)",
+                                        int(time_since_move),
+                                        current_state_code,
+                                        timeout
+                                    )
 
                     # Update stuck sensor
                     if ENTITY_MOWER_STUCK in self.entities:

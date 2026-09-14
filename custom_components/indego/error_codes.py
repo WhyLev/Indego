@@ -64,11 +64,16 @@ MOWER_STATE_CODES = {
     "777": {"name": "RET_DOCK_ZONE_CHANGE", "display": "Returning to dock – zone change", "state": "returning"},
 
     # Service/Maintenance (1025+)
+    "1005": {"name": "DOCK_CONNECTION_FAILED", "display": "Connection to dockingstation failed", "state": "error"},
     "1025": {"name": "SERVICE_DIAGNOSTIC_MODE", "display": "Diagnostic mode", "state": "maintenance"},
     "1026": {"name": "SERVICE_EOL_MODE", "display": "EOL mode", "state": "maintenance"},
     "1027": {"name": "SERVICE_REQUESTING_STATUS", "display": "Getting status", "state": "unknown"},
+    "1038": {"name": "MOWER_IMMOBILIZED", "display": "Mower immobilized", "state": "stuck"},
     "1281": {"name": "SW_UPDATE_MODE", "display": "Firmware update", "state": "updating"},
-    "1537": {"name": "LOW_POWER_MODE", "display": "Low power mode", "state": "low_power"},
+    # Confirmed via pyIndego (the library this integration depends on, see
+    # MOWER_STATE_DESCRIPTION_DETAIL / MOWER_STATE_DESCRIPTION in pyIndego/const.py):
+    # 1537 is the mower firmware's own "stuck, needs help" signal, not a power-saving state.
+    "1537": {"name": "STUCK_HELP_NEEDED", "display": "Stuck on lawn, help needed", "state": "stuck"},
     "1792": {"name": "LEAVING_DOCK", "display": "Leaving dock", "state": "leaving"},
 
     # Synthetic States (app-side only)
@@ -113,7 +118,9 @@ DEVICE_ERROR_CODES: Dict[str, Dict[str, Any]] = {
     "109": {"msg": "System error", "severity": "ERROR"},
     "110": {"msg": "Charging station error", "severity": "ERROR"},
     "111": {"msg": "Charging contact error", "severity": "ERROR"},
-    "115": {"msg": "Permanent tactile detected", "severity": "WARNING"},
+    # Confirmed via pyIndego ALERT_ERROR_CODE (this integration's own dependency): 115 is
+    # the mower's "stuck" alert, not a tactile-sensor notice.
+    "115": {"msg": "Mower is stuck", "severity": "ERROR"},
     "126": {"msg": "Charging current/voltage too high", "severity": "ERROR"},
     "127": {"msg": "Charging current/voltage too high", "severity": "ERROR"},
     "128": {"msg": "Cutter motor overload", "severity": "ERROR"},
@@ -137,7 +144,7 @@ DEVICE_ERROR_CODES: Dict[str, Dict[str, Any]] = {
     # Perimeter/Wire errors (149-197)
     "149": {"msg": "Mower out of perimeter limit", "severity": "ERROR"},
     "150": {"msg": "No signal from perimeter wire", "severity": "ERROR"},
-    "151": {"msg": "Waiting for loop signal", "severity": "WARNING"},
+    "151": {"msg": "Perimeter cable signal missing", "severity": "ERROR"},
     "152": {"msg": "Loop signal interference", "severity": "WARNING"},
     "153": {"msg": "Loop signal too weak", "severity": "WARNING"},
     "160": {"msg": "Battery temperature too high", "severity": "WARNING"},
@@ -202,9 +209,12 @@ DEVICE_ERROR_CODES: Dict[str, Dict[str, Any]] = {
     "1000": {"msg": "System error", "severity": "ERROR"},
     "1001": {"msg": "Unknown error", "severity": "ERROR"},
     "1002": {"msg": "Shutdown detected", "severity": "WARNING"},
+    "1005": {"msg": "Mower has not entered the charging station", "severity": "ERROR"},
     "1008": {"msg": "Mower is stuck", "severity": "ERROR"},
     "1108": {"msg": "Inclination angle too large", "severity": "WARNING"},
-    "1138": {"msg": "Last run error", "severity": "ERROR"},
+    # Confirmed via pyIndego ALERT_ERROR_CODE: 1138 is "mower needs help", not a generic
+    # last-run failure.
+    "1138": {"msg": "Mower needs help", "severity": "ERROR"},
     "1146": {"msg": "Orientation filter error", "severity": "ERROR"},
     "1148": {"msg": "On-/Off error. Need PIN code to unlock", "severity": "ERROR"},
     "1156": {"msg": "Unsupported battery pack", "severity": "ERROR"},

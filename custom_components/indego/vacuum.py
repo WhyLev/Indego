@@ -36,6 +36,7 @@ STATE_CLASSIFICATION_TO_ACTIVITY = {
     "random_mowing": VacuumActivity.CLEANING,
     "zone_mowing": VacuumActivity.CLEANING,
     "leaving": VacuumActivity.CLEANING,
+    "stuck": VacuumActivity.ERROR,
     "not_mapped": VacuumActivity.ERROR,
     "no_pin": VacuumActivity.ERROR,
     "disabled": VacuumActivity.ERROR,
